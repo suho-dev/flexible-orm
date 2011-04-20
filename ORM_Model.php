@@ -1,0 +1,876 @@
+<?php
+/**
+ * Definition of the ORM_Model class
+ * @file
+ * @author jarrod.swift
+ */
+namespace ORM;
+
+use ORM\Exceptions;
+
+/**
+ * Base class for ordinary ORM classes
+ *
+ * It is very similar to the old base_model class but has been simplified to
+ * have a more consistent interface and require less code to create model classes.
+ *
+ * \n\n
+ * <b>Basic Usage</b>
+ *
+ * If the default configuration is correct for a model, then all is required
+ * is to create a subclass of ORM_Model
+ * 
+ * \include orm_model.example.php
+ *
+ * The default configuration is simply:
+ *  - Primary key is "id"
+ *  - Table name is lowercase plural of model name (in the example above "cars")
+ *
+ * Alternatively, configuration can be set manually through constants:
+ * - <b>PRIMARY_KEY</b>: sets the primary key for this table, only supports single
+ * keys
+ * - <b>TABLE</b>: sets the table name if it is not just the plural of the model name
+ *
+ * \include orm_model_custom.example.php
+ * 
+ * \n\n
+ * <b>Foreign Keys</b>
+ *
+ * It is possible to fetch an object with related object(s) in a single query. This
+ * only works for the model that has the foreign key in it. For more information,
+ * on configuring foreign keys, see \ref intro_step3 "Define Foreign Keys".
+ *
+ * \include orm_model_foreign.example.php
+ *
+ * \n\n
+ * @todo Exceptions - if model is poorly coded, it should raise a more descriptive
+ *      exception than a PDOException
+ * @todo Implement limit for pagination
+ *
+ */
+abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
+    /**
+     * Map the value of the unique identifier to $_id for simplicity
+     * @see id()
+     * @var mixed $_id
+     */
+    protected $_id;
+
+    /**
+     * Create a new ORM_Model, optionally with some preset options
+     *
+     * @see ORM_Core::__construct()
+     * @param array $values
+     */
+    public function __construct( $values = array() ) {
+        // Get the primary key variable and assign $_id to be a pointer to it
+        $this->_id  = &$this->{$this->PrimaryKeyName()};
+
+        parent::__construct( $values );
+    }
+
+    /*! Find a single object
+     * 
+     *
+     * May be used two ways: as a simple lookup by primary key, or as a more complex
+     * lookup using an array of options.
+     *
+     * <b>Usage: Primary key lookup</b>
+     * @code
+     * // Find car with id=2
+     * @car = Car::Find( 2 );
+     * @endcode
+     *
+     * <b>Usage: Array of options</b>
+     * @code
+     * $minDoors = 3;
+     * $brand    = 'Alfa Romeo';
+     *
+     * // Find the first car that is not an Alfa Romeo where doors is greater than 3
+     * $car      = Car::Find(array(
+     *      'where' => 'doors > ? AND brand NOT LIKE ?',
+     *      'order' => 'colour DESC',
+     *      'values' => array( $minDoors, $brand ),
+     * ));
+     * @endcode
+     *
+     * For more information about the options array, see \ref intro_step4_options "Options Array"
+     * in the \ref getting_started "Getting Started" tutorial.
+     * 
+     * <b>Foreign Keys</b>
+     *
+     * It is possible to fetch an object with related object(s) in a single query. This
+     * only works for the model that has the foreign key in it. For more information,
+     * on configuring foreign keys, see \ref intro_step3 "Define Foreign Keys".
+     *
+     * @code
+     * // Fetch the car with id 1 and include the Owner object
+     * @car = Car::Find( 1, 'Owner' );
+     * echo "This car is owned by ", $car->Owner->name;
+     * @endcode
+     *
+     * @see FindByOptions(), FindAll()
+     * @param mixed $idOrArray
+     *      Either an array of search options or a primary key value. If nothing
+     *      is supplied, the first database entry is returned
+     * @param string|array $findWith
+     *      [optional] A string or array of strings defining the related model
+     *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
+     * @return ORM_Model
+     */
+    public static function Find( $idOrArray = array(), $findWith = false ) {
+        if( is_array($idOrArray) ) {
+            return static::FindByOptions( $idOrArray, $findWith );
+        } else {
+            return static::FindBy( static::PrimaryKeyName(), $idOrArray, $findWith );
+        }
+    }
+
+    /**
+     * Find all matching objects
+     *
+     * Same syntax as Find() except will return a ModelCollection of all matched
+     * items, rather than just the first matching object.
+     *
+     * @see Find(), FindAllBy()
+     * @param array $optionsArray
+     *      An array of options for finding objects. If not supplied, this will
+     *      return all objects of this type stored in the database. For more
+     *      information about the options array, see \ref intro_step4_options "Options Array"
+     *      in the \ref getting_started "Getting Started" tutorial
+     * @param string|array $findWith
+     *      [optional] A string or array of strings defining the related model
+     *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
+     * @return ModelCollection
+     *      A collection of ORM_Model subclasses
+     */
+    public static function FindAll( $optionsArray = array(), $findWith = false ) {
+        $df     = static::DataFactory();
+        $sql    = static::_BuildSQL( $optionsArray, static::TableName(), $findWith );
+        $query  = $df::Get( $sql, static::DatabaseConfigName() );
+
+        if( isset($optionsArray['values']) ) {
+            $query->execute($optionsArray['values']);
+        } else {
+            $query->execute();
+        }
+
+        return $query->fetchAllInto( get_called_class() );
+    }
+
+    /**
+     * Allow for specialty "FindBy" functions
+     *
+     * Objects can retrieved using (for example)
+     *
+     * @code
+     * Car::FindByColour( 'red' );
+     * Car::FindAllByColour( 'red' );
+     * Car::FindAllByDoors( 3, '>=' );
+     * @endcode
+     *
+     * @see FindBy(), FindAllBy()
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     */
+    public static function  __callStatic($name, $arguments) {
+        if( preg_match('/^FindBy(.+)$/', $name, $matches) ) {
+            $findWith = isset($arguments[1]) ? $arguments[1] : false;
+
+            return static::FindBy( self::_LowercaseFirst($matches[1]), $arguments[0], $findWith );
+
+        } elseif(  preg_match('/^FindAllBy(.+)$/', $name, $matches) ) {
+            $findWith = isset( $arguments[2] ) ? $arguments[2] : false;
+            $operator = isset( $arguments[1] ) ? $arguments[1] : '=';
+
+            return static::FindAllBy( self::_LowercaseFirst($matches[1]), $arguments[0], $operator, $findWith );
+        }
+    }
+
+    /**
+     * Convert the first character of a string to lowercase
+     *
+     * Used by __callStatic for FindByFieldName calls.
+     * 
+     * @param string $name
+     *      The string to be changed
+     * @return string
+     *      With the first character changed to lowercase
+     */
+    private static function _LowercaseFirst( $name ) {
+        $name{0} = strtolower( $name{0} );
+        return $name;
+    }
+
+    /**
+     * Find the first object where field equals value
+     *
+     * This would not be called directly ordinarily, instead call the "magic" method
+     * as shown below. It is also called by Find(), which is a shortcut to \c FindById()
+     * (assuming that the primary key is "id").
+     *
+     * <b>Usage</b>:
+     * @code
+     * // Get the first car owned by owner_id 4
+     * $car = Car::FindByOwner_id( 4 );
+     * @endcode
+     *
+     * @param string $field
+     *      The field name to search on
+     * @param string $value
+     *      The value to that field must contain
+     * @param string|array $findWith
+     *      [optional] A string or array of strings defining the related model
+     *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
+     * @return ORM_Model
+     */
+    public static function FindBy( $field, $value, $findWith = false ) {
+        $df         = static::DataFactory();
+        $tableName  = static::ClassName();
+        $sql        = static::_BuildSQL(
+            array( 'where' =>  "`$tableName`.`$field` = :$field" ),
+            static::TableName(),
+            $findWith
+        );
+
+        $query      = $df::Get( "$sql LIMIT 1", static::DatabaseConfigName() );
+        
+        $query->bindValue( ":$field", $value );
+        $query->execute();
+
+        return $query->fetchInto( get_called_class() );
+    }
+
+    /**
+     * Find a single object using the supplied options array
+     *
+     * See the instructions for ORM_Model::Find()
+     *
+     * @param array $optionsArray
+     *      Array of options. For more information about the options array, see
+     *      \ref intro_step4_options "Options Array"  in the
+     *      \ref getting_started "Getting Started" tutorial.
+     * @param string|array $findWith
+     *      [optional] A string or array of strings defining the related model
+     *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
+     * @return ORM_Model
+     */
+    public static function FindByOptions( $optionsArray, $findWith = false ) {
+        $df     = static::DataFactory();
+        $sql    = static::_BuildSQL( $optionsArray, static::TableName(), $findWith );
+        $sql    .= "LIMIT 1";
+        $query  = $df::Get( $sql, static::DatabaseConfigName() );
+
+        if( isset($optionsArray['values']) ) {
+            $query->execute($optionsArray['values']);
+        } else {
+            $query->execute();
+        }
+
+        return $query->fetchInto( get_called_class() );
+    }
+
+    /**
+     * Helper function for creating SQL statements based on the options array
+     *
+     * @see FindByOptions(), FindAll(), Find()
+     * @param array $optionsArray
+     *      Array of options. For more information about the options array, see
+     *      \ref intro_step4_options "Options Array" in the
+     *      \ref getting_started "Getting Started" tutorial
+     * @param string $table
+     *      Table name
+     * @param string|array $findWith
+     *      [optional] A string or array of strings defining the related model
+     *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
+     * @return string
+     */
+    protected static function _BuildSQL( $optionsArray, $table, $findWith = false ) {
+        $className  = static::ClassName();
+        
+        if( $findWith ) {
+            // This will convert a single className string into an array, or
+            // leave it unchanged if it was already an array
+            $findWith = (array)$findWith;
+            
+            $models = array( "`$className`.*" );
+            $joins  = '';
+
+            foreach( $findWith as $nsFetchClass ) {
+                $fetchTable = $nsFetchClass::TableName();
+                $primaryKey = $nsFetchClass::PrimaryKeyName();
+                $foreignKey = static::ForeignKey( $nsFetchClass );
+                $fetchClass = basename( str_replace('\\', '//', $nsFetchClass) );
+
+                $models[]   = "`$fetchClass`.*";
+                $joins      .= "LEFT JOIN `$fetchTable` AS `$fetchClass` "
+                            . "ON (`$className`.$foreignKey = `$fetchClass`.$primaryKey) ";
+            }
+
+            $sql = 'SELECT '.implode(', ', $models)." FROM `$table` AS `$className` $joins";
+
+        } else {
+            $sql = "SELECT `$className`.* FROM `$table` AS `$className` ";
+        }
+
+        if( isset($optionsArray['where']) ) {
+            $sql .= "WHERE {$optionsArray['where']} ";
+        }
+
+        if( isset($optionsArray['order']) ) {
+            $sql .= "ORDER BY {$optionsArray['order']} ";
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Find all objects where a single field meets the requirements
+     *
+     * This would not be called directly ordinarily, instead call the "magic" method
+     * as shown below.
+     *
+     * <b>Usage</b>:
+     * \include orm_model.findAllBy.example.php
+     *
+     * @todo if operator is IN then allow $value to be an array
+     * @todo verify operator type
+     *
+     * @param string $field
+     *      The field name to search on
+     * @param string $value
+     *      The value to compare for finding objects
+     * @param string $operator
+     *      [optional] A valid SQL comparison operator (Default =)
+     * @param string|array $findWith
+     *      [optional] A string or array of strings defining the related model
+     *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
+     * @return ModelCollection
+     *      Return the ModelCollection of objects
+     */
+    public static function FindAllBy( $field, $value, $operator = '=', $findWith = false ) {
+        $df         = static::DataFactory();
+        $className  = static::ClassName();
+        $sql        = static::_BuildSQL(
+            array( 'where' =>  "`$className`.`$field` $operator :$field" ),
+            static::TableName(),
+            $findWith
+        );
+        
+        $query = $df::Get( $sql, static::DatabaseConfigName() );
+
+        $query->bindParam( ":$field", $value );
+
+        $query->execute();
+
+        return $query->fetchAllInto( get_called_class() );
+    }
+
+    /**
+     * Delete a single item from the database without having to fetch it first
+     * 
+     * @see delete()
+     * @param string $id
+     *      The primary key value specifying which item to delete
+     */
+    public static function Destroy( $id ) {
+        $tableName  = static::TableName();
+        $key        = static::PrimaryKeyName();
+        $df         = static::DataFactory();
+        $query      = $df::Get(
+                "DELETE FROM `$tableName` WHERE `$key` = :id",
+                static::DatabaseConfigName()
+        );
+
+        $query->bindParam( ':id', $id );
+        $query->execute();
+    }
+
+    /**
+     * Delete a single item from the database
+     *
+     * The object will remain populated.
+     *
+     * \include orm_model.delete.example.php
+     *
+     * @todo what happens if it's not saved? Probably should do nothing
+     *
+     */
+    public function delete() {
+        $tableName  = static::TableName();
+        $key        = static::PrimaryKeyName();
+        $df         = static::DataFactory();
+        $query      = $df::Get(
+                "DELETE FROM `$tableName` WHERE `$key` = :id",
+                static::DatabaseConfigName()
+        );
+
+        $query->bindParam( ':id', $this->_id );
+        $query->execute();
+    }
+
+    /**
+     * Save an object to the database
+     *
+     * Either creates a new item or updates an existing one. First checks that
+     * the object is valid (see valid()). Returns false if not valid and will
+     * not attempt to save the object.
+     *
+     * <b>Usage:</b>
+     * \include orm_model.save.example.php
+     *
+     * \note Changing the primary key on an existing object will create
+     * a new record and leave the old one still in the database. If you want to
+     * change the primary key, first call delete() then change the key and call
+     * save()
+     *
+     * \n
+     * <b>Pre- or Post-Processing Hooks</b>
+     *
+     * There are 6 pre and post processing hooks available for this method, to
+     * allow for special processing to be done before or after saving. They are
+     * called in the following order:
+     *
+     * - beforeSave()
+     * \copydetails beforeSave()
+     * - beforeUpdate()
+     * \copydetails beforeUpdate()
+     * - beforeCreate()
+     * \copydetails beforeCreate()
+     * - afterUpdate()
+     * \copydetails afterUpdate()
+     * - afterCreate()
+     * \copydetails afterCreate()
+     * - afterSave()
+     * \copydetails afterSave()
+     *
+     * \n\n
+     *
+     * @see _update(), _create()
+     *
+     * @param boolean $forceCreate
+     *      Skips the load test for speed, always resulting in a new object
+     * @return boolean
+     *      True if successful
+     */
+    public function save( $forceCreate = false) {
+        $this->beforeSave();
+
+        if( !$forceCreate && isset($this->_id) && $this->load() ) {
+            $result = $this->_update();
+        } else {
+            $result = $this->_create();
+        }
+
+        return $result ? $this->afterSave() || true : false;
+    }
+
+    /**
+     * Update an existing object
+     *
+     * <b>How this works:</b>
+     * - call load() Compare to existing
+     * - Generate query
+     * - Bind params
+     * - Execute
+     *
+     * @note If the key value is set but not record exists, this method will exit
+     * and invoke _create() instead
+     *
+     * @see save()
+     * @return boolean
+     *      true on successful update
+     */
+    private function _update() {
+        
+        $this->beforeUpdate();
+
+         if( !$this->valid() ) {
+            return false;
+        }
+        
+        $changedFields = $this->changedFields();
+
+        if( count($changedFields) ) {
+            $table  = static::TableName();
+            $key    = static::PrimaryKeyName();
+            $set    = array_map(function($field) {
+                return "`$field` = :$field";
+            }, $changedFields );
+            
+            $sql = "UPDATE `$table` SET ".implode( ', ', $set );
+            $sql .= " WHERE `$key` = :$key";
+
+            $changedFields[] = $key;
+            $df              = static::DataFactory();
+            $query = $df::Get( $sql, static::DatabaseConfigName() )->bindObject($this, $changedFields);
+
+            if( $query->execute() ) {
+                $this->afterUpdate();
+
+                return true;
+            }
+            
+        } else {
+            // No changes made
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Create a new record in the database
+     *
+     * If the primary key is an \c autoincrement key and it was not specified
+     * in the object, the assigned primary key will be retrieved and added to
+     * the object.
+     *
+     * @code
+     * $car = new Car();
+     * // ... setup properties here
+     *
+     * $car->save();
+     *
+     * echo "Car saved with id: ", $car->id();
+     * @endcode
+     *
+     * <b>How this works:</b>
+     *
+     * - Get field names from database
+     * - Generate SQL
+     * - Bind params
+     * - Execute query
+     *
+     * @return boolean
+     *      True on succesful update
+     */
+    private function _create() {
+        $this->beforeCreate();
+
+         if( !$this->valid() ) {
+            return false;
+        }
+
+        $table  = static::TableName();
+        $fields = $this->_includedFields( $this->DescribeTable() );
+        $df     = static::DataFactory();
+
+        $sql    = "INSERT INTO `$table` (`".implode('`, `',$fields)."`)";
+        $sql    .= " VALUES ( :".implode(', :',$fields)." )";
+        $query  = $df::Get( $sql, static::DatabaseConfigName() )->bindObject($this, $fields);
+
+        $result = $query->execute();
+        
+        if( $result ) {
+            if( is_null($this->_id) ) {
+                $this->_id = $df::LastInsertId();
+            }
+
+            $this->afterCreate();
+            
+            return true;
+            
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Filter field names to only include fields that are in this object
+     * 
+     * This allows for database defaults to work.
+     *
+     * @see _create(), DescribeTable()
+     *
+     * @param array $allFields
+     *      Array of all field names (from ORM_Model::DescribeTable())
+     * @return array
+     *      Array of fields names representing each database field that is actually
+     *      present in this object
+     */
+    private function _includedFields( $allFields ) {
+        $me = $this;
+        return array_filter($allFields, function( $field ) use( $me ){
+            return isset($me->$field);
+        });
+    }
+
+    /**
+     * Get an array listing all the fields stored in the database for this object
+     *
+     * @return array
+     *      An array of field names representing each database field
+     */
+    public static function DescribeTable() {
+        $table  = static::TableName();
+        $df     = static::DataFactory();
+        $query  = $df::Get( "DESCRIBE `$table`", static::DatabaseConfigName() );
+        $query->execute();
+        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+
+        return array_map(function($row){
+            return $row['Field'];
+        }, $result );
+    }
+
+    /**
+     * Get the value of the primary key for this object
+     *
+     * @param mixed $value
+     *      [optional] If specified, set the primary key value for this object
+     * @return mixed
+     */
+    public function id( $value = null ) {
+        if( !is_null($value) ) {
+            $this->_id = $value;
+        }
+        
+        return $this->_id;
+    }
+
+    /**
+     * The default validity check (none) .
+     *
+     * Override this for individual models to check for validity. The default
+     * implementation looks for error messages that have been set by validationError()
+     *
+     * @return boolean
+     *      If this method returns false for a particular object, it is considered
+     *      not in a "valid" state and so it cannot be saved using save()
+     */
+    public function valid() {
+        return count($this->_errorMessages) == 0;
+    }
+
+    /**
+     * Get the database configuration group name for this model
+     *
+     * See \ref intro_step2_advanced "Multiple Databases" for more information
+     * 
+     * @return string
+     */
+    public static function DatabaseConfigName() {
+        return defined("static::DATABASE") ? static::DATABASE : PDOFactory::DEFAULT_DATABASE;
+    }
+
+    /**
+     * Get the datafactory classname for this model
+     *
+     * Advanced feature that allows you to use an alternative to the PDOFactory
+     * class. The class should implement the DataFactory interface.
+     *
+     * @return string
+     *      Normally returns "PDOFactory"
+     */
+    public static function DataFactory() {
+        return defined("static::DATAFACTORY") ?  __NAMESPACE__."\\".static::DATAFACTORY : __NAMESPACE__.'\PDOFactory';
+    }
+
+    /**
+     * Get the table name for a given model
+     * 
+     * The table name is either guessed from the model name or explicitly defined
+     * by creating a constant \c TABLE in the class.
+     *
+     * See \ref intro_step2 "Getting Started: 2. Define Model Classes" for more information
+     *
+     * @return string
+     * @see _makeTableName()
+     */
+    public static function TableName() {
+        return defined("static::TABLE") ? static::TABLE : self::_makeTableName(get_called_class());
+    }
+
+    /**
+     * Get the primary key for a given table
+     *
+     * This is assumed to be <i>"id"</i> except for models where the constant \c PRIMARY_KEY
+     * has been set.
+     *
+     * See \ref intro_step2 "Getting Started: 2. Define Model Classes" for more information
+     * 
+     * @return string
+     */
+    public static function PrimaryKeyName() {
+        return defined("static::PRIMARY_KEY") ? static::PRIMARY_KEY : 'id';
+    }
+
+    /**
+     * Get the name of the foreign key that relates another model to this one
+     *
+     * Defaults to <i>modelName</i>_<i>modelPrimaryKey</i> (lowercase). Can be
+     * overriden by defining constant \c FOREIGN_KEY_<i>{modelName}</i> to the
+     * foreign key name.
+     *
+     * See \ref intro_step2 "Getting Started: 2. Define Model Classes" for more information
+     * 
+     * @param string $modelName
+     *      The name of the model to join to this one
+     * @return string
+     */
+    public static function ForeignKey( $modelName ) {
+        $model = basename( str_replace('\\', '//', $modelName) );
+
+        $constName = "FOREIGN_KEY_".strtoupper( $model );
+        $defaultFK = strtolower($model).'_'.$modelName::PrimaryKeyName();
+        
+        return defined("static::$constName") ? constant("static::$constName") : $defaultFK;
+    }
+
+    /**
+     * Assume the name of the table from a given model name
+     * 
+     * Basically just a plural lowercase version of the model name
+     *
+     * @note Currently this only allows for the simplest of plurals (i.e. adding an s)
+     *
+     * @todo Implement more complex plural name generator
+     *
+     * @param string $model_name
+     *      The name of the model.
+     * @return string
+     * @see TableName()
+     */
+    private static function _makeTableName( $model_name ) {
+        $class = strtolower( basename(str_replace( '\\', '/', $model_name)) );
+
+        return "{$class}s";
+    }
+
+    /**
+     * Get the base classname
+     * 
+     * @return string
+     *      The class name that is calling this function, stripped of namespacing
+     */
+    public static function ClassName() {
+        return basename(str_replace('\\', '//', get_called_class()));
+    }
+
+    /**
+     * Get the possible values of an ENUM field
+     *
+     * \note Only works for MySQL ENUM datatypes
+     *
+     * This is useful for rapid development as it allows you to only change the
+     * ENUM values at the SQL side, but it is going to be slightly slower and
+     * cause higer database load. If using this in production cache the result.
+     *
+     * @param string $fieldName
+     *      The name of the database field you wish to check. If it is not an
+     *      ENUM field, an empty array will be returned.
+     * @return array
+     *      Array of strings containing the valid field values. Is indexed from 1
+     *      to match the MYSQL index. Will be empty if it cannot determine values
+     *      (ie it's not a MySQL table or it's not an ENUM field).
+     */
+    public static function PossibleValues( $fieldName ) {
+        $query = PDOFactory::Get('SHOW COLUMNS FROM `' . static::TableName() . '` LIKE "' . $fieldName . '"');
+        $query->execute();
+
+        $results = $query->fetch();
+        $fields  = array();
+
+        if( preg_match_all('/\'(.*?)\'/', $results[1], $fieldsZeroIndexed) ) {
+            // Convert to 1-indexed array
+            $fields = array_combine(
+                    range( 1 ,count($fieldsZeroIndexed[1])),
+                    $fieldsZeroIndexed[1]
+            );
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Load the rest of the details into a partial model
+     *
+     * The _originalValues array will be updated to reflect the values retrieved
+     * from the database.
+     *
+     * <b>Usage</b>
+     * \include orm_model.load.example.php
+     *
+     * @note If no there is no pre-existing object, nothing is loaded
+     * 
+     * @todo Throw an exception if this is called on an object with no _id
+     *
+     * @return boolean
+     *      true if an existing object existed
+     */
+    public function load() {
+        if( $stored_object = static::Find( $this->_id ) ) {
+            $attributes = $stored_object->attributes();
+
+            foreach( $attributes as $attribute ) {
+                if( !isset($this->$attribute) ) {
+                    $this->$attribute = $stored_object->$attribute;
+                }
+
+                $this->setOriginalValue($attribute, $stored_object->$attribute);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * For debugging, return the model name and primary key value when casting
+     * an ORM_Model object to string
+     * 
+     * @return string
+     */
+    public function __toString() {
+        return get_called_class()." [{$this->id()}]";
+    }
+
+    /**
+     * Override this method to perform an action \e before an object is saved to
+     * the database (creating and updating).
+     *
+     * @note This is called \e before valid(), meaning it is always called when
+     * saving
+     */
+    public function beforeSave() {}
+
+    /**
+     * Override this method to perform an action \e before an existing object is
+     * updated in the database.
+     *
+     * @note This is called \e before valid(), meaning it is always called when
+     * updating
+     */
+    public function beforeUpdate() {}
+
+    /**
+     * Override this method to perform an action \e before a new object is
+     * created in the database.
+     *
+     * @note This is called \e before valid(), meaning it is always called when
+     * creating
+     */
+    public function beforeCreate() {}
+
+    /**
+     * Override this method to perform an \e after before a new object is
+     * created in the database. Only called on success. The object will have its
+     * $_id field populated.
+     */
+    public function afterCreate() {}
+
+    /**
+     * Override this method to perform an action \e after an existing object is
+     * updated in the database. Only called on success.
+     */
+    public function afterUpdate() {}
+
+    /**
+     * Override this method to perform an action \e after an object is saved to
+     * the database (creating and updating). Only called on success.
+     */
+    public function afterSave() {}
+}
