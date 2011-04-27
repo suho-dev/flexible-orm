@@ -11,6 +11,10 @@ namespace ORM\Tests\Mock;
 class SDBCar extends \ORM\SDB\ORMModelSDB {
     const TABLE = 'cars';
 
+    public $brand;
+    public $colour;
+    public $doors;
+
     private $_privateTest = 'should not be saved';
 
     public function privateTest( $value = null) {

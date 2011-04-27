@@ -489,6 +489,21 @@ class ORM_ModelTest extends ORMTest {
         $ford->save();
     }
 
+    public function testUpdateArray() {
+        $options = array(1=>'Sedan', 2=>'Coupe');
+        $type = $options[rand(1,2)];
+        $car = new Mock\Car(array(
+            'id'    => 1,
+            'type'  => $type
+        ));
+
+        $this->assertTrue( $car->save() );
+
+        $alfa = Mock\Car::Find(1);
+        $this->assertEquals('Alfa Romeo', $alfa->brand );
+        $this->assertEquals($type, $alfa->type );
+    }
+
     /**
      * Test by ensuring the correct global variables were set and that they
      * were set in order.
@@ -517,6 +532,7 @@ class ORM_ModelTest extends ORMTest {
 
         $fred->delete();
     }
+    
     public function testBeforeAfterUpdate() {
         $tim = Mock\Elephant::Find( 'Tim' );
         $tim->weight++;

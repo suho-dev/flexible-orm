@@ -317,11 +317,11 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
 
         $attributes = $this->_getAttributesFromInsertQuery( $this->_queryString );
         $domain     = $this->_getDomainFromQuery();
-        
+
         // Remove itemName and store it or generate our own itemName
-        if( isset($fields['itemName()']) ) {
-            $itemName = $fields['itemName()'];
-            unset($fields['itemName()']);
+        if( isset($attributes['itemName()']) ) {
+            $itemName = $attributes['itemName()'];
+            unset($attributes['itemName()']);
         } else {
             $itemName = $this->_generateItemName( $domain );
         }
@@ -340,9 +340,15 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      *      Associative array where keys will be used as field names
      */
     private function _getAttributesFromInsertQuery( $query ) {
+        $query = str_replace('itemName()', 'itemName[]', $query, $itemNamePresent);
         preg_match_all('/INTO ([a-z_0-9A-Z]+) \(([^)]+)\) VALUES \((.+) \)/i', $query, $matches );
         $fields = explode( ', ', $matches[2][0] );
         $values = explode( ', ', $matches[3][0] );
+
+        if( $itemNamePresent ) {
+            $i = array_search('itemName[]', $fields);
+            $fields[$i] = 'itemName()';
+        }
 
         $attributes = array();
         for( $i = 0; $i < count($values); $i++ ) {

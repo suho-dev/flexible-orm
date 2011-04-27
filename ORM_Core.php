@@ -29,7 +29,7 @@ abstract class ORM_Core {
      *
      * @var array $_originalValues
      */
-    protected  			$_originalValues;
+    protected  			$_originalValues = array();
 
     /**
      * Instantiate the object with supplied default values
@@ -188,6 +188,14 @@ abstract class ORM_Core {
     }
 
     /**
+     * Get the original values of this object
+     * @return array
+     */
+    public function originalValues() {
+        return $this->_originalValues;
+    }
+
+    /**
      * Set an individual properties "original" value
      * 
      * @param string $property
@@ -209,7 +217,6 @@ abstract class ORM_Core {
         if( !is_null($values) ) {
             foreach( $values as $field => $value ) {
                 $this->$field = $value;
-                $this->_originalValues[$field] = $value;
             }
         }
     }

@@ -76,8 +76,6 @@ class SDBSessionHandler {
         $this->_sdb->set_region(\AmazonSDB::REGION_APAC_SE1);
         $this->_sdb->set_cache_config('apc');
 
-        $this->_sdb->create_domain( SDBSession::TableName() );
-
         return true;
     }
 

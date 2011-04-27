@@ -35,7 +35,7 @@ class ORMModelSDB extends \ORM\ORM_Model {
         // to ensure it only gets the publicly accessible attributes
         $publicPropertiesFunction = (function() use( $item ) {
             $vars = get_object_vars($item);
-            unset($vars['itemName()']);
+//            unset($vars['itemName()']);
 
             return array_keys($vars);
         });
@@ -79,9 +79,16 @@ class ORMModelSDB extends \ORM\ORM_Model {
                 $decodedValue = SDBStatement::DecodeValue($sanitizedValue);
 
                 $this->$field = $decodedValue;
-                $this->_originalValues[$field] = $decodedValue;
             }
         }
+    }
+
+    /**
+     * Rtturn the attributes of this object that will be stored
+     * @return array
+     */
+    public function attributes() {
+        return empty($this->_originalValues) ? self::DescribeTable() : array_keys($this->_originalValues);
     }
 }
 ?>

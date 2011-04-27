@@ -29,6 +29,15 @@ class ORMModelSDBTest extends ORMTest {
 
     }
 
+    public function testDescribe() {
+        $table = Mock\SDBCar::DescribeTable();
+
+        $this->assertEquals( 4, count($table), "Got: ".implode(', ', $table) );
+        $this->assertTrue( in_array('brand', $table ) );
+        $this->assertTrue( in_array('colour', $table ) );
+        $this->assertTrue( in_array('doors', $table ) );
+    }
+
     protected function tearDown() {
         $items = $this->object->select("SELECT * FROM ".self::DOMAIN." WHERE brand = 'Ford'");
         foreach($items as $id => $item ) {
@@ -118,13 +127,13 @@ class ORMModelSDBTest extends ORMTest {
         $car->brand     = 'Ford';
         $car->colour    = 'Blue';
         $car->doors     = 8;
-        $car->save(); // Create
+        $this->assertTrue( $car->save(), "Failed to save: ".$car->errorMessagesString() );
 
         $this->assertEquals( 'Blue', Mock\SDBCar::Find($car->id())->colour );
 
         $car->colour = 'Red';
         $car->doors  = 6;
-        $car->save(); // Update!
+        $this->assertTrue( $car->save(), "Failed to save: ".$car->errorMessagesString() );
 
         $storedCar = Mock\SDBCar::Find($car->id());
         $this->assertEquals( $car->id(), $storedCar->id() );
@@ -243,6 +252,18 @@ class ORMModelSDBTest extends ORMTest {
 
         $fetched = Mock\SDBOwner::Find( $owner->id() );
         $this->assertEquals( $owner->name, $fetched->name );
+    }
+
+    public function testCreateWithID() {
+        $owner = new Mock\SDBOwner();
+        $owner->name = 'MyNewOwner';
+        $id = rand(1, 999999999). 'myID'.rand(1,100);
+        $owner->id($id);
+
+        $this->assertTrue( $owner->save(true), "Failed saving: ".$owner->errorMessagesString() );
+
+        $stored = Mock\SDBOwner::Find($id);
+        $this->assertEquals( $owner->name, $stored->name );
     }
 }
 ?>
