@@ -153,6 +153,24 @@ class ORMModelSDBTest extends ORMTest {
         $this->assertFalse( Mock\SDBCar::Find($car->id()), "Found car when it should not exist" );
     }
 
+    public function testDestroy() {
+        $car            = new Mock\SDBCar();
+        $car->brand     = 'Ford';
+        $car->colour    = 'Blue';
+        $car->doors     = 8;
+        $this->assertTrue( $car->save(), "Unable to save car for deletion!" );
+
+        $car2            = new Mock\SDBCar();
+        $car2->brand     = 'Ford';
+        $car2->colour    = 'Red';
+        $car2->doors     = 6;
+        $car2->id( $car->id() );
+        $this->assertTrue( $car->save(true), "Unable to save 2nd lot of car attributes for deletion!" );
+
+        Mock\SDBCar::Destroy( $car->id() );
+        $this->assertFalse( Mock\SDBCar::Find($car->id()), "Found car when it should not exist" );
+    }
+
     public function testUpdateChangeItemName() {
         $this->markTestIncomplete("Test not implemented");
     }

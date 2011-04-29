@@ -34,23 +34,23 @@ class GdataTest extends ORMTest {
         );
     }
 
-    public function testRows() {
-        $user       = Configuration::GoogleData('user');
-        $pass       = Configuration::GoogleData('password');
-        $service    = \Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;;
-        $httpClient = \Zend_Gdata_ClientLogin::getHttpClient($user, $pass, $service);
-        $gdClient   = new \Zend_Gdata_Spreadsheets($httpClient);
-
-        $key        = 'tUp-3zdla2ly7gqJEreNZ2g';
-        $query = new \Zend_Gdata_Spreadsheets_ListQuery();
-        $query->setSpreadsheetKey($key);
-//        $query->setWorksheetId(0);
-        $listFeed = $gdClient->getListFeed($query);
-        
-        $this->_printFeed( $listFeed );
-
-        $this->assertTrue(false);
-    }
+//    public function testRows() {
+//        $user       = Configuration::GoogleData('user');
+//        $pass       = Configuration::GoogleData('password');
+//        $service    = \Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;;
+//        $httpClient = \Zend_Gdata_ClientLogin::getHttpClient($user, $pass, $service);
+//        $gdClient   = new \Zend_Gdata_Spreadsheets($httpClient);
+//
+//        $key        = 'tUp-3zdla2ly7gqJEreNZ2g';
+//        $query = new \Zend_Gdata_Spreadsheets_ListQuery();
+//        $query->setSpreadsheetKey($key);
+////        $query->setWorksheetId(0);
+//        $listFeed = $gdClient->getListFeed($query);
+//
+//        $this->_printFeed( $listFeed );
+//
+//        $this->assertTrue(false);
+//    }
 
     private function _printFeed($feed)
     {

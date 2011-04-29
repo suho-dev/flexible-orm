@@ -573,12 +573,13 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             throw new Exceptions\ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
+        $consistentRead = $className::EnforceReadConsistency();
         $optionsArray = array(
-            'ConsistentRead' => $className::EnforceReadConsistency()
+            'ConsistentRead' => $consistentRead
         );
 
         $this->_simplifyQuery($className);
-        $this->_result = self::$_sdb->select( $this->_queryString, $optionsArray )->getAll();
+        $this->_result = self::$_sdb->select( $this->_queryString, $optionsArray )->getAll($consistentRead == 'true');
 
         $collection = new \ORM\ModelCollection();
 
@@ -647,5 +648,15 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             'NextToken'      => $nextToken
         ));
     }
+
+    /**
+     * Get the active SDB connection
+     * @return AmazonSDB
+     */
+    public static function GetSDBConnection() {
+        self::_InitSDBConnection();
+        return self::$_sdb;
+    }
 }
 ?>
+

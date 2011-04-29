@@ -133,17 +133,19 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      *       others, except maybe getAttributes if you have a large number of
      *       attributes or listDomains if you have a lot.
      *
+     * @param boolean $consistentRead
+     *      [optional] defaults to false. Tell SDB whether or not to force consistency.
      * return SDBResponse
      *      The current SDBResponse item is returned for convenience
      */
-    public function getAll() {
+    public function getAll($consistentRead = false) {
         if( isset($this->body->SelectResult) ) {
             $result = $this;
             $query  = $this->getQuery();
             $count  = 0;
 
             while( $result->nextToken() ) {
-                $result = SDBStatement::Query( $query, true, $result->nextToken() );
+                $result = SDBStatement::Query( $query, $consistentRead, $result->nextToken() );
 
                 foreach( $result as $key => $item ) {
                     $this->_items[$key] = $item;
@@ -153,7 +155,6 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
             }
         }
         
-
         return $this;
     }
 

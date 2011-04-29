@@ -21,11 +21,6 @@ namespace ORM\SDB;
  */
 class SDBSessionHandler {
     /**
-     * @var AmazonSDB $_sdb
-     */
-    private $_sdb;
-
-    /**
      * @var SDBSessionHandler $_sessionHandler
      */
     private static $_sessionHandler;
@@ -70,12 +65,19 @@ class SDBSessionHandler {
         return self::$_sessionHandler;
     }
 
+    /**
+     * Currently does nothing
+     *
+     * @todo The $sessionName should change the table name for SDBSession
+     *
+     * @param string $savePath
+     *      Not currently used
+     * @param string $sessionName
+     *      Not currently used
+     * @return boolean
+     *      Always returns true
+     */
     public function open( $savePath, $sessionName ) {
-        $this->_sdb = new \AmazonSDB();
-        $this->_sdb->set_response_class( __NAMESPACE__.'\SDBResponse');
-        $this->_sdb->set_region(\AmazonSDB::REGION_APAC_SE1);
-        $this->_sdb->set_cache_config('apc');
-
         return true;
     }
 
@@ -95,7 +97,7 @@ class SDBSessionHandler {
         $session->data  = $data;
         $session->id( $id );
         
-        $session->save( true );
+        $session->save();
     }
 
     public function destroy( $id ) {
