@@ -66,6 +66,24 @@ class ORMModelSDB extends \ORM\ORM_Model {
     }
 
     /**
+     * Create the SDB domain for this model
+     *
+     * This action is idempotent (can be called repeatedly with no ill-effect)
+     * though it should not be called every time the script is run, since it
+     * may be slightly slower.
+     *
+     * @return string
+     *      Returns the domain name created (will be the same as calling
+     *      ORM_Model::TableName())
+     */
+    public static function CreateDomain() {
+        $domain_name = static::TableName();
+        SDBStatement::GetSDBConnection()->create_domain($domain_name);
+
+        return $domain_name;
+    }
+
+    /**
      * (re)sets the all the attribute values for this object
      *
      * Overrides the core version to allow decoding of manually escaped values
