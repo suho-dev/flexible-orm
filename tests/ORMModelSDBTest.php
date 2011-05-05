@@ -32,7 +32,7 @@ class ORMModelSDBTest extends ORMTest {
     public function testDescribe() {
         $table = Mock\SDBCar::DescribeTable();
 
-        $this->assertEquals( 4, count($table), "Got: ".implode(', ', $table) );
+        $this->assertEquals( 5, count($table), "Got: ".implode(', ', $table) );
         $this->assertTrue( in_array('brand', $table ) );
         $this->assertTrue( in_array('colour', $table ) );
         $this->assertTrue( in_array('doors', $table ) );
@@ -282,6 +282,38 @@ class ORMModelSDBTest extends ORMTest {
 
         $stored = Mock\SDBOwner::Find($id);
         $this->assertEquals( $owner->name, $stored->name );
+    }
+
+    public function testFindWith() {
+        $this->_setupForeignKeysTest();
+        
+        $carWithOwner = Mock\SDBCar::FindByBrand( 'Volkswagen', '\ORM\Tests\Mock\SDBOwner');
+
+        $this->assertEquals( 'MyCarsOwner', $carWithOwner->SDBOwner->name );
+    }
+
+    public function testFindAllWith() {
+        $this->_setupForeignKeysTest();
+        $carsWithOwners = Mock\SDBCar::FindAll(array(), '\ORM\Tests\Mock\SDBOwner');
+
+        foreach($carsWithOwners as $car ) {
+            $this->assertEquals( 'MyCarsOwner', $car->SDBOwner->name );
+        }
+    }
+
+    private function _setupForeignKeysTest() {
+        $owner = new Mock\SDBOwner();
+        $owner->name = 'MyCarsOwner';
+        $id = rand(1, 999999999). 'myID'.rand(1,100);
+        $owner->id($id);
+
+        $this->assertTrue( $owner->save(true), "Failed saving: ".$owner->errorMessagesString() );
+        $cars = Mock\SDBCar::FindAll();
+        $cars->each(function($car)use($id){
+            $car->owner_id = $id;
+        });
+        
+        $cars->save();
     }
 }
 ?>

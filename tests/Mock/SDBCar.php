@@ -10,10 +10,12 @@ namespace ORM\Tests\Mock;
  */
 class SDBCar extends \ORM\SDB\ORMModelSDB {
     const TABLE = 'cars';
-
+    const FOREIGN_KEY_SDBOWNER = 'owner_id';
+    
     public $brand;
     public $colour;
     public $doors;
+    public $owner_id;
 
     private $_privateTest = 'should not be saved';
 

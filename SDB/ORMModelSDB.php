@@ -35,7 +35,6 @@ class ORMModelSDB extends \ORM\ORM_Model {
         // to ensure it only gets the publicly accessible attributes
         $publicPropertiesFunction = (function() use( $item ) {
             $vars = get_object_vars($item);
-//            unset($vars['itemName()']);
 
             return array_keys($vars);
         });
@@ -107,6 +106,24 @@ class ORMModelSDB extends \ORM\ORM_Model {
      */
     public function attributes() {
         return empty($this->_originalValues) ? self::DescribeTable() : array_keys($this->_originalValues);
+    }
+
+    /**
+     * Override the ORM_Model::_BuildSQLFindWith() to work with SDB
+     *
+     * Uses the SDBStatment::$findWith static variable, which is not a very nice
+     * way to do this.
+     *
+     * @param string $table
+     * @param array|string $findWith
+     * @return string
+     *      SQL Query
+     */
+    protected static function _BuildSQLFindWith( $table, $findWith ) {
+        SDBStatement::$findWith = (array)$findWith;
+        $className  = static::ClassName();
+        
+        return "SELECT `$className`.* FROM `$table` AS `$className` ";
     }
 }
 ?>

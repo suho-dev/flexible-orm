@@ -78,6 +78,18 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     private static $_lastInsertID;
 
     /**
+     * Ugly method of implementing the ORM_Model findWith option
+     *
+     * Set this value to an array of models to fetch for each base model class
+     * fetched. It will be reset to a blank array after fetching.
+     *
+     * @var array $findWith
+     */
+    public static $findWith = array();
+
+    private $_findWith;
+
+    /**
      * Create an SDBStatement object for a query
      *
      * @todo Change this to not be forcing the APAC region
@@ -89,6 +101,9 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     public function __construct( $sql ) {
         $this->_queryString = $sql;
         self::_InitSDBConnection();
+
+        $this->_findWith    = self::$findWith;
+        self::$findWith     = array();
     }
 
     /**
@@ -529,11 +544,36 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             $object->id( $keys[0] );
 
             $object->setValues( $this->_result[$keys[0]] );
+            $this->_fetchWith($object);
 
             return $object;
         }
 
         return false;
+    }
+
+    /**
+     * Add requested foreign key objects to this object
+     *
+     * All fetch class options must be classes that extend ORM_Model
+     *
+     * @param ORMModelSDB $object
+     */
+    private function _fetchWith( ORMModelSDB &$object ) {
+        $className = get_class($object);
+        
+        foreach( $this->_findWith as $fetchClassName ) {
+            if( !is_subclass_of($fetchClassName, '\ORM\ORM_Model') ) {
+                throw new \ORM\Exceptions\ORMFetchIntoException(
+                    "Find with class '$fetchClassName' does not extend class ORM_Model"
+                );
+            }
+
+            $key            = $className::ForeignKey( $fetchClassName );
+            $baseClassName  = $fetchClassName::ClassName();
+
+            $object->$baseClassName = $fetchClassName::Find($object->$key);
+        }
     }
 
     /**
@@ -589,6 +629,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
                 $object->id( $key );
                 
                 $object->setValues( $attributes );
+                $this->_fetchWith($object);
 
                 $collection[] = $object;
             }

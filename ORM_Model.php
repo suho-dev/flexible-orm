@@ -285,34 +285,14 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *      [optional] A string or array of strings defining the related model
      *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
      * @return string
+     *      SQL Query string
      */
     protected static function _BuildSQL( $optionsArray, $table, $findWith = false ) {
         $className  = static::ClassName();
-        
-        if( $findWith ) {
-            // This will convert a single className string into an array, or
-            // leave it unchanged if it was already an array
-            $findWith = (array)$findWith;
-            
-            $models = array( "`$className`.*" );
-            $joins  = '';
 
-            foreach( $findWith as $nsFetchClass ) {
-                $fetchTable = $nsFetchClass::TableName();
-                $primaryKey = $nsFetchClass::PrimaryKeyName();
-                $foreignKey = static::ForeignKey( $nsFetchClass );
-                $fetchClass = basename( str_replace('\\', '//', $nsFetchClass) );
-
-                $models[]   = "`$fetchClass`.*";
-                $joins      .= "LEFT JOIN `$fetchTable` AS `$fetchClass` "
-                            . "ON (`$className`.$foreignKey = `$fetchClass`.$primaryKey) ";
-            }
-
-            $sql = 'SELECT '.implode(', ', $models)." FROM `$table` AS `$className` $joins";
-
-        } else {
-            $sql = "SELECT `$className`.* FROM `$table` AS `$className` ";
-        }
+        $sql = $findWith ? 
+                static::_BuildSQLFindWith( $table, $findWith )
+                : "SELECT `$className`.* FROM `$table` AS `$className` ";
 
         if( isset($optionsArray['where']) ) {
             $sql .= "WHERE {$optionsArray['where']} ";
@@ -323,6 +303,41 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         }
 
         return $sql;
+    }
+
+    /**
+     * Build the SELECT statement for a fetch request with specified foreign
+     * keys.
+     *
+     * Called by _BuildSQL() if you specify $findWith
+     *
+     * @see _BuildSQL()
+     * @param string $table
+     *      Table name
+     * @param string|array $findWith
+     *      [optional] A string or array of strings defining the related model
+     *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
+     * @return string
+     *      SQL Query
+     */
+    protected static function _BuildSQLFindWith( $table, $findWith ) {
+        $className  = static::ClassName();
+        $findWith   = (array)$findWith;
+        $models     = array( "`$className`.*" );
+        $joins      = '';
+
+        foreach( $findWith as $nsFetchClass ) {
+            $fetchTable = $nsFetchClass::TableName();
+            $primaryKey = $nsFetchClass::PrimaryKeyName();
+            $foreignKey = static::ForeignKey( $nsFetchClass );
+            $fetchClass = basename( str_replace('\\', '//', $nsFetchClass) );
+
+            $models[]   = "`$fetchClass`.*";
+            $joins      .= "LEFT JOIN `$fetchTable` AS `$fetchClass` "
+                        . "ON (`$className`.$foreignKey = `$fetchClass`.$primaryKey) ";
+        }
+
+        return 'SELECT '.implode(', ', $models)." FROM `$table` AS `$className` $joins";
     }
 
     /**
@@ -369,7 +384,11 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
 
     /**
      * Delete a single item from the database without having to fetch it first
-     * 
+     *
+     * \note This function is faster than ORM_Model::delete() because it does
+     *       not fetch the object first, however as a result it does not call
+     *       beforeDelete().
+     *
      * @see delete()
      * @param string $id
      *      The primary key value specifying which item to delete
@@ -390,7 +409,8 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     /**
      * Delete a single item from the database
      *
-     * The object will remain populated.
+     * The object will remain populated. Calls beforeDelete() before the object
+     * is removed.
      *
      * \include orm_model.delete.example.php
      *
@@ -398,6 +418,8 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *
      */
     public function delete() {
+        $this->beforeDelete();
+
         $tableName  = static::TableName();
         $key        = static::PrimaryKeyName();
         $df         = static::DataFactory();
@@ -409,6 +431,14 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $query->bindParam( ':id', $this->_id );
         $query->execute();
     }
+
+    /**
+     * A pre-delete hook
+     *
+     * This method is called before an object is deleted (only if it is called
+     * using delete(), not Destroy()
+     */
+    public function beforeDelete() {}
 
     /**
      * Save an object to the database
