@@ -1,11 +1,11 @@
 <?php
 namespace ORM;
-/*! @mainpage Introduction to ORM 2.0
+/*! @mainpage Introduction to flexible-orm
  * 
  * \section intro_sec Introduction
  *
- * The ORM forms the basis of all PHP projects at Sustainability House and
- * The Woolcock Group (excluding projects that have no database requirements).
+ * Simple PHP 5.3 based ORM allowing cloud-based models and traditional database
+ * models to coexist.
  *
  * It aims to simplify the relationship between the database and the application
  * by presenting database rows in an Object-Oriented fashion.
