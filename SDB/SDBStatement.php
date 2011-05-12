@@ -28,17 +28,16 @@ namespace ORM\SDB;
  * <b>Usage</b>
  * \include sdb.sdbstatement.example.php
  *
- * \n\n
- * \note Can be used essentially in the same way as ORM_PDOStatement, although the
- *       \e findWith abilities are not present.
  *
  * @see SDBFactory, ORMModelSDB, SDBResponse
- *
- * @todo ESCAPE THESE VALUES!!
- * @todo implement DELETE
- * @todo automatically fetch ALL (nextToken stuff)
  */
 class SDBStatement implements \ORM\Interfaces\DataStatement {
+    /**
+     * The maximum size a single attribute is allowed to be (in bytes)
+     * Currently the Amazon SimpleDB limit is 1K
+     */
+    const MAX_ATTRIBUTE_SIZE = 1024;
+
     /**
      * SQL statement
      *
@@ -73,7 +72,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
 
     /**
      * The last inserted itemName()
-     * @var string
+     * @var string $_lastInsertID
      */
     private static $_lastInsertID;
 
@@ -87,6 +86,11 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      */
     public static $findWith = array();
 
+    /**
+     * The instance property version of the static $findWith, this is used internally
+     * to represent the statically set array of models when the objec is intantiated
+     * @var array $_findWith
+     */
     private $_findWith;
 
     /**
@@ -138,6 +142,8 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * 
      * Behaves exactly like PDOStatement::bindValue(); Escapes the values, so
      * values have to be decoded (see DecodeValue()).
+     * 
+     * Bind is different for update and create actions
      *
      * @param string $placeholder
      *      The SQL placeholder name (including the colon).
@@ -145,16 +151,24 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      *      Value to place where the placeholder was
      */
     public function bindValue( $placeholder, $value ) {
-        if( $this->queryType() == 'SELECT' ) {
-            $sanitizedValue = str_replace("'", "''", $value );
+        $queryType = $this->queryType();
+        if( $queryType == 'SELECT' || $queryType == 'DELETE' ) {
+            $this->_bindToSQL($placeholder, $value);
         } else {
-            $sanitizedValue = str_replace(
-                array('\\', "\0", "\n", "\r", "'", '"', "\x1a"),
-                array('\\\\', '\\0', '\\n', '\\r', "\\'", '\\"'),
-                $value
-            );
+            $this->_bindToArray($placeholder, $value);
         }
+    }
 
+    /**
+     * Bind the requested parameter by inserting the escaped value into the query
+     *
+     * @see _bindValue()
+     * @param string $placeholder
+     * @param string $value
+     */
+    private function _bindToSQL( $placeholder, $value ) {
+        $sanitizedValue = $this->_sanitizeValue($value);
+        
         // REGEX for finding the placeholder
         $regex = ($placeholder == ':itemName()') ? "/:itemName\(\)/": "/$placeholder(?!\w)/";
 
@@ -168,6 +182,67 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
                 "'$sanitizedValue'",
                 $this->_queryString
         );
+    }
+
+    /**
+     * For updates and inserts, the parameters to be bound are stored in an
+     * array rather than in the query string for simplicity
+     *
+     * This is entirely redudant if the values were bound as params already
+     *
+     * @param string $placeholder
+     * @param string $value
+     */
+    private function _bindToArray( $placeholder, $value ) {
+        $this->_binds[$placeholder] = $value;
+    }
+
+    /**
+     * Deal with attributes that are too large for SDB by splitting them up
+     *
+     * @param array $attributes
+     *      An array of key pairs
+     * @return array
+     *      An array of key pairs where values that are larger than MAX_ATTRIBUTE_SIZE
+     *      have been split into multiple values and an index number applied to
+     *      their key name (ie "name" would become "name[1]", "name[2]", etc)
+     */
+    private function _chunkLargeAttributes( array $attributes ) {
+        $chunkedAttributes = array();
+        
+        foreach( $attributes as $field => $value ) {
+            if( strlen($field) && strlen($value) > self::MAX_ATTRIBUTE_SIZE ) {
+                $chunks = str_split( $value, self::MAX_ATTRIBUTE_SIZE );
+                foreach($chunks as $i => $chunk ) {
+                    $chunkedAttributes["{$field}[$i]"] = $chunk;
+                }
+                
+            } elseif( strlen($field) ) {
+                $chunkedAttributes[$field] = $value;
+            }
+        }
+        
+        return $chunkedAttributes;
+    }
+
+    /**
+     * Sanitize string for use with SDB
+     * 
+     * @param string $value
+     * @return string
+     */
+    private function _sanitizeValue( $value ) {
+        if( $this->queryType() == 'SELECT' ) {
+            $sanitizedValue = str_replace("'", "''", $value );
+        } else {
+            $sanitizedValue = str_replace(
+                array('\\', "\0", "\n", "\r", "'", '"', "\x1a"),
+                array('\\\\', '\\0', '\\n', '\\r', "\\'", '\\"'),
+                $value
+            );
+        }
+
+        return $sanitizedValue;
     }
 
     /**
@@ -299,7 +374,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
                 throw new \ORM\Exceptions\ORMPDOException("Unknown query type $queryType");
         }
     }
-
+    
     /**
      * Get the type of SQL statement
      * 
@@ -324,6 +399,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * \note This function will set the $_lastInsertID value.
      *       See SDBStatement::LastInsertId()
      *
+     * @throws ORMInsertException if there is an error putting the attributes
      * @return boolean
      *      True on success
      */
@@ -343,11 +419,20 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
 
         self::$_lastInsertID = $itemName;
 
-        return self::$_sdb->put_attributes( $domain, $itemName, $attributes )->isOK();
+        $response = self::$_sdb->put_attributes( $domain, $itemName, $attributes );
+
+        if( !$response->isOK() ) {
+            $errors = $response->body->Message();
+            throw new \ORM\Exceptions\ORMInsertException( (string)$errors[0] );
+        }
+
+        return $response->isOK();
     }
 
     /**
      * Convert a SQL INSERT statment to an array for use with AmazonSDB
+     * 
+     * "Binds" should be used to ensure that this function works
      * 
      * @param string $query
      *      An SQL \c INSERT query (in simple form)
@@ -365,28 +450,29 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             $fields[$i] = 'itemName()';
         }
 
+        if( $itemNamePresent > 1 ) {
+            $i = array_search(':itemName[]', $values);
+            if( $i !== false ) $values[$i] = ':itemName()';
+        }
+
         $attributes = array();
-        for( $i = 0; $i < count($values); $i++ ) {
-            if( preg_match('/\'$/', trim($values[$i])) ) {
-                // This is a complete value, so add it
-                $attributes[array_shift($fields)] = substr(trim($values[$i]), 1, -1);
-            } elseif(isset($values[$i+1])) {
-                // This looks like a comma in the value, not the end of the value
-                // so preppend it to the next element and ignore
-                $values[$i+1] = "{$values[$i]}, {$values[$i+1]}";
+        foreach($values as $i => $value ) {
+            if( array_key_exists( trim($value), $this->_binds) ) {
+                $attributes[$fields[$i]] = $this->_binds[trim($value)];
             } else {
-                throw new \ORM\Exceptions\ORMPDOException("Failed sanitizing query '$query' [Stuck on $i: {$values[$i]}]");
+                $attributes[$fields[$i]] = substr($value, 1, -1);
             }
         }
 
-        return $attributes;
+        return $this->_chunkLargeAttributes( $attributes );
     }
 
     /**
      * Convert a SQL UPDATE statment to an array for use with AmazonSDB
      *
      * @return array
-     *      Associative array where keys will be used as field names
+     *      Associative array where keys will be used as field names. Large values
+     *      will be split over mutiple keys
      */
     private function _getAttributesFromUpdateQuery() {
         // This could probably be done with one expression, but I couldn't work
@@ -394,14 +480,19 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         preg_match('/^UPDATE ([a-z_0-9A-Z]+) SET (.+) WHERE/i', $this->_queryString, $matches );
         $setString = $matches[2];
 
-        // REGEX to split SET statement up:  /[a-z_]+ = '.*?(?<!\\)'/i
-        preg_match_all('/[a-z_]+ = \'.*?(?<!\\\)\'/i', $setString, $matches);
+        $regex = '/[a-z_]+ = (\'.*?(?<!\\\)\'|:[^, )]+)/i';
+        preg_match_all($regex, $setString, $matches);
         $set = $matches[0];
         
         $attributes = array();
         foreach($set as $pair) {
             list( $field, $value ) = explode( ' = ', trim($pair), 2 );
-            $attributes[$field] = substr($value, 1, -1);
+            
+            if( array_key_exists(trim($value), $this->_binds) ) {
+                $attributes[$field] = $this->_binds[trim($value)];
+            } else {
+                $attributes[$field] = substr($value, 1, -1);
+            }
         }
 
         return $attributes;
@@ -411,7 +502,8 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * Get the domain name (the table name in normal SQL) from the current
      * queryString
      *
-     * \note Currently only works for INSERT and UPDATE statements
+     * \note Currently only works for INSERT and UPDATE statements (because it
+     *       is not needed for SELECT or DELETE
      *
      * @return string
      */
@@ -433,6 +525,8 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     private function _getItemNameFromQuery() {
         if( preg_match('/itemName\(\) = \'(.+)\'/i', $this->_queryString, $matches ) ) {
             return $matches[1];
+        } elseif(isset($this->_binds[':itemName()'])) { 
+            return $this->_binds[':itemName()'];
         } else {
             return false;
         }
@@ -444,6 +538,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * SDB does not natively support \c UPDATE, so we emulate it here. Converts
      * the \c UPDATE string into a put_attributes() operation.
      *
+     * @todo better handling of errors from SimpleDB
      * @return boolean
      *      True on success
      */
@@ -455,14 +550,19 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         $attributes = $this->_getAttributesFromUpdateQuery();
         $result     = self::$_sdb->put_attributes( $domain, $itemName, $attributes, true );
 
+        if( !$result->isOK() ) print_r($result->body->Errors);
         return $result->isOK();
     }
 
     /**
-     * Emulate the SQL UPDATE functionality
+     * Emulate the SQL DELETE functionality
      *
      * SDB does not natively support \c DELETE, so we emulate it here. Converts
      * the \c DELETE string into a delete_attributes() operation.
+     *
+     * \note Only has very primative support for deleting items using constraints
+     *       other than itemName (primary key). Will only delete a maximum of 25
+     *       results at a time.
      *
      * @return boolean
      *      True on success

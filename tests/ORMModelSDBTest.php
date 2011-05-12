@@ -24,9 +24,16 @@ class ORMModelSDBTest extends ORMTest {
         $this->object->set_response_class('\ORM\SDB\SDBResponse');
         $this->object->set_region(\AmazonSDB::REGION_APAC_SE1);
 
-        $this->object->create_domain(self::DOMAIN);
+        Mock\File::CreateDomain();
+        Mock\SDBCar::CreateDomain();
         $this->object->batch_put_attributes(self::DOMAIN, $this->_testCars);
 
+    }
+
+    protected function tearDown() {
+        $sdb = \ORM\SDB\SDBStatement::GetSDBConnection();
+        $sdb->delete_domain( Mock\File::TableName() );
+        $sdb->delete_domain( Mock\SDBCar::TableName() );
     }
 
     public function testDescribe() {
@@ -36,13 +43,6 @@ class ORMModelSDBTest extends ORMTest {
         $this->assertTrue( in_array('brand', $table ) );
         $this->assertTrue( in_array('colour', $table ) );
         $this->assertTrue( in_array('doors', $table ) );
-    }
-
-    protected function tearDown() {
-        $items = $this->object->select("SELECT * FROM ".self::DOMAIN." WHERE brand = 'Ford'");
-        foreach($items as $id => $item ) {
-            $this->object->delete_attributes(self::DOMAIN, $id);
-        }
     }
 
     public function testReturnsSDBResponse() {
@@ -234,7 +234,7 @@ class ORMModelSDBTest extends ORMTest {
 
     public function testCreateComplex() {
         $owner = new Mock\SDBOwner();
-        $owner->name = "This i's, \na =  silly";
+        $owner->name = "This i', s',\na =  silly";
 
         $this->assertTrue( $owner->save() );
 
@@ -246,7 +246,7 @@ class ORMModelSDBTest extends ORMTest {
         $owner = Mock\SDBOwner::Find();
         $owner->name = "This \ni's', 'a silly\\\\',";
 
-        $this->assertTrue( $owner->save() );
+        $this->assertTrue( $owner->save(), "Unable to save owner: {$owner->errorMessagesString()}" );
 
         $fetched = Mock\SDBOwner::Find( $owner->id() );
         $this->assertEquals( $owner->name, $fetched->name );
@@ -256,7 +256,7 @@ class ORMModelSDBTest extends ORMTest {
         $owner = new Mock\SDBOwner();
         $owner->name = "Th''is i's a \'silly";
 
-        $this->assertTrue( $owner->save() );
+        $this->assertTrue( $owner->save(), "Unable to save owner: {$owner->errorMessagesString()}" );
 
         $fetched = Mock\SDBOwner::Find( $owner->id() );
         $this->assertEquals( $owner->name, $fetched->name );
@@ -266,7 +266,7 @@ class ORMModelSDBTest extends ORMTest {
         $owner = Mock\SDBOwner::Find();
         $owner->name = "This i's a \'silly";
 
-        $this->assertTrue( $owner->save() );
+        $this->assertTrue( $owner->save(), "Unable to save owner: {$owner->errorMessagesString()}" );
 
         $fetched = Mock\SDBOwner::Find( $owner->id() );
         $this->assertEquals( $owner->name, $fetched->name );

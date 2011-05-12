@@ -124,8 +124,8 @@ class AutoLoader {
      * Get the path of a package
      *
      * @todo test this
-     * @param string $package
-     *      Package name to locate
+     * @param string $class
+     *      Class name to use as package name locate
      * @return string|false
      *      Returns path or false if unknown package
      */

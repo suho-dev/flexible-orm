@@ -78,15 +78,48 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
 
         if( $items ) {
             foreach( $items as $item ) {
-                $att_array = array();
-
-                foreach($item->Attribute as $attribute ) {
-                    $att_array[(string)$attribute->Name] = (string)$attribute->Value;
-                }
-
-                $this->_items[(string)$item->Name] = $att_array;
+                $this->_items[(string)$item->Name] = $this->_getObject($item->Attribute);
             }
         }
+    }
+
+    /**
+     * Convert an XML attribute tree to array of key-value pairs
+     *
+     * @see _getSelectResult(), _getAttributesResult()
+     * @param SimpleXMLElement $attributes
+     * @return array
+     */
+    private function _getObject( $attributes ) {
+        $att_array = array();
+        $toFlatten = array();
+
+        foreach($attributes as $attribute ) {
+            $name = (string)$attribute->Name;
+            if( isset($att_array[$name]) ) {
+                $att_array[$name]   = (array)$att_array[$name];
+                $att_array[$name][] = (string)$attribute->Value;
+
+            } elseif( preg_match('/(\w+)\[(\d+)\]/', $name, $matches) ) {
+                // Large attributes are chunked into multiple items <fieldname>_<i>
+                if( !isset($att_array[$matches[1]]) ) {
+                    $att_array[$matches[1]] = array();
+                    $toFlatten[] = $matches[1];
+                }
+                
+                $att_array[$matches[1]][$matches[2]] = (string)$attribute->Value;
+                
+            } else {
+                $att_array[$name] = (string)$attribute->Value;
+            }
+        }
+
+        foreach($toFlatten as $key ) {
+            ksort($att_array[$key]);
+            $att_array[$key] = implode('', $att_array[$key]);
+        }
+
+        return $att_array;
     }
 
     /**
@@ -97,9 +130,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
         $attributes = $this->body->GetAttributesResult->Attribute();
 
         if( $attributes ) {
-            foreach( $attributes as $attribute ) {
-                $this->_items[(string)$attribute->Name] = (string)$attribute->Value;
-            }
+            $this->_items = $this->_getObject($attributes);
         }
     }
 
