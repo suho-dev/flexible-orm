@@ -4,7 +4,7 @@
  * @author jarrod.swift
  */
 namespace ORM\SDB;
-
+use \ORM\Utilities\Configuration;
 /**
  * Mimick the behaviour of ORM_PDOStatement for AmazonSDB
  *
@@ -113,16 +113,19 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     /**
      * Setup the SDB connection
      *
-     * Use the configuration value AWS->region to set the region for the SDB
-     * 
+     *  * Use the configuration value AWS->region to set the region for the SDB
+     *  * Use the configuration value AWS->apc_enabled to enable/disable APC
      */
     private static function _InitSDBConnection() {
         if( is_null(self::$_sdb) ){
             self::$_sdb = new \AmazonSDB();
             self::$_sdb->set_response_class( __NAMESPACE__.'\SDBResponse');
-            $region = \ORM\Utilities\Configuration::AWS()->region;
+            $region = Configuration::AWS()->region;
             self::$_sdb->set_region( $region ?: \AmazonSDB::REGION_APAC_SE1);
-            self::$_sdb->set_cache_config('apc');
+            
+            if( Configuration::AWS()->apc_enabled ) {
+                self::$_sdb->set_cache_config('apc');
+            }
         }
     }
 
