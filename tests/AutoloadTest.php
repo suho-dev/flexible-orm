@@ -16,7 +16,7 @@ require_once dirname(__FILE__) . '/ORMTest.php';
 class AutoLoaderTest extends ORMTest {
     function testLocate() {
         $this->assertEquals(
-            '/server/projects/orm.2.0/Utilities/Configuration.php',
+            '/server/projects/flexible-orm/Utilities/Configuration.php',
             AutoLoader::Get()->locate( 'ORM\Utilities\Configuration')
         );
 
@@ -26,7 +26,7 @@ class AutoLoaderTest extends ORMTest {
         );
 
         $this->assertEquals(
-            '/server/projects/orm.2.0/Tests/Mock/Owner.php',
+            '/server/projects/flexible-orm/Tests/Mock/Owner.php',
             AutoLoader::Get()->locate('ORM\Tests\Mock\Owner')
         );
     }

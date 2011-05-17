@@ -17,7 +17,6 @@ namespace ORM\SDB;
  * SDBSessionHandler::Register()
  * @endcode
  *
- * @todo Complete and Test
  */
 class SDBSessionHandler {
     /**

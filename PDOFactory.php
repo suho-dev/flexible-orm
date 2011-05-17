@@ -15,8 +15,6 @@ use ORM\Utilities\Configuration;
  *
  * \copydoc PDOFactory::Get()
  *
- * @todo exception for incorrect database settings
- *
  * @see Configuration, ORM_PDOStatement
  */
 class PDOFactory implements Interfaces\DataFactory {
@@ -77,7 +75,8 @@ class PDOFactory implements Interfaces\DataFactory {
      * $query = PDOFactory::Get("SELECT * FROM rabbits");
      * @endcode
      *
-     * @todo Exception for invalid $databaseConfig
+     * @throws \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException if
+     *      configuration details are not present or invalid
      * 
      * @param string $databaseConfig
      *      Name of the group to load from the Configuration (normally this would
@@ -85,16 +84,26 @@ class PDOFactory implements Interfaces\DataFactory {
      * @return PDOFactory
      */
     private function __construct( $databaseConfig ) {
+        if( !Configuration::GroupExists($databaseConfig) ) {
+            throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException(
+                "No database configuration details for $databaseConfig"
+            );
+        }
+        
         $db_name = Configuration::$databaseConfig()->name;
         $db_host = Configuration::$databaseConfig()->host ?: 'localhost';
         $db_user = Configuration::$databaseConfig()->user;
         $db_pswd = Configuration::$databaseConfig()->pass;
         $dsn     = "mysql:host={$db_host};dbname={$db_name};";
-
-        $this->_db = new \PDO( $dsn, $db_user, $db_pswd );
-        $this->_db->setAttribute( \PDO::ATTR_EMULATE_PREPARES, TRUE);
-        $this->_db->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $this->_db->setAttribute( \PDO::ATTR_STATEMENT_CLASS, array(__NAMESPACE__.'\ORM_PDOStatement'));
+        
+        try {
+            $this->_db = new \PDO( $dsn, $db_user, $db_pswd );
+            $this->_db->setAttribute( \PDO::ATTR_EMULATE_PREPARES, TRUE);
+            $this->_db->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->_db->setAttribute( \PDO::ATTR_STATEMENT_CLASS, array(__NAMESPACE__.'\ORM_PDOStatement'));
+        } catch( \PDOException $e ) {
+            throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException( $e->getMessage() );
+        }
     }
 
     /**

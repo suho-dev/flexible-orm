@@ -12,7 +12,7 @@ namespace ORM\SDB;
  * <b>Usage</b>
  * \include sdb.sdbresponse.example.php
  *
- * @todo work with tagged values (multiple values for single attribute)
+ * @todo test working with tagged values (multiple values for single attribute)
  *
  * @see SDBFactory, SDBStatement, ORMModelSDB
  */

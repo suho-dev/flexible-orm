@@ -61,11 +61,25 @@ class Configuration {
      * Get an object with properties matching the group's set parameters
      * 
      * @param string $group
-     *      The group name
+     *      The group name (ie the bit between the square brackets in the ini
+     *      file
      * @return ConfigurationGroup
      */
     private function _getGroup( $group ) {
-        return new ConfigurationGroup( $this->_options[$group] );
+        $options = self::GroupExists($group) ? $this->_options[$group] : array();
+        
+        return new ConfigurationGroup( $options );
+    }
+    
+    /**
+     * Check if a group exists in the current configuration
+     * @param string $group
+     * @return boolean
+     *      True if group name exists (although it may not have any properties
+     *      in it.
+     */
+    public static function GroupExists( $group ) {
+        return array_key_exists($group, self::Get()->_options);
     }
 
     /**

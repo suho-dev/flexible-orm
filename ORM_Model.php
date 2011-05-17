@@ -45,7 +45,6 @@ use ORM\Exceptions;
  * \n\n
  * @todo Exceptions - if model is poorly coded, it should raise a more descriptive
  *      exception than a PDOException
- * @todo Implement limit for pagination
  *
  */
 abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
@@ -414,7 +413,6 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *
      * \include orm_model.delete.example.php
      *
-     * @todo what happens if it's not saved? Probably should do nothing
      *
      */
     public function delete() {
@@ -757,8 +755,6 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * Basically just a plural lowercase version of the model name
      *
      * @note Currently this only allows for the simplest of plurals (i.e. adding an s)
-     *
-     * @todo Implement more complex plural name generator
      *
      * @param string $model_name
      *      The name of the model.

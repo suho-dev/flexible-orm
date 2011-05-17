@@ -350,10 +350,9 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * select operation, see fetchInto() and fetchAllInto().
      *
      * @todo throw an exception if all placeholders aren't bound yet
-     *
-     * @todo work with non-named placeholders also
-     *
      * @todo Define exception for this action
+     * 
+     * @todo work with non-named placeholders also
      *
      * @param array $values
      *      [optional] Array of values to bind.
@@ -378,7 +377,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             case 'SELECT':
                 return true;
             default:
-                throw new \ORM\Exceptions\ORMPDOException("Unknown query type $queryType");
+                throw new \ORM\Exceptions\ORMPDOException("Unsupported query type $queryType");
         }
     }
     
@@ -545,7 +544,6 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * SDB does not natively support \c UPDATE, so we emulate it here. Converts
      * the \c UPDATE string into a put_attributes() operation.
      *
-     * @todo better handling of errors from SimpleDB
      * @return boolean
      *      True on success
      */

@@ -10,6 +10,5 @@ namespace ORM\Exceptions;
  *
  */
 class ORMException extends \Exception {
-    //put your code here
 }
 ?>

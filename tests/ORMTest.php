@@ -7,7 +7,7 @@ namespace ORM\Tests;
 error_reporting(E_ALL);
 
 require_once dirname(__FILE__) . '/../AutoLoader.php';
-require_once '../plugins/aws-sdk-1.3.2/sdk.class.php';
+require_once '../../plugins/aws-sdk-1.3.2/sdk.class.php';
 
 \ORM\Utilities\Configuration::Load('test.ini');
 

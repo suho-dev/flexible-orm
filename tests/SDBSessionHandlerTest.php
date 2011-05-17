@@ -40,11 +40,11 @@ class SDBSessionHandlerTest extends ORMTest{
     public function testWrite() {
         $data = array('my' => 'data', 'for' => 'testing' );
         $id   = "testWrite-".rand();
-        SDB\SDBSessionHandler::Get()->write($id, $data);
+        SDB\SDBSessionHandler::Get()->write($id, serialize($data) );
 
         $session = SDB\SDBSession::Find($id);
 
-        $this->assertEquals( $id, $session->id() );
+        $this->assertEquals( serialize($data), $session->data );
     }
 
     public function testRead() {

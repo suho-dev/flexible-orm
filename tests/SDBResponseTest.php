@@ -84,7 +84,7 @@ class SDBResponseTest extends ORMTest {
 
         $result = $this->object->select('SELECT * FROM bigDomain', array('ConsistentRead' => 'true'))->getAll();
 
-        $this->assertGreaterThan( 199, count($result) );
+        $this->assertGreaterThan( 99, count($result) );
 
     }
 

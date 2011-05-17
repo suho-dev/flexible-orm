@@ -57,5 +57,19 @@ class PDOFactoryTest extends ORMTest {
         
         $query->fetchInto('\ORM\Tests\Mock\Owner');
     }
+    
+    /**
+     * @expectedException ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException
+     */
+    public function testInvalidDetails() {
+        $factory = PDOFactory::GetFactory('invalidDatabase');
+    }
+    
+    /**
+     * @expectedException ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException
+     */
+    public function testNoDetails() {
+        $factory = PDOFactory::GetFactory('noDetails');
+    }
 }
 ?>
