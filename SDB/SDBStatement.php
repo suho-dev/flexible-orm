@@ -428,11 +428,10 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         $response = self::$_sdb->put_attributes( $domain, $itemName, $attributes );
 
         if( !$response->isOK() ) {
-            $errors = $response->body->Message();
-            throw new \ORM\Exceptions\ORMInsertException( (string)$errors[0] );
+            throw new \ORM\Exceptions\ORMInsertException( $response->errorMessage() );
         }
-
-        return $response->isOK();
+        
+        return true; //<! since we got past the exception, response is OK
     }
 
     /**
@@ -555,7 +554,10 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         $attributes = $this->_getAttributesFromUpdateQuery();
         $result     = self::$_sdb->put_attributes( $domain, $itemName, $attributes, true );
 
-        if( !$result->isOK() ) print_r($result->body->Errors);
+        if( !$result->isOK() ) {
+            throw new \ORM\Exceptions\ORMUpdateException( $result->errorMessage() );
+        }
+        
         return $result->isOK();
     }
 
@@ -639,9 +641,8 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         );
 
         if( !$this->_result->isOK() ) {
-            $errors = $this->_result->body->Message();
             throw new \ORM\Exceptions\ORMFetchIntoException(
-                (string)$errors[0] . " Query: $this->_queryString"
+                $this->_result->errorMessage()
             );
         } else if( count($this->_result) ) {
             $keys   = $this->_result->itemNames();
@@ -706,7 +707,8 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * \note This function is effected by the ORMModelSDB::EnforceReadConsistency()
      *      setting.
      *
-     * @throws Exceptions\ORMFetchIntoClassNotFoundException
+     * @throws Exceptions\ORMFetchIntoClassNotFoundException for invalid classname
+     * @throws Exceptions\ORMFetchIntoException for AmazonSDB errors
      *
      * @param string $className
      *      Object type to fetch into
@@ -727,8 +729,12 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         $this->_result = self::$_sdb->select( $this->_queryString, $optionsArray )->getAll($consistentRead == 'true');
 
         $collection = new \ORM\ModelCollection();
-
-        if( count($this->_result) ) {
+        
+        if( !$this->_result->isOK() ) {
+            throw new \ORM\Exceptions\ORMFetchIntoException(
+                $this->_result->errorMessage()
+            );
+        } elseif( count($this->_result) ) {
             foreach( $this->_result as $key => $attributes ) {
                 $object = new $className;
                 $object->id( $key );

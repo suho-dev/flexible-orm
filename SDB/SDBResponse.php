@@ -163,9 +163,15 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      * \note Only works with Select statements. It should not be neccasary for
      *       others, except maybe getAttributes if you have a large number of
      *       attributes or listDomains if you have a lot.
+     * 
+     * \note The $consistentRead parameter must have the same value as the original
+     *       command, if the original query was run with consistentRead==true, 
+     *       then getAll() must be called as getAll(true)
      *
      * @param boolean $consistentRead
      *      [optional] defaults to false. Tell SDB whether or not to force consistency.
+     *      This must be the same as the original query (ie if the original query
+     *      enforced consistent read, this must be true)
      * return SDBResponse
      *      The current SDBResponse item is returned for convenience
      */
@@ -177,7 +183,11 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
 
             while( $result->nextToken() ) {
                 $result = SDBStatement::Query( $query, $consistentRead, $result->nextToken() );
-
+                
+                if( !$result->isOK() ) {
+                    throw new \ORM\Exceptions\ORMPDOException($result->errorMessage() );
+                }
+                
                 foreach( $result as $key => $item ) {
                     $this->_items[$key] = $item;
                 }
@@ -213,6 +223,18 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
         $encodedQuery   = substr($this->header['x-aws-body'], $pos+strlen($marker), $queryStringLen);
         
         return urldecode($encodedQuery);
+    }
+    
+    /**
+     * Get the error details (if there are errors)
+     * 
+     * @return string
+     */
+    public function errorMessage() {
+        if( !$this->isOK() ) {
+            $errors = $this->body->Message();
+            return  (string)$errors[0];
+        }
     }
 
     /**

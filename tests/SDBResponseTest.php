@@ -82,15 +82,23 @@ class SDBResponseTest extends ORMTest {
 //            }
 //        }
 
-        $result = $this->object->select('SELECT * FROM bigDomain', array('ConsistentRead' => 'true'))->getAll();
+        $result = $this->object->select('SELECT * FROM bigDomain', array('ConsistentRead' => 'true'))->getAll(true);
 
-        $this->assertGreaterThan( 99, count($result) );
+        $this->assertGreaterThan( 100, count($result) );
 
     }
 
     public function testGetQuery() {
         $results = $this->object->select('SELECT * FROM bigDomain');
         $this->assertEquals('SELECT * FROM bigDomain', $results->getQuery() );
+    }
+    
+    public function testErrorMessage() {
+        $results = $this->object->select('SELECT * FROM nonexistant');
+        
+        $this->assertFalse( $results->isOK(), "Response was OK, when it shouldn't be!" );
+        
+        $this->assertEquals( $results->errorMessage(), "The specified domain does not exist.");
     }
 }
 ?>
