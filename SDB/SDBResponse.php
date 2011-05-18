@@ -173,27 +173,34 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      *      This must be the same as the original query (ie if the original query
      *      enforced consistent read, this must be true)
      * @param int $limit
-     *      [optionl] Maximum number of records to return (including the original items)
+     *      [optional] Maximum number of records to return (including the original items)
      *      Defaults to no limit (other than those imposed by MAX_QUERIES).
+     * @paran int $offset
+     *      [optional] Number of rows to skip from beinging when used with limit.
+     *      Defaults to 0 (start from beginning).
      * return SDBResponse
      *      The current SDBResponse item is returned for convenience
      */
-    public function getAll($consistentRead = false, $limit = null) {
+    public function getAll($consistentRead = false, $limit = null, $offset = 0) {
         if( isset($this->body->SelectResult) ) {
             $result = $this;
             $query  = $this->getQuery();
             $count  = 0;
+            
+            if( $limit && $offset ) {
+                NextTokenCache::Store($query, $limit, $offset, $result->nextToken());
+            }
 
             while( (is_null($limit) || count($this->_items) < $limit) && $result->nextToken() ) {
-                $limitRemaining = $limit - count($this->_items);
-                if( $limitRemaining < 100 ) {
-                    $result = SDBStatement::Query( "$query LIMIT $limitRemaining", $consistentRead, $result->nextToken() );
-                } else {
-                    $result = SDBStatement::Query( $query, $consistentRead, $result->nextToken() );
-                }
+                $limitRemaining = is_null($limit) ? 1000 : $limit - count($this->_items);
+                $result = SDBStatement::Query( "$query LIMIT $limitRemaining", $consistentRead, $result->nextToken() );
                 
                 if( !$result->isOK() ) {
                     throw new \ORM\Exceptions\ORMPDOException($result->errorMessage() );
+                }
+                
+                if( $limit && $offset ) {
+                    NextTokenCache::Store($query, $limit, $offset, $result->nextToken());
                 }
                 
                 foreach( $result as $key => $item ) {

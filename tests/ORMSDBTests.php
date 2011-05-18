@@ -3,6 +3,7 @@ namespace ORM\Tests;
 use \ORM\Tests\Mock, \ORM\SDB\ORMModelSDB;
 
 require_once 'ORMTest.php';
+
 /**
  * Description of ORMSDBTests
  *
@@ -57,6 +58,52 @@ class ORMSDBTests extends ORMTest {
         ));
 
         $this->assertEquals( 10, count($owners) );
+    }
+    
+    public function testOffset() {
+        $owners1 = Mock\SDBOwner::FindAll(array(
+            'limit'  => 10
+        ));
+        
+        $owners1 = Mock\SDBOwner::FindAll(array(
+            'limit'  => 10
+        ));
+        
+        $owners2 = Mock\SDBOwner::FindAll(array(
+            'limit'  => 10,
+            'offset' => 10
+        ));
+        
+        $owners2 = Mock\SDBOwner::FindAll(array(
+            'limit'  => 10,
+            'offset' => 10
+        ));
+        
+        $owners3 = Mock\SDBOwner::FindAll(array(
+            'limit'  => 10,
+            'offset' => 20
+        ));
+        
+        $owners5 = Mock\SDBOwner::FindAll(array(
+            'limit'  => 10,
+            'offset' => 40
+        ));
+        
+        $ownersAll = Mock\SDBOwner::FindAll(array(
+            'limit'  => 50
+        ));
+        
+        $this->assertEquals( 10, count($owners1) );
+        $this->assertEquals( 10, count($owners2) );
+        $this->assertEquals( 10, count($owners3) );
+        $this->assertEquals( 50, count($ownersAll) );
+        
+        $this->assertNotEquals( $owners1[0]->id(), $owners2[0]->id(), "Second returned collection is same as first" );
+        $this->assertNotEquals( $owners2[0]->id(), $owners3[0]->id(), "Third returned collection is same as second" );
+        $this->assertNotEquals( $owners1[0]->id(), $owners3[0]->id(), "Third returned collection is same as first" );
+        $this->assertEquals( $ownersAll[10]->id(), $owners2[0]->id(), "Second group does not match" );
+        $this->assertEquals( $ownersAll[20]->id(), $owners3[0]->id(), "Third group does not match" );
+        $this->assertEquals( $ownersAll[40]->id(), $owners5[0]->id(), "Fourth group does not match (skipped offset problem)" );
     }
 }
 ?>

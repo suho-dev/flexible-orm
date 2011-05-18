@@ -98,6 +98,12 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @var int limit
      */
     private $_limit;
+    
+    /**
+     * The number of records to skip (for pagination in combination with LIMIT
+     * @var int $_offset
+     */
+    private $_offset = 0;
 
     /**
      * Create an SDBStatement object for a query
@@ -705,12 +711,13 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         
         if( preg_match('/LIMIT (\d+), (\d+) $/', $this->_queryString, $matches) ) {
             $replace[]      = $matches[0];
+            $this->_offset  = (int)$matches[1];
             $this->_limit   = (int)$matches[2];
         }
         
         $this->_queryString = str_replace( $replace, '', $this->_queryString );
         
-        if( !is_null($this->_limit) && $this->_limit < 100 ) {
+        if( !is_null($this->_limit) ) {
             $this->_queryString .= " LIMIT {$this->_limit}";
         }
     }
@@ -737,17 +744,8 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             throw new Exceptions\ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
-        $consistentRead = $className::EnforceReadConsistency();
-        $optionsArray = array(
-            'ConsistentRead' => $consistentRead
-        );
-
         $this->_simplifyQuery($className);
-        
-        // Execute the query
-        $this->_result = self::$_sdb->select(
-                $this->_queryString, $optionsArray 
-        )->getAll($consistentRead == 'true', $this->_limit);
+        $this->_result = $this->_executeFetchQuery($className::EnforceReadConsistency());
 
         $collection = new \ORM\ModelCollection();
         
@@ -768,6 +766,28 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         }
 
         return $collection;
+    }
+    
+    private function _executeFetchQuery( $consistentRead ) {
+        $optionsArray = array(
+            'ConsistentRead' => $consistentRead
+        );
+        
+        if( $this->_offset > 0 ) {
+            list( $offset, $token ) = NextTokenCache::GetNearestToken(
+                $this->_queryString, 
+                $this->_limit, 
+                $this->_offset
+            );
+            
+            if( $token ) {
+                $optionsArray['NextToken'] = $token;
+            }
+        }
+        
+        return self::$_sdb->select(
+                $this->_queryString, $optionsArray 
+        )->getAll($consistentRead == 'true', $this->_limit, $this->_offset);
     }
 
     /**
