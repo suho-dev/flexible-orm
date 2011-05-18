@@ -759,17 +759,21 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * 
      * Basically just a plural lowercase version of the model name
      *
-     * @note Currently this only allows for the simplest of plurals (i.e. adding an s)
+     * @note Currently this only allows for some simple plurals ('ies' or 's')
      *
+     * @see TableName()
      * @param string $model_name
      *      The name of the model.
      * @return string
-     * @see TableName()
      */
     private static function _makeTableName( $model_name ) {
         $class = strtolower( basename(str_replace( '\\', '/', $model_name)) );
 
-        return "{$class}s";
+        if( substr($class, 0, -1) == 'y' ) {
+            return "{$class}ies";
+        } else {
+            return "{$class}s";
+        }
     }
 
     /**
