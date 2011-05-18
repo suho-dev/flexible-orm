@@ -300,6 +300,11 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         if( isset($optionsArray['order']) ) {
             $sql .= "ORDER BY {$optionsArray['order']} ";
         }
+        
+        if( isset($optionsArray['limit']) ) {
+            $offset = isset($optionsArray['offset']) ? $optionsArray['offset'] : 0;
+            $sql .= "LIMIT $offset, {$optionsArray['limit']} ";
+        }
 
         return $sql;
     }

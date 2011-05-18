@@ -36,6 +36,14 @@ namespace ORM;
  *
  * - <i>order</i><br >
  *          The SQL \c ORDER \c BY value.
+ * 
+ * - <i>limit</i><br >
+ *          (Only for findAll statements). Limit the number of results to the specified
+ *          maximum.
+ * 
+ * - <i>offset</i><br >
+ *          (Only for findAll statements). Offset rows to skip (used with \e limit 
+ *          to create pagination.
  *
  * \n\n
  * \subsection intro_step4_find_one Find

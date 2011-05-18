@@ -598,5 +598,21 @@ class ORM_ModelTest extends ORMTest {
 
         $this->assertTrue( $owner->save() );
     }
+    
+    public function testFindAllWithLimit() {
+        $owners = Mock\Owner::FindAll(array(
+            'limit' => 2
+        ));
+        
+        $this->assertEquals( 2, count($owners) );
+        
+        $moreOwners = Mock\Owner::FindAll(array(
+            'limit'  => 2,
+            'offset' => 2
+        ));
+        
+        $this->assertNotEquals( $owners[0]->id(), $moreOwners[0]->id() );
+        $this->assertGreaterThan( 1, count($moreOwners) );
+    }
 }
 ?>
