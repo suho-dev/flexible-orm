@@ -92,6 +92,12 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @var array $_findWith
      */
     private $_findWith;
+    
+    /**
+     * The maximum number of results to return, if null then return all
+     * @var int limit
+     */
+    private $_limit;
 
     /**
      * Create an SDBStatement object for a query
@@ -685,7 +691,8 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     /**
      * Alter the querystring so that it works with Amazon SDB
      *
-     * Remove backticks and aliases.
+     * Remove backticks and aliases. Removes offset so that the inbuilt limit
+     * option works.
      *
      * @param string $className
      *      [optional] The ORM_Model class sometimes adds the model name to the
@@ -695,7 +702,17 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     private function _simplifyQuery( $className = '' ) {
         $baseClass  = basename( str_replace('\\', '//', $className) );
         $replace    = array("`$baseClass`.", "AS `$baseClass`", "`");
+        
+        if( preg_match('/LIMIT (\d+), (\d+) $/', $this->_queryString, $matches) ) {
+            $replace[]      = $matches[0];
+            $this->_limit   = (int)$matches[2];
+        }
+        
         $this->_queryString = str_replace( $replace, '', $this->_queryString );
+        
+        if( !is_null($this->_limit) && $this->_limit < 100 ) {
+            $this->_queryString .= " LIMIT {$this->_limit}";
+        }
     }
 
     /**
@@ -726,7 +743,11 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         );
 
         $this->_simplifyQuery($className);
-        $this->_result = self::$_sdb->select( $this->_queryString, $optionsArray )->getAll($consistentRead == 'true');
+        
+        // Execute the query
+        $this->_result = self::$_sdb->select(
+                $this->_queryString, $optionsArray 
+        )->getAll($consistentRead == 'true', $this->_limit);
 
         $collection = new \ORM\ModelCollection();
         

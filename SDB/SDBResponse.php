@@ -172,17 +172,25 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      *      [optional] defaults to false. Tell SDB whether or not to force consistency.
      *      This must be the same as the original query (ie if the original query
      *      enforced consistent read, this must be true)
+     * @param int $limit
+     *      [optionl] Maximum number of records to return (including the original items)
+     *      Defaults to no limit (other than those imposed by MAX_QUERIES).
      * return SDBResponse
      *      The current SDBResponse item is returned for convenience
      */
-    public function getAll($consistentRead = false) {
+    public function getAll($consistentRead = false, $limit = null) {
         if( isset($this->body->SelectResult) ) {
             $result = $this;
             $query  = $this->getQuery();
             $count  = 0;
 
-            while( $result->nextToken() ) {
-                $result = SDBStatement::Query( $query, $consistentRead, $result->nextToken() );
+            while( (is_null($limit) || count($this->_items) < $limit) && $result->nextToken() ) {
+                $limitRemaining = $limit - count($this->_items);
+                if( $limitRemaining < 100 ) {
+                    $result = SDBStatement::Query( "$query LIMIT $limitRemaining", $consistentRead, $result->nextToken() );
+                } else {
+                    $result = SDBStatement::Query( $query, $consistentRead, $result->nextToken() );
+                }
                 
                 if( !$result->isOK() ) {
                     throw new \ORM\Exceptions\ORMPDOException($result->errorMessage() );

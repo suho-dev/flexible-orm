@@ -42,5 +42,21 @@ class ORMSDBTests extends ORMTest {
         $this->assertEquals( $car->brand,  $storedCar->brand, "Incorrect brand stored data for {$car->id()}" );
         $this->assertEquals( $car->colour, $storedCar->colour, "Incorrect colour stored data for {$car->id()}" );
     }
+    
+    public function testLimit() {
+        $owners = Mock\SDBOwner::FindAll(array(
+            'limit' => 110
+        ));
+
+        $this->assertEquals( 110, count($owners) );
+    }
+    
+    public function testSmallLimit() {
+        $owners = Mock\SDBOwner::FindAll(array(
+            'limit' => 10
+        ));
+
+        $this->assertEquals( 10, count($owners) );
+    }
 }
 ?>
