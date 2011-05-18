@@ -14,19 +14,30 @@ use \ORM\Interfaces\DebugLog;
 /**
  * Simple class to help with debugging tasks
  * 
- * Using this for debugging makes it easy to disable debug remarks on production servers
+ * Using this for debugging makes it easy to disable debug remarks on production
+ * servers and control how (or if) debugs are loggged)
  *
- * Operates as a simple factory
- *
- * @todo rewrite and document this class
+ * <b>Simple Usage</b>
+ * @code
+ * $myObject = Car::Find();
+ * Debug::Dump($myObject);
+ * 
+ * // Would output the contents of $myObject
+ * @encode
+ * 
+ * <b>Options</b>
+ * You can disable output system wide by calling \c Debug::SetDisplayOutput(false)
+ * . If you don't alter the 'SetDisplayOutput' setting, it will use the PHP setting
+ * for display_errors.
+ * 
+ * You can enable logging of errors by defining a class that implements the
+ * Interfaces\DebugLog interface and then nominating it \c Debug::SetLogStore( $classname )
+ * 
+ * @see DebugCorrectLog in tests/Mock
+ * 
  *
  * @todo add option to catch all errors (not exceptions)
- *
- * @todo add exception for unknown classname
- *
  * @todo implement backtrace
- *
- * @todo add disable output
  */
 class Debug {
     /**
@@ -45,6 +56,14 @@ class Debug {
      */
     private static $_instance;
     
+    /**
+     * @var DebugLog $_lastLogObject
+     */
+    private $_lastLogObject;
+    
+    /**
+     * Private constructor, this is a singleton class (sort of)
+     */
     private function __construct() {
         if( is_null(self::$_displayDebug) ) {
             self::$_displayDebug = ini_get('display_errors');
@@ -57,9 +76,11 @@ class Debug {
      * @see debugObject()
      * @param mixed $object
      *      Object to debug
+     * @return string
+     *      The output contents (or what would have been output had it been allowed)
      */
     public static function Dump( $object ) {
-        self::Get()->debugObject( $object );
+        return self::Get()->debugObject( $object );
     }
     
     /**
@@ -69,7 +90,7 @@ class Debug {
      *      A class name. Must implement the Interfaces\DebugLog
      */
     public static function SetLogStore( $storeClass ) {
-        if( !in_array( 'ORM\Interfaces\DebugLog', class_implements($storeClass) ) ) {
+        if( !is_null($storeClass) && !in_array( 'ORM\Interfaces\DebugLog', class_implements($storeClass) ) ) {
             throw new \Exception("Class $storeClass does not implement DebugLog");
         }
         
@@ -82,7 +103,7 @@ class Debug {
      * @param boolean $displayDebug
      *      True to display debugs
      */
-    public static function SetDisplayErrors( $displayDebug = true ) {
+    public static function SetDisplayOutput( $displayDebug = true ) {
         self::$_displayDebug = $displayDebug;
     }
     
@@ -116,10 +137,19 @@ class Debug {
         }
         
         if( self::$_logStoreClass ) {
-            $log = new self::$_logStoreClass;
-            $log->store( $object );
+            $this->_lastLogObject = new self::$_logStoreClass;
+            $this->_lastLogObject->store( $object );
         }
         
         return $output;
+    }
+    
+    /**
+     * Get the last debug log object (if it exists)
+     * @return DebugLog
+     *      Will be null if either debugLogStore is null or nothing has been logged
+     */
+    public function lastLogObject() {
+        return $this->_lastLogObject;
     }
 }

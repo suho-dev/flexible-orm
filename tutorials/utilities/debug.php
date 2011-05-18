@@ -3,23 +3,8 @@ namespace ORM;
 /*! @page debug_tutorial Debug - Debugging Helpers
  *
  * \section debug_intro Introduction
- * 
- *
- *
- *
- * \n\n
- * \subsection debug_inifiles INI Files
- * 
- *
- * \n
- * <b>INI File - Basic</b>
- * 
- * \n
- * <b>INI File - With Groups</b>
- * 
- *
- * \n\n
- * \subsection debug_loading Loading Settings
+ * There is a simple debug class included, documentation is available in the Debug
+ * section of the api.
  * 
  *
  * \n\n
