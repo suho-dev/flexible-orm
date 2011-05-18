@@ -769,8 +769,8 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     private static function _makeTableName( $model_name ) {
         $class = strtolower( basename(str_replace( '\\', '/', $model_name)) );
 
-        if( substr($class, 0, -1) == 'y' ) {
-            return "{$class}ies";
+        if( substr($class, -1) == 'y' ) {
+            return substr($class, 0, -1)."ies";
         } else {
             return "{$class}s";
         }

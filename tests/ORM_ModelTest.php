@@ -26,6 +26,11 @@ class ORM_ModelTest extends ORMTest {
             'my_elephants',
             Mock\Elephant::TableName()
         );
+        
+        $this->assertEquals(
+            'canaries',
+            Mock\Canary::TableName()
+        );
     }
 
     public function testFind() {
