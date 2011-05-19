@@ -8,8 +8,11 @@ namespace ORM\SDB;
 use \ORM\Utilities\Cache\APCCache;
 
 /**
- * Description of NextTokenCache
  * Simple container for some token caching
+ * 
+ * Currently requires PHP APC for caching
+ * 
+ * @todo abstract out caching to use any cache class
  */
 class NextTokenCache {
     /**
@@ -35,6 +38,7 @@ class NextTokenCache {
     /**
      * Get the "nextToken" for a query/offset/limit combination if known
      * 
+     * @see GetNearestToken
      * @param string $query
      * @param int $limit
      * @param int $offset 
@@ -46,14 +50,27 @@ class NextTokenCache {
             self::_CacheName($query, $limit, $offset)
         );
     }
-    
+
+    /**
+     * Get the closest nextToken value for a given query and offset
+     * 
+     * Search the cache for any known tokens to limit the number of requests 
+     * required to reach the requested offset.
+     * 
+     * @see GetToken()
+     * @param string $query
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     *      Array in the format of ([0] => offset, [1] => token). If none found
+     *      will return array(0, false)
+     */
     public static function GetNearestToken( $query, $limit, $offset ) {
-        $noToken = array( 0, false );
         do {
             $token = self::GetToken( $query, $limit, $offset-- );
         } while( $offset > 0 && $token === false );
         
-        return $token ? array( ++$offset, $token ) : $noToken;
+        return $token ? array( ++$offset, $token ) : array( 0, false );
     }
     
     /**

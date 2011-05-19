@@ -768,13 +768,23 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         return $collection;
     }
     
+    /**
+     * Execute a fetchAll query and deal with offsets and limits
+     * 
+     * Called by FetchAllInto
+     * 
+     * @param string $consistentRead
+     * @return SDBResponse
+     */
     private function _executeFetchQuery( $consistentRead ) {
         $optionsArray = array(
             'ConsistentRead' => $consistentRead
         );
         
+        // If we already know some tokens, don't start from the begining (for speed)
+        $initialOffset = 0;
         if( $this->_offset > 0 ) {
-            list( $offset, $token ) = NextTokenCache::GetNearestToken(
+            list( $initialOffset, $token ) = NextTokenCache::GetNearestToken(
                 $this->_queryString, 
                 $this->_limit, 
                 $this->_offset
@@ -787,7 +797,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         
         return self::$_sdb->select(
                 $this->_queryString, $optionsArray 
-        )->getAll($consistentRead == 'true', $this->_limit, $this->_offset);
+        )->getAll($consistentRead == 'true', $this->_limit, $this->_offset, $initialOffset );
     }
 
     /**

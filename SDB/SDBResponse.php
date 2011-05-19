@@ -175,43 +175,96 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      * @param int $limit
      *      [optional] Maximum number of records to return (including the original items)
      *      Defaults to no limit (other than those imposed by MAX_QUERIES).
-     * @paran int $offset
+     * @param int $offset
      *      [optional] Number of rows to skip from beinging when used with limit.
      *      Defaults to 0 (start from beginning).
+     * @param int $currentOffset
+     *      The number of rows already skipped. Defaults to 0 (started from beginning).
      * return SDBResponse
      *      The current SDBResponse item is returned for convenience
      */
-    public function getAll($consistentRead = false, $limit = null, $offset = 0) {
+    public function getAll($consistentRead = false, $limit = null, $offset = 0, $currentOffset = 0) {
         if( isset($this->body->SelectResult) ) {
             $result = $this;
             $query  = $this->getQuery();
             $count  = 0;
             
-            if( $limit && $offset ) {
-                NextTokenCache::Store($query, $limit, $offset, $result->nextToken());
+            if( $currentOffset < $offset ) {
+                $this->clear();
             }
-
-            while( (is_null($limit) || count($this->_items) < $limit) && $result->nextToken() ) {
-                $limitRemaining = is_null($limit) ? 1000 : $limit - count($this->_items);
-                $result = SDBStatement::Query( "$query LIMIT $limitRemaining", $consistentRead, $result->nextToken() );
+            
+            if( $limit ) {
+                $currentOffset += $limit;
+                NextTokenCache::Store($query, $limit, $currentOffset, $result->nextToken());
+                $query = str_replace("LIMIT $limit", '', $query);
+            } else {
+                $limit = 2400;
+            }
+            
+            // Continue querying SDB until all items have been fetched or limit is reached
+            while( count($this->_items) < $limit && $result->nextToken() ) {
+                $limitRemaining = $this->_limitRemaining($limit, $offset, $currentOffset);
                 
-                if( !$result->isOK() ) {
-                    throw new \ORM\Exceptions\ORMPDOException($result->errorMessage() );
-                }
+                $result = SDBStatement::Query(
+                    "$query LIMIT $limitRemaining", $consistentRead, $result->nextToken()
+                );
                 
-                if( $limit && $offset ) {
-                    NextTokenCache::Store($query, $limit, $offset, $result->nextToken());
-                }
+                $this->_setItems( $result );
                 
-                foreach( $result as $key => $item ) {
-                    $this->_items[$key] = $item;
-                }
+                $currentOffset += $limit;
+                NextTokenCache::Store($query, $limit, $currentOffset, $result->nextToken());
                 
                 if( ++$count > self::MAX_QUERIES ) break;
             }
         }
         
         return $this;
+    }
+    
+    /**
+     * Clear all the items in the _items array
+     * 
+     * Also calls rewind()
+     * 
+     * @return void
+     */
+    public function clear() {
+        $this->_items = array();
+        $this->rewind();
+    }
+    
+    /**
+     * Helper function to tidy up the getAll() function
+     * 
+     * Determine how many more items are required. Removes items if the target
+     * offset has not yet been reached
+     *
+     * @param int $limit
+     * @param int $targetOffset
+     * @param int $currentOffset 
+     * @return int
+     */
+    private function _limitRemaining( $limit, $targetOffset, $currentOffset ) {
+        if( $targetOffset === 0 || $targetOffset == $currentOffset ) {
+            return $limit - count($this->_items);
+        } else {
+            $this->clear();
+            return $limit;
+        }
+    }
+    
+    /**
+     * Get items from a query and add them to this query
+     * @param SDBResponse $response 
+     */
+    private function _setItems( SDBResponse $response ) {
+        if( !$response->isOK() ) {
+            throw new \ORM\Exceptions\ORMPDOException( $response->errorMessage() );
+        }
+        
+        foreach( $response as $key => $item ) {
+            $this->_items[$key] = $item;
+        }
     }
 
     /**
