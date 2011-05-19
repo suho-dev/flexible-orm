@@ -167,7 +167,7 @@ class Configuration {
             return new $cacheClass;
         }
         
-        return null;
+        return new \ORM\Utilities\Cache\NullCache();
     }
     
     /**
