@@ -29,7 +29,7 @@ class Configuration {
      *      Associative (possibly 2-dimensional) array of settings
      */
     private $_options;
-
+    
     /**
      * Private constructor
      * @return Configuration
@@ -153,6 +153,30 @@ class Configuration {
     public static function Get() {
         return self::$_settings;
     }
+    
+    /**
+     * Get an instance of the configured cache object
+     * 
+     * To alter the cache object, add <code>[Cache]class = ""</code> to your ini
+     * file or call SetCacheClass()
+     * 
+     * @return Cache
+     */
+    public static function GetCache() {
+        if( $cacheClass = self::Value('cacheClass', 'Cache') ) {
+            return new $cacheClass;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Set the cache class for the whole system to use
+     * @param string|null $className 
+     */
+    public static function SetCacheClass( $className ) {
+        self::$_settings->_options['Cache'] = array('cacheClass' => $className);
+    }
 
     /**
      * Clear all the configuration settings
@@ -232,6 +256,6 @@ class Configuration {
      * Send the current settings to the Debug class
      */
     public static function Debug() {
-        DEBUG::dump(self::$_settings);
+        Debug::Dump(self::$_settings);
     }
 }

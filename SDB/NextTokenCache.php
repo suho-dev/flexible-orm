@@ -10,13 +10,12 @@ use \ORM\Utilities\Cache\APCCache;
 /**
  * Simple container for some token caching
  * 
- * Currently requires PHP APC for caching
+ * Currently requires a cache class to be defined in Configuration for caching
  * 
- * @todo abstract out caching to use any cache class
  */
 class NextTokenCache {
     /**
-     * @var APCCache $_cache
+     * @var Cache $_cache
      */
     private static $_cache;
     
@@ -76,11 +75,12 @@ class NextTokenCache {
     /**
      * Get the cache object
      * 
-     * @return APCCache
+     * Cache object defined by Configuration::SetCacheClass()
+     * @return Cache
      */
     private static function _Cache() {
         if( is_null(self::$_cache) ) {
-            self::$_cache = new APCCache();
+            self::$_cache = \ORM\Utilities\Configuration::GetCache();
         }
         
         return self::$_cache;

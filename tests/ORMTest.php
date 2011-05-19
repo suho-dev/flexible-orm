@@ -10,6 +10,7 @@ require_once dirname(__FILE__) . '/../AutoLoader.php';
 require_once '../../plugins/aws-sdk-1.3.2/sdk.class.php';
 
 \ORM\Utilities\Configuration::Load('test.ini');
+\ORM\Utilities\Configuration::SetCacheClass('\ORM\Utilities\Cache\APCCache');
 
 if( function_exists('apc_clear_cache') ) {
     $cache = new \ORM\Utilities\Cache\APCCache();
