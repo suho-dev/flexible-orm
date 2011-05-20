@@ -130,15 +130,40 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      */
     private static function _InitSDBConnection() {
         if( is_null(self::$_sdb) ){
-            self::$_sdb = new \AmazonSDB();
-            self::$_sdb->set_response_class( __NAMESPACE__.'\SDBResponse');
+            list( $key, $secret ) = self::_GetAWSKeys();
             $region = Configuration::AWS()->region;
+            
+            self::$_sdb = new \AmazonSDB( $key, $secret );
+            self::$_sdb->set_response_class( __NAMESPACE__.'\SDBResponse');
             self::$_sdb->set_region( $region ?: \AmazonSDB::REGION_APAC_SE1);
             
             if( Configuration::AWS()->apc_enabled ) {
                 self::$_sdb->set_cache_config('apc');
             }
         }
+    }
+    
+    /**
+     * Get array containing the public and private keys for accessing AmazonSDB
+     * 
+     * \note These can be retrieved through the Accounts panel of the AWS website.
+     * 
+     * Looks for ini settings below, or the constants AWS_KEY and AWS_SECRET_KEY
+     * @code
+     * [AWS]
+     * key = "aaaa"
+     * secret_key = "aaaaa"
+     * @endcode
+     * 
+     * @return array
+     *      public, private
+     */
+    private static function _GetAWSKeys() {
+        $aws        = \ORM\Utilities\Configuration::AWS();
+        $key        = $aws->key ?: AWS_KEY;
+        $secret_key = $aws->secret_key ?: AWS_SECRET_KEY;
+        
+        return array( $key, $secret_key );
     }
 
     /**
