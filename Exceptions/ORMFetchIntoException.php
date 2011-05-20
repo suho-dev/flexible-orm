@@ -10,6 +10,5 @@ namespace ORM\Exceptions;
  *
  */
 class ORMFetchIntoException extends ORMPDOException {
-    //put your code here
 }
 ?>

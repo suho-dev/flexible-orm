@@ -27,6 +27,17 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      */
     protected function __construct() {
     }
+    
+    /**
+     * For simplicity, the fetch method has fewer options when using the DataStatement
+     * interface
+     *
+     * @param int $fetch_style
+     * @return mixed
+     */
+    public function fetch( $fetch_style = \PDO::FETCH_BOTH ) {
+        return parent::fetch( $fetch_style );
+    }
 
     /**
      * Return an object representing the result of the database query
@@ -66,7 +77,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
     public function fetchInto( $className ) {
         return $this->_getObject($className, $this->_getQualifiedColumnNames());
     }
-
+    
     /**
      * Get a collection of objects representing a number of rows in the database
      * 
@@ -120,7 +131,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
 
         return $qualifiedNames;
     }
-
+    
     /**
      * Get a single object of class '$className' from the database
      *
@@ -331,7 +342,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      *      parameters in the SQL statement being executed. See PDOStatement->execute()
      * @return bool
      */
-    public function execute($input = null) {
+    public function execute( array $input = null) {
         try{
 
             return parent::execute($input);

@@ -41,6 +41,14 @@ use ORM\Exceptions;
  * on configuring foreign keys, see \ref intro_step3 "Define Foreign Keys".
  *
  * \include orm_model_foreign.example.php
+ * 
+ * \n\n
+ * <b>Counting and Pagination</b>
+ * 
+ * For "paging" data (i.e. splitting into fixed sized sequential groups) you simply
+ * need to use the CountFindAll() function and the \c limit and \c offset options.
+ * 
+ * \include orm_model.pagination.example.php
  *
  * \n\n
  * @todo Exceptions - if model is poorly coded, it should raise a more descriptive
@@ -54,7 +62,27 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * @var mixed $_id
      */
     protected $_id;
-
+    
+    /**
+     * Only return the total number of matches, not the items
+     * @see _BuildSQL()
+     */
+    const QUERY_COUNT_ONLY    = 1;
+    
+    /**
+     * Default setting, just perform a query with joins and return the results
+     * @see _BuildSQL()
+     */
+    const QUERY_REGULAR       = 2;
+    
+    /**
+     * Placeholder constant for profiling a query
+     * 
+     * \note Not currently implemented, will behave like QUERY_REGULAR
+     * @see _BuildSQL()
+     */
+    const QUERY_PROFILE_ONLY    = 3;
+    
     /**
      * Create a new ORM_Model, optionally with some preset options
      *
@@ -133,7 +161,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *
      * @see Find(), FindAllBy()
      * @param array $optionsArray
-     *      An array of options for finding objects. If not supplied, this will
+     *      [optional] An array of options for finding objects. If not supplied, this will
      *      return all objects of this type stored in the database. For more
      *      information about the options array, see \ref intro_step4_options "Options Array"
      *      in the \ref getting_started "Getting Started" tutorial
@@ -148,15 +176,109 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $sql    = static::_BuildSQL( $optionsArray, static::TableName(), $findWith );
         $query  = $df::Get( $sql, static::DatabaseConfigName() );
 
-        if( isset($optionsArray['values']) ) {
-            $query->execute($optionsArray['values']);
-        } else {
-            $query->execute();
-        }
+        $query->execute( isset($optionsArray['values']) ? $optionsArray['values'] : null);
 
         return $query->fetchAllInto( get_called_class() );
     }
+    
+    /**
+     * Find all objects where a single field meets the requirements
+     *
+     * This would not be called directly ordinarily, instead call the "magic" method
+     * as shown below.
+     *
+     * <b>Usage</b>:
+     * \include orm_model.findAllBy.example.php
+     *
+     * @todo if operator is IN then allow $value to be an array
+     * @todo verify operator type
+     *
+     * @param string $field
+     *      The field name to search on
+     * @param string $value
+     *      The value to compare for finding objects
+     * @param string $operator
+     *      [optional] A valid SQL comparison operator (Default =)
+     * @param string|array $findWith
+     *      [optional] A string or array of strings defining the related model
+     *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
+     * @return ModelCollection
+     *      Return the ModelCollection of objects
+     */
+    public static function FindAllBy( $field, $value, $operator = '=', $findWith = false ) {
+        $df         = static::DataFactory();
+        $className  = static::ClassName();
+        $sql        = static::_BuildSQL(
+            array( 'where' =>  "`$className`.`$field` $operator :$field" ),
+            static::TableName(),
+            $findWith
+        );
+        
+        $query = $df::Get( $sql, static::DatabaseConfigName() );
 
+        $query->bindParam( ":$field", $value );
+
+        $query->execute();
+
+        return $query->fetchAllInto( get_called_class() );
+    }
+    
+    /**
+     * Get the number of records that exist matching the specified options
+     * 
+     * @see FindAll(), CountFindAllBy()
+     * @param array $optionsArray 
+     *      [optional] An array of options for finding objects. If not supplied, this will
+     *      return all objects of this type stored in the database. For more
+     *      information about the options array, see \ref intro_step4_options "Options Array"
+     *      in the \ref getting_started "Getting Started" tutorial
+     * @return int
+     *      The total number of values that match this query
+     */
+    public static function CountFindAll( $optionsArray = array() ) {
+        $df     = static::DataFactory();
+        $sql    = static::_BuildSQL( $optionsArray, static::TableName(), false, self::QUERY_COUNT_ONLY );
+        $query  = $df::Get( $sql, static::DatabaseConfigName() );
+        
+        $query->execute( isset($optionsArray['values']) ? $optionsArray['values'] : null);
+
+        $result = $query->fetch();
+        return $result[0];
+    }
+    
+    /**
+     * Get the number of records that exist matching the specified options
+     * 
+     * @see FindAllBy(), CountFindAll()
+     * @param string $field
+     *      The field name to search on
+     * @param string $value
+     *      The value to compare for finding objects
+     * @param string $operator
+     *      [optional] A valid SQL comparison operator (Default =)
+     * @return int
+     *      The total number of values that match this query
+     */
+    public static function CountFindAllBy( $field, $value, $operator = '=' ) {
+        $df         = static::DataFactory();
+        $className  = static::ClassName();
+        $sql        = static::_BuildSQL(
+            array( 'where' =>  "`$field` $operator :$field" ),
+            static::TableName(),
+            false,
+            self::QUERY_COUNT_ONLY
+        );
+        
+        $query = $df::Get( $sql, static::DatabaseConfigName() );
+
+        $query->bindParam( ":$field", $value );
+
+        $query->execute();
+
+        $result = $query->fetch();
+        return $result[0];
+    }
+    
     /**
      * Allow for specialty "FindBy" functions
      *
@@ -168,7 +290,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * Car::FindAllByDoors( 3, '>=' );
      * @endcode
      *
-     * @see FindBy(), FindAllBy()
+     * @see FindBy(), FindAllBy(), CountFindAllBy()
      * @param string $name
      * @param array $arguments
      * @return mixed
@@ -179,12 +301,20 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
 
             return static::FindBy( self::_LowercaseFirst($matches[1]), $arguments[0], $findWith );
 
-        } elseif(  preg_match('/^FindAllBy(.+)$/', $name, $matches) ) {
+        } elseif( preg_match('/^FindAllBy(.+)$/', $name, $matches) ) {
             $findWith = isset( $arguments[2] ) ? $arguments[2] : false;
             $operator = isset( $arguments[1] ) ? $arguments[1] : '=';
 
             return static::FindAllBy( self::_LowercaseFirst($matches[1]), $arguments[0], $operator, $findWith );
+            
+        } elseif( preg_match('/^CountFindAllBy(.+)$/', $name, $matches) ) {
+            $findWith = isset( $arguments[2] ) ? $arguments[2] : false;
+            $operator = isset( $arguments[1] ) ? $arguments[1] : '=';
+            
+            return static::CountFindAllBy( self::_LowercaseFirst($matches[1]), $arguments[0], $operator );
         }
+        
+        throw new Exceptions\ORMException("Method $name does not exist");
     }
 
     /**
@@ -283,15 +413,22 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * @param string|array $findWith
      *      [optional] A string or array of strings defining the related model
      *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
+     * @param int $queryOption
+     *      [optional] Special setting for changing the purpose of this query.
+     *      Can either be QUERY_REGULAR or QUERY_COUNT_ONLY
      * @return string
      *      SQL Query string
      */
-    protected static function _BuildSQL( $optionsArray, $table, $findWith = false ) {
+    protected static function _BuildSQL( $optionsArray, $table, $findWith = false, $queryOption = self::QUERY_REGULAR ) {
         $className  = static::ClassName();
 
-        $sql = $findWith ? 
-                static::_BuildSQLFindWith( $table, $findWith )
-                : "SELECT `$className`.* FROM `$table` AS `$className` ";
+        if( $queryOption == self::QUERY_COUNT_ONLY ) {
+            $sql = "SELECT COUNT(*) FROM `$table` ";
+        } else {
+            $sql = $findWith ? 
+                    static::_BuildSQLFindWith( $table, $findWith )
+                    : "SELECT `$className`.* FROM `$table` AS `$className` ";
+        }
 
         if( isset($optionsArray['where']) ) {
             $sql .= "WHERE {$optionsArray['where']} ";
@@ -342,48 +479,6 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         }
 
         return 'SELECT '.implode(', ', $models)." FROM `$table` AS `$className` $joins";
-    }
-
-    /**
-     * Find all objects where a single field meets the requirements
-     *
-     * This would not be called directly ordinarily, instead call the "magic" method
-     * as shown below.
-     *
-     * <b>Usage</b>:
-     * \include orm_model.findAllBy.example.php
-     *
-     * @todo if operator is IN then allow $value to be an array
-     * @todo verify operator type
-     *
-     * @param string $field
-     *      The field name to search on
-     * @param string $value
-     *      The value to compare for finding objects
-     * @param string $operator
-     *      [optional] A valid SQL comparison operator (Default =)
-     * @param string|array $findWith
-     *      [optional] A string or array of strings defining the related model
-     *      names to also fetch (see \ref intro_step3 "Define Foreign Keys")
-     * @return ModelCollection
-     *      Return the ModelCollection of objects
-     */
-    public static function FindAllBy( $field, $value, $operator = '=', $findWith = false ) {
-        $df         = static::DataFactory();
-        $className  = static::ClassName();
-        $sql        = static::_BuildSQL(
-            array( 'where' =>  "`$className`.`$field` $operator :$field" ),
-            static::TableName(),
-            $findWith
-        );
-        
-        $query = $df::Get( $sql, static::DatabaseConfigName() );
-
-        $query->bindParam( ":$field", $value );
-
-        $query->execute();
-
-        return $query->fetchAllInto( get_called_class() );
     }
 
     /**

@@ -18,7 +18,7 @@ interface DataStatement {
      * 
      * @see http://www.php.net/manual/en/pdostatement.execute.php
      */
-    public function execute( $values );
+    public function execute( array $values = null );
     
     /**
      * Bind a variable to a placeholder
@@ -44,6 +44,12 @@ interface DataStatement {
      * :name
      */
     public function bindObject( $object, array $params );
+    
+    /**
+     * Fetch a row from the database
+     * @sse http://www.php.net/manual/en/pdostatement.fetch.php
+     */
+    public function fetch( $fetch_style );
     
     /**
      * Fetch the results of the query in to an object of this classname

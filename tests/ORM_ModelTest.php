@@ -619,5 +619,17 @@ class ORM_ModelTest extends ORMTest {
         $this->assertNotEquals( $owners[0]->id(), $moreOwners[0]->id() );
         $this->assertGreaterThan( 1, count($moreOwners) );
     }
+    
+    public function testCountFindAll() {
+        $carCount = Mock\Car::CountFindAll();
+        
+        $this->assertEquals( 4, $carCount );
+    }
+    
+    public function testCountFindAllBy() {
+        $carCount = Mock\Car::CountFindAllByColour('black');
+        
+        $this->assertEquals( 2, $carCount );
+    }
 }
 ?>

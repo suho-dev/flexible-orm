@@ -105,5 +105,12 @@ class ORMSDBTests extends ORMTest {
         $this->assertEquals( $ownersAll[20]->id(), $owners3[0]->id(), "Third group does not match" );
         $this->assertEquals( $ownersAll[40]->id(), $owners5[0]->id(), "Fourth group does not match (skipped offset problem)" );
     }
+    
+    public function testCoundFindAll() {
+        $carCount = Mock\SDBCar::CountFindAll();
+        $cars     = Mock\SDBCar::FindAll();
+        
+        $this->assertEquals(count($cars), $carCount);
+    }
 }
 ?>

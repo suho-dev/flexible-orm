@@ -371,9 +371,11 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @return boolean
      *      True on success (only valid for \c INSERT and \c UPDATE operations).
      */
-    public function execute( $values = array() ) {
-        foreach( $values as $key => $value ) {
-            $this->bindValue( $key, $value );
+    public function execute( array $values = null ) {
+        if( !is_null($values) ) {
+            foreach( $values as $key => $value ) {
+                $this->bindValue( $key, $value );
+            }
         }
 
         $this->_bind();
@@ -720,6 +722,34 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         if( !is_null($this->_limit) ) {
             $this->_queryString .= " LIMIT {$this->_limit}";
         }
+    }
+    
+    /**
+     * Fetch a row from simpleDB
+     * 
+     * \note Does not use ConsistentRead, so may be inaccurate by faster than
+     *       fetchInto
+     * 
+     * @throws \ORM\Exceptions\ORMFetchException
+     * @param int $fetch_style 
+     *      Currently does nothing
+     * @return array
+     *      In the same format as PDOStatement::Fetch(PDO::FETCH_BOTH)
+     */
+    public function fetch( $fetch_style = 1 ) {
+        $this->_result = self::$_sdb->select( $this->_queryString );
+        
+        if( !$this->_result->isOK() ) {
+            throw new \ORM\Exceptions\ORMFetchException(
+                $this->_result->errorMessage()
+            );
+        } elseif( count($this->_result) ) {
+            $items  = $this->_result->items();
+            
+            return array_merge(array_values($items['Domain']), $items['Domain']);
+        }
+
+        return array();
     }
 
     /**
