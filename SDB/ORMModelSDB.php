@@ -4,9 +4,21 @@
  * @author jarrod.swift
  */
 namespace ORM\SDB;
+
 /**
- * Description of ORMModelSDB
+ * An model class where the backend is the Amazon simpleDB service.
+ * 
+ * Almost identical to the ORM_Model class with a few exceptions:
+ *  # Primary key is always itemName()
+ *  # Foreign keys (ie FindWith requests) require extra lookups, as there are no
+ * joins in SimpleDB
+ *  # Requests that return a lot of results or use large offset values may be
+ * slow
+ * 
+ * If you are using Amazon Web Services, you might want to consider using the
+ * SDBSessionHandler also.
  *
+ * @see ORM_Model, SDBSessionHandler
  */
 class ORMModelSDB extends \ORM\ORM_Model {
     /**

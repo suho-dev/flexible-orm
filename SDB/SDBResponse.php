@@ -19,7 +19,7 @@ namespace ORM\SDB;
 class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Countable {
     /**
      * The maximum number of consecutive "nextToken" queries run when getAll() is
-     * called. Each query will usually return 100 items.
+     * called.
      */
     const MAX_QUERIES = 30;
     /**
