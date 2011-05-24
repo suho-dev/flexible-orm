@@ -96,7 +96,8 @@ class NextTokenCache {
      *      A unique name for this combination 
      */
     private static function _CacheName( $query, $limit, $offset ) {
-        return "$query-$limit-$offset";
+        $query = preg_replace("/LIMIT \d+/", '', $query);
+        return trim($query)."-$limit-$offset";
     }
 }
 ?>
