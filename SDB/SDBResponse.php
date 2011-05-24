@@ -194,7 +194,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
             }
             
             if( $limit ) {
-                $currentOffset += $limit;
+                $currentOffset += count($this->_items);
                 NextTokenCache::Store($query, $limit, $currentOffset, $result->nextToken());
                 $query = str_replace("LIMIT $limit", '', $query);
             } else {
@@ -211,8 +211,8 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
                 
                 $this->_setItems( $result );
                 
-                $currentOffset += $limit;
-                NextTokenCache::Store($query, $limit, $currentOffset, $result->nextToken());
+                $currentOffset += count($result);
+                NextTokenCache::Store("$query LIMIT $limitRemaining", $limit, $currentOffset, $result->nextToken());
                 
                 if( ++$count > self::MAX_QUERIES ) break;
             }
@@ -245,7 +245,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      * @return int
      */
     private function _limitRemaining( $limit, $targetOffset, $currentOffset ) {
-        if( $targetOffset === 0 || $targetOffset == $currentOffset ) {
+        if( $targetOffset <= $currentOffset ) {
             return $limit - count($this->_items);
         } else {
             $this->clear();
