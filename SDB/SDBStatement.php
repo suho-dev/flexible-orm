@@ -131,15 +131,34 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     private static function _InitSDBConnection() {
         if( is_null(self::$_sdb) ){
             list( $key, $secret ) = self::_GetAWSKeys();
-            $region = Configuration::AWS()->region;
+            $region = self::_SDBRegion();
             
             self::$_sdb = new \AmazonSDB( $key, $secret );
             self::$_sdb->set_response_class( __NAMESPACE__.'\SDBResponse');
-            self::$_sdb->set_region( $region ?: \AmazonSDB::REGION_APAC_SE1);
+            
+            if( $region ) {
+                self::$_sdb->set_region( $region );
+            }
             
             if( Configuration::AWS()->apc_enabled ) {
                 self::$_sdb->set_cache_config('apc');
             }
+        }
+    }
+    
+    private static function _SDBRegion() {
+        switch(Configuration::AWS()->region) {
+            case 'us-east':
+                return false;
+            case 'us-west':
+                return \AmazonSDB::REGION_US_W1;
+            case 'ap-northeast':
+                return \AmazonSDB::REGION_APAC_NE1;
+            case 'eu-west':
+                return \AmazonSDB::REGION_EU_W1;
+            case 'ap-southeast':
+            default:
+                return \AmazonSDB::REGION_APAC_SE1;
         }
     }
     
