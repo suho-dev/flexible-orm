@@ -112,5 +112,6 @@ class ORMSDBTests extends ORMTest {
         
         $this->assertEquals(count($cars), $carCount);
     }
+    
 }
 ?>

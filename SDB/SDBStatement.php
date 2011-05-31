@@ -37,6 +37,24 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * Currently the Amazon SimpleDB limit is 1K
      */
     const MAX_ATTRIBUTE_SIZE = 1024;
+    
+    /**
+     * Fetch as both associative and indexed array
+     * @see fetch(), fetchAll()
+     */
+    const FETCH_BOTH    = 1;
+    
+    /**
+     * Fetch as associative array
+     * @see fetch(), fetchAll()
+     */
+    const FETCH_ASSOC   = 2;
+    
+    /**
+     * Fetch as indexed array
+     * @see fetch(), fetchAll()
+     */
+    const FETCH_ARRAY   = 3;
 
     /**
      * SQL statement
@@ -63,6 +81,13 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @var SDBResponse $_result
      */
     private $_result;
+    
+    /**
+     * Used to store the results.
+     * @see fetch(), fetchAll()
+     * @var array $_items
+     */
+    private $_items;
 
     /**
      * Used to reduce the number of regular expressions executed in queryType()
@@ -422,6 +447,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             }
         }
 
+        $this->_items = null;
         $this->_bind();
         $queryType = $this->queryType();
 
@@ -770,30 +796,103 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     
     /**
      * Fetch a row from simpleDB
-     * 
+     *
+     * Does not return itemName() properties
+     *  
      * \note Does not use ConsistentRead, so may be inaccurate by faster than
      *       fetchInto
      * 
      * @throws \ORM\Exceptions\ORMFetchException
+     * @see fetchAll()
      * @param int $fetch_style 
-     *      Currently does nothing
-     * @return array
-     *      In the same format as PDOStatement::Fetch(PDO::FETCH_BOTH)
+     *      [optional] What type of array to return. Defaults to \c FETCH_BOTH
+     *      \c FETCH_ASSOC
+     *          An associative array where keys are attributes.  
+     *      \c FETCH_BOTH  
+     *          Both associative keys and zero-indexed keys returned
+     *      \c FETCH_ARRAY 
+     *          Return a zero-indexed array of attributes. Since the attribute
+     *          order is unpredictable on a "*" request, only use when you know
+     *          the return order.
+     * @return array|false
      */
-    public function fetch( $fetch_style = 1 ) {
-        $this->_result = self::$_sdb->select( $this->_queryString );
+    public function fetch( $fetch_style = self::FETCH_BOTH ) {
+        if( is_null($this->_items) ) {
+            $this->_executeSelect();
+        }
         
+        if( !count($this->_items) ) return false;
+        
+        $result = array_shift($this->_items);
+
+        switch( $fetch_style) {
+            case self::FETCH_ARRAY:
+                return array_values($result);
+
+            case self::FETCH_ASSOC:
+                return $result;
+
+            case self::FETCH_BOTH:
+                return array_merge(array_values($result), $result);
+
+            default:
+                throw new \ORM\Exceptions\ORMFetchException(
+                        "Unknown fetch style $fetch_style"
+                );
+        }
+        
+    }
+    
+    /**
+     * Fetch all returned results in an array
+     * 
+     * @see fetch()
+     * @param int $fetch_style 
+     *      [optional] What type of array to return. Defaults to \c FETCH_BOTH
+     *      \c FETCH_ASSOC
+     *          An associative array where keys are attributes. Each row will
+     *          have it's itemName as key 
+     *      \c FETCH_BOTH  
+     *          Both associative keys and zero-indexed keys returned
+     *      \c FETCH_ARRAY 
+     *          Return a zero-indexed array of attributes. Since the attribute
+     *          order is unpredictable on a "*" request, only use when you know
+     *          the return order.
+     * @return array
+     *      An array of results, each one the same as calling fetch(). If there 
+     *      are no results, an empty array is returned. The array will be associative
+     *      with keys being itemNames if the fetch type is \c FETCH_ASSOC, otherwise
+     *      it will be zero-indexed
+     */
+    public function fetchAll( $fetch_style = self::FETCH_BOTH ) {
+        $this->_executeSelect();
+        $results = array();
+        
+        if( $fetch_style == self::FETCH_ASSOC ) {
+            $results = $this->_items;
+        } else {
+            while( $results[] = $this->fetch($fetch_style) ) {}
+            array_pop($results);
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Execute a SQL-like select query and populate the $_items array
+     * 
+     * @throws \ORM\Exceptions\ORMFetchException
+     */
+    private function _executeSelect() {
+        $this->_result = self::$_sdb->select( $this->_queryString );
+
         if( !$this->_result->isOK() ) {
             throw new \ORM\Exceptions\ORMFetchException(
                 $this->_result->errorMessage()
             );
-        } elseif( count($this->_result) ) {
-            $items  = $this->_result->items();
-            
-            return array_merge(array_values($items['Domain']), $items['Domain']);
+        } else {
+            $this->_items = $this->_result->items();
         }
-
-        return array();
     }
 
     /**
