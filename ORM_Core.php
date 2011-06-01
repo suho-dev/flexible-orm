@@ -20,6 +20,8 @@ namespace ORM;
 abstract class ORM_Core {
     /**
      * Array of key > values of fields with errors.
+     * 
+     * @see errorMessages()
      * @var array $_errorMessages
      */
     protected 			$_errorMessages = array();
@@ -54,8 +56,10 @@ abstract class ORM_Core {
     }
 
     /**
-     * Array of all the values of the public attributes of this object
+     * Get an associative array of all the values of the public attributes of this object
      *
+     * Keys will be attribute names
+     * 
      * @return array
      * @see attributes()
      */
@@ -71,7 +75,29 @@ abstract class ORM_Core {
     }
 
     /**
-     * Return array of error messages
+     * Return array of all error messages
+     * 
+     * If there are no error messages, this will return an empty array.
+     * 
+     * The array will be associative, with the keys being object properties and
+     * the values being the actual error message.
+     * 
+     * <b>Usage</b>
+     * @code
+     * if( !$car->save() ) {
+     *     // Validation issue, echo each error message
+     *     foreach( $car->errorMessages() as $property => $message ) { 
+     *         echo "Error with the $property field - $message \n";
+     *     }
+     * 
+     *     // Log all the errors to a log file
+     *     error_log( $car->errorMessagesString() );
+     * }
+     * @endcode
+     * 
+     * \note This is only populated if you use validationError
+     * 
+     * @see errorMessage()
      * @return array
      */
     public function errorMessages() {
@@ -81,8 +107,10 @@ abstract class ORM_Core {
 
     /**
      * Return a string of error messages
+     * 
+     * Each error is listed comma seperated as '<propertyname>' <error message>
      *
-     * For logging essentially
+     * @see errorMessages()
      * @return string
      */
     public function errorMessagesString() {
