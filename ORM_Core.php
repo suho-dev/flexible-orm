@@ -95,7 +95,8 @@ abstract class ORM_Core {
      * }
      * @endcode
      * 
-     * \note This is only populated if you use validationError
+     * \note This is only populated if you use validationError(). See 
+     *       \ref validation "Model Validation" for more information.
      * 
      * @see errorMessage()
      * @return array
