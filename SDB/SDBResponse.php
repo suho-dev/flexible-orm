@@ -180,7 +180,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      *      Defaults to 0 (start from beginning).
      * @param int $currentOffset
      *      The number of rows already skipped. Defaults to 0 (started from beginning).
-     * return SDBResponse
+     * @return SDBResponse
      *      The current SDBResponse item is returned for convenience
      */
     public function getAll($consistentRead = false, $limit = null, $offset = 0, $currentOffset = 0) {
@@ -259,7 +259,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      */
     private function _setItems( SDBResponse $response ) {
         if( !$response->isOK() ) {
-            throw new \ORM\Exceptions\ORMPDOException( $response->errorMessage() );
+            throw new \ORM\Exceptions\ORMPDOException( $response->errorMessage().' - '.$response->getQuery() );
         }
         
         foreach( $response as $key => $item ) {

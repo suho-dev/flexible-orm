@@ -111,6 +111,8 @@ abstract class ORM_Core {
      * 
      * Each error is listed comma seperated as '<propertyname>' <error message>
      *
+     * See \ref validation "Model Validation" for more information.
+     * 
      * @see errorMessages()
      * @return string
      */
@@ -136,6 +138,8 @@ abstract class ORM_Core {
      *   echo "There was no error on the name field";
      * }
      * @endcode
+     * 
+     * See \ref validation "Model Validation" for more information.
      *
      * @return string
      * @param string $field
@@ -158,6 +162,8 @@ abstract class ORM_Core {
      * echo $this->errorMessage( 'name' );
      * // will print 'Must be at least 5 characters long' if name was less than 5 chars long
      * @endcode
+     * 
+     * See \ref validation "Model Validation" for more information.
      *
      * @param string $field
      * @param string $message
@@ -170,6 +176,8 @@ abstract class ORM_Core {
 
     /**
      * Clear all existing validation errors
+     * 
+     * See \ref validation "Model Validation" for more information.
      */
     public function clearValidationErrors() {
         $this->_errorMessages = array();

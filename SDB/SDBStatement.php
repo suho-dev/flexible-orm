@@ -150,8 +150,17 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     /**
      * Setup the SDB connection
      *
-     *  * Use the configuration value AWS->region to set the region for the SDB
-     *  * Use the configuration value AWS->apc_enabled to enable/disable APC
+     *   - Use the Configuration value AWS->region to set the region for the SDB
+     *   - Use the Configuration value AWS->apc_enabled to enable/disable APC
+     * 
+     * Valid regions for AWS->region are:
+     *   - us-east
+     *   - us-west
+     *   - ap-southeast
+     *   - ap-northeast
+     *   - eu-west
+     * 
+     * All other values will be ignored.
      */
     private static function _InitSDBConnection() {
         if( is_null(self::$_sdb) ){
@@ -171,6 +180,14 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         }
     }
     
+    /**
+     * Get the SDB region from the ini file
+     * 
+     * Converts from short form names (like 'us-west') to urls ('sdb.us-west-1.amazonaws.com')
+     * 
+     * @see _InitSDBConnection()
+     * @return string 
+     */
     private static function _SDBRegion() {
         switch(Configuration::AWS()->region) {
             case 'us-east':
@@ -200,7 +217,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @endcode
      * 
      * @return array
-     *      public, private
+     *      2 elements to the array: [0] => public, [1] => private
      */
     private static function _GetAWSKeys() {
         $aws        = \ORM\Utilities\Configuration::AWS();
@@ -438,7 +455,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @param array $values
      *      [optional] Array of values to bind.
      * @return boolean
-     *      True on success (only valid for \c INSERT and \c UPDATE operations).
+     *      True on success.
      */
     public function execute( array $values = null ) {
         if( !is_null($values) ) {
@@ -670,7 +687,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             $sql = "SELECT * FROM {$matches[1]} WHERE {$matches[2]} LIMIT 25";
 
             $items = self::$_sdb->select( $sql );
-            self::$_sdb->batch_delete_attributes( $matches[1], $items->itemNames() );
+            return self::$_sdb->batch_delete_attributes( $matches[1], $items->itemNames() )->isOK();
         }
     }
 
@@ -720,9 +737,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         }
 
         $this->_simplifyQuery($className);
-        $this->_result = self::$_sdb->select( $this->_queryString, array(
-            'ConsistentRead' => $className::EnforceReadConsistency() )
-        );
+        $this->_executeFetchQuery($className::EnforceReadConsistency());
 
         if( !$this->_result->isOK() ) {
             throw new \ORM\Exceptions\ORMFetchIntoException(
@@ -785,6 +800,9 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             $replace[]      = $matches[0];
             $this->_offset  = (int)$matches[1];
             $this->_limit   = (int)$matches[2];
+        } elseif( preg_match('/LIMIT (\d+)$/', $this->_queryString, $matches) ) {
+            $replace[]      = $matches[0];
+            $this->_limit   = (int)$matches[1];
         }
         
         $this->_queryString = str_replace( $replace, '', $this->_queryString );
@@ -817,13 +835,17 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @return array|false
      */
     public function fetch( $fetch_style = self::FETCH_BOTH ) {
-        if( is_null($this->_items) ) {
-            $this->_executeSelect();
+        if( is_null($this->_result) ) {
+            if( !$this->_executeFetchQuery() ) {
+                throw new \ORM\Exceptions\ORMFetchException(
+                    $this->_result->errorMessage()
+                );
+            }
         }
         
-        if( !count($this->_items) ) return false;
+        if( !count($this->_result->items()) ) return false;
         
-        $result = array_shift($this->_items);
+        $result = array_shift($this->_result->items());
 
         switch( $fetch_style) {
             case self::FETCH_ARRAY:
@@ -865,34 +887,22 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      *      it will be zero-indexed
      */
     public function fetchAll( $fetch_style = self::FETCH_BOTH ) {
-        $this->_executeSelect();
+        if( !$this->_executeFetchQuery() ) {
+            throw new \ORM\Exceptions\ORMFetchException(
+                $this->_result->errorMessage()
+            );
+        }
+        
         $results = array();
         
         if( $fetch_style == self::FETCH_ASSOC ) {
-            $results = $this->_items;
+            $results = $this->_result->items();
         } else {
             while( $results[] = $this->fetch($fetch_style) ) {}
             array_pop($results);
         }
         
         return $results;
-    }
-    
-    /**
-     * Execute a SQL-like select query and populate the $_items array
-     * 
-     * @throws \ORM\Exceptions\ORMFetchException
-     */
-    private function _executeSelect() {
-        $this->_result = self::$_sdb->select( $this->_queryString );
-
-        if( !$this->_result->isOK() ) {
-            throw new \ORM\Exceptions\ORMFetchException(
-                $this->_result->errorMessage()
-            );
-        } else {
-            $this->_items = $this->_result->items();
-        }
     }
 
     /**
@@ -918,7 +928,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         }
 
         $this->_simplifyQuery($className);
-        $this->_result = $this->_executeFetchQuery($className::EnforceReadConsistency());
+        $this->_executeFetchQuery($className::EnforceReadConsistency());
 
         $collection = new \ORM\ModelCollection();
         
@@ -944,12 +954,13 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     /**
      * Execute a fetchAll query and deal with offsets and limits
      * 
-     * Called by FetchAllInto
+     * Populates the _result variable
      * 
      * @param string $consistentRead
-     * @return SDBResponse
+     * @return boolean
+     *      \c true on success
      */
-    private function _executeFetchQuery( $consistentRead ) {
+    private function _executeFetchQuery( $consistentRead = 'false' ) {
         $optionsArray = array(
             'ConsistentRead' => $consistentRead
         );
@@ -968,9 +979,11 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             }
         }
         
-        return self::$_sdb->select(
+        $this->_result = self::$_sdb->select(
                 $this->_queryString, $optionsArray 
         )->getAll($consistentRead == 'true', $this->_limit, $this->_offset, $initialOffset );
+        
+        return $this->_result->isOK();
     }
 
     /**

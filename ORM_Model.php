@@ -761,10 +761,12 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     }
 
     /**
-     * The default validity check (none) .
+     * Validity check to be called before saving.
      *
      * Override this for individual models to check for validity. The default
      * implementation looks for error messages that have been set by validationError()
+     * 
+     * See \ref validation "Model Validation" for more information.
      *
      * @return boolean
      *      If this method returns false for a particular object, it is considered

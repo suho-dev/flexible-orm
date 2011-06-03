@@ -29,6 +29,25 @@ class SDBStatementTest extends ORMTest {
     public function testBindParam() {
 
     }
+    
+    public function testBindNonNamed() {
+        $query = new SDBStatement("SELECT * FROM cars WHERE doors > ? AND colour = ?");
+        
+        $this->assertTrue( $query->execute(array(1, 'black')) );
+        $this->assertEquals( 'SELECT * FROM cars WHERE doors > \'1\' AND colour = \'black\'', (string)$query );
+    }
+    
+    public function testBindInsertNotNamed() {
+        $query = new SDBStatement("INSERT INTO cars (brand, colour, doors) VALUES ( ?, 'black', ? )");
+        $this->assertTrue( $query->execute(array('Dodge', 2)) );
+        
+        $id = SDBStatement::LastInsertId();
+        
+        $car = Mock\SDBCar::Find( $id );
+        $this->assertEquals( 'Dodge',   $car->brand );
+        $this->assertEquals( 'black',   $car->colour );
+        $this->assertEquals( 2,         $car->doors );
+    }
 
     public function testHybridBind() {
         
