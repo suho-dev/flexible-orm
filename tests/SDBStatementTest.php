@@ -94,7 +94,6 @@ class SDBStatementTest extends ORMTest {
     }
     
     public function testFetchMultiple() {
-        echo "testFetchMultiple()...\n";
         $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 10");
         $query->execute();
         
@@ -107,11 +106,10 @@ class SDBStatementTest extends ORMTest {
             $count++;
         }
         
-        $this->assertGreaterThan(10, $count);
+        $this->assertEquals(10, $count);
     }
     
     public function testFetchAllAssoc() {
-        echo "testFetchAllAssoc()...\n";
         $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 10");
         $query->execute();
         $count      = 0;
@@ -128,25 +126,28 @@ class SDBStatementTest extends ORMTest {
         $this->assertEquals( $count, count($fetchAllResult) );
         $this->assertNotEquals( $results, $fetchAllResult);
         $this->assertEquals( $results, array_values($fetchAllResult));
+        
+        unset($results);
     }
     
     public function testFetchAll() {
-        echo "testFetchAll()...\n";
         $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 10");
         $query->execute();
         $count      = 0;
         $results    = array();
-        $query->execute();
         
         while( $results[] = $query->fetch(SDBStatement::FETCH_ARRAY) ) {
             $count++;
         }
+        
+        $this->assertEquals(10, $count);
         
         array_pop($results);
         
         $query->execute();
         $fetchAllResult = $query->fetchAll(SDBStatement::FETCH_ARRAY );
         $this->assertEquals( $results, $fetchAllResult);
+        
     }
 
 }

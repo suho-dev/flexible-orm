@@ -862,9 +862,9 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @return array|false
      */
     public function fetch( $fetch_style = self::FETCH_BOTH ) {
-        if( !count($this->_result->items()) ) return false;
+        if( count($this->_items) === 0 ) return false;
         
-        $result = array_shift($this->_result->items());
+        $result = array_shift($this->_items);
 
         switch( $fetch_style) {
             case self::FETCH_ARRAY:
@@ -909,7 +909,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         $results = array();
         
         if( $fetch_style == self::FETCH_ASSOC ) {
-            $results = $this->_result->items();
+            $results = $this->_items;
         } else {
             while( $results[] = $this->fetch($fetch_style) ) {}
             array_pop($results);
@@ -990,6 +990,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
                 $this->_queryString, $optionsArray 
         )->getAll( $this->_consistentRead, $this->_limit, $this->_offset, $initialOffset );
         
+        $this->_items = $this->_result->items();
         return $this->_result->isOK();
     }
 
