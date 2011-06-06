@@ -31,10 +31,10 @@ class SDBStatementTest extends ORMTest {
     }
     
     public function testBindNonNamed() {
-        $query = new SDBStatement("SELECT * FROM cars WHERE doors > ? AND colour = ?");
+        $query = new SDBStatement("SELECT * FROM cars WHERE doors > ? AND colour = ? LIMIT 10");
         
         $this->assertTrue( $query->execute(array(1, 'black')) );
-        $this->assertEquals( 'SELECT * FROM cars WHERE doors > \'1\' AND colour = \'black\'', (string)$query );
+        $this->assertEquals( 'SELECT * FROM cars WHERE doors > \'1\' AND colour = \'black\' LIMIT 10', (string)$query );
     }
     
     public function testBindInsertNotNamed() {
@@ -62,8 +62,8 @@ class SDBStatementTest extends ORMTest {
     }
     
     public function testFetchArray() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM owners");
-        
+        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM owners LIMIT 110");
+        $query->execute();
         $result = $query->fetch(SDBStatement::FETCH_ARRAY);
         
         $this->assertTrue(is_array($result));
@@ -71,8 +71,8 @@ class SDBStatementTest extends ORMTest {
     }
     
     public function testFetchAssoc() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM owners");
-        
+        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM owners LIMIT 10");
+        $query->execute();
         $result = $query->fetch(SDBStatement::FETCH_ASSOC);
         
         $this->assertTrue(is_array($result));
@@ -82,8 +82,8 @@ class SDBStatementTest extends ORMTest {
     }
     
     public function testFetchBoth() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM owners");
-        
+        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM owners LIMIT 10");
+        $query->execute();
         $result = $query->fetch();
         
         $this->assertTrue(is_array($result));
@@ -94,7 +94,8 @@ class SDBStatementTest extends ORMTest {
     }
     
     public function testFetchMultiple() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners");
+        echo "testFetchMultiple()...\n";
+        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 10");
         $query->execute();
         
         $lastName   = '';
@@ -110,7 +111,8 @@ class SDBStatementTest extends ORMTest {
     }
     
     public function testFetchAllAssoc() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners");
+        echo "testFetchAllAssoc()...\n";
+        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 10");
         $query->execute();
         $count      = 0;
         $results    = array();
@@ -129,10 +131,12 @@ class SDBStatementTest extends ORMTest {
     }
     
     public function testFetchAll() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners");
+        echo "testFetchAll()...\n";
+        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 10");
         $query->execute();
         $count      = 0;
         $results    = array();
+        $query->execute();
         
         while( $results[] = $query->fetch(SDBStatement::FETCH_ARRAY) ) {
             $count++;

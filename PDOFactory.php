@@ -133,7 +133,7 @@ class PDOFactory implements Interfaces\DataFactory {
      *      to connect to multiple databases.
      * @return ORM_PDOStatement
      */
-    public static function Get( $sql, $database = self::DEFAULT_DATABASE ) {
+    public static function Get( $sql, $database = self::DEFAULT_DATABASE, $callingClass = null ) {
         $factory = self::GetFactory( $database );
 
         return $factory->statementPrepared($sql) ?

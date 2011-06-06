@@ -94,6 +94,12 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @var string $_queryType
      */
     private $_queryType;
+    
+    /**
+     * Set to true to force consistent reads
+     * @var boolean $_consistentRead
+     */
+    private $_consistentRead = false;
 
     /**
      * The last inserted itemName()
@@ -442,10 +448,9 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     /**
      * Execute the query
      *
-     * Designed so that this class mimicks ORM_PDOStatement::execute(). This
-     * only actually performs a query for \c INSERT and \c UPDATE operations,
-     * for \c SELECT operations it binds the values. To actually perform the
-     * select operation, see fetchInto() and fetchAllInto().
+     * Designed so that this class mimicks ORM_PDOStatement::execute(). For
+     * retrieving data, you will need to call one of the fetch*() functions to
+     * actually get the data.
      *
      * @todo throw an exception if all placeholders aren't bound yet
      * @todo Define exception for this action
@@ -471,15 +476,32 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         switch( $queryType ) {
             case 'INSERT':
                 return $this->_emulateInsert();
+                
             case 'UPDATE':
                 return $this->_emulateUpdate();
+                
             case 'DELETE':
                 return $this->_emulateDelete();
+                
             case 'SELECT':
-                return true;
+                return $this->_executeFetchQuery();
+                
             default:
                 throw new \ORM\Exceptions\ORMPDOException("Unsupported query type $queryType");
         }
+    }
+    
+    /**
+     * Force read (in)consistency.
+     * 
+     * Defaults to inconsistent reads.
+     * 
+     * @param boolean $consistentRead 
+     *      Set to true to force read consistency. Inconsistent reads will be
+     *      faster, but the information may be out of date.
+     */
+    public function setConsistentRead( $consistentRead ) {
+        $this->_consistentRead = $consistentRead;
     }
     
     /**
@@ -736,9 +758,6 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             throw new Exceptions\ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
-        $this->_simplifyQuery($className);
-        $this->_executeFetchQuery($className::EnforceReadConsistency());
-
         if( !$this->_result->isOK() ) {
             throw new \ORM\Exceptions\ORMFetchIntoException(
                 $this->_result->errorMessage()
@@ -787,14 +806,14 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * Remove backticks and aliases. Removes offset so that the inbuilt limit
      * option works.
      *
-     * @param string $className
-     *      [optional] The ORM_Model class sometimes adds the model name to the
-     *      SQL query (for joins). Since SDB can't do joins and they make altering
-     *      the SQL more difficult, specify the classname to have them removed
+     * @return string
+     *      Returns the possible classname found in the SQL. This comes from
+     *      ORM_Model SELECT statements that alias the table name with the model
+     *      name, eg "SELECT * FROM cars AS Car" would return 'Car'. Returns empty
+     *      string if no class;
      */
-    private function _simplifyQuery( $className = '' ) {
-        $baseClass  = basename( str_replace('\\', '//', $className) );
-        $replace    = array("`$baseClass`.", "AS `$baseClass`", "`");
+    private function _simplifyQuery() {
+        $replace    = array();
         
         if( preg_match('/LIMIT (\d+), (\d+) $/', $this->_queryString, $matches) ) {
             $replace[]      = $matches[0];
@@ -805,11 +824,22 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             $this->_limit   = (int)$matches[1];
         }
         
+        if( preg_match('/AS `([^`]+)`/i', $this->_queryString, $matches ) ) {
+            $className = $matches[1];
+            $replace[] = "`$className`.";
+            $replace[] = "AS `$className`";
+        } else {
+            $className = '';
+        }
+        
+        $replace[] = "`";
         $this->_queryString = str_replace( $replace, '', $this->_queryString );
         
         if( !is_null($this->_limit) ) {
             $this->_queryString .= " LIMIT {$this->_limit}";
         }
+        
+        return $className;
     }
     
     /**
@@ -817,9 +847,6 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      *
      * Does not return itemName() properties
      *  
-     * \note Does not use ConsistentRead, so may be inaccurate by faster than
-     *       fetchInto
-     * 
      * @throws \ORM\Exceptions\ORMFetchException
      * @see fetchAll()
      * @param int $fetch_style 
@@ -835,14 +862,6 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @return array|false
      */
     public function fetch( $fetch_style = self::FETCH_BOTH ) {
-        if( is_null($this->_result) ) {
-            if( !$this->_executeFetchQuery() ) {
-                throw new \ORM\Exceptions\ORMFetchException(
-                    $this->_result->errorMessage()
-                );
-            }
-        }
-        
         if( !count($this->_result->items()) ) return false;
         
         $result = array_shift($this->_result->items());
@@ -887,12 +906,6 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      *      it will be zero-indexed
      */
     public function fetchAll( $fetch_style = self::FETCH_BOTH ) {
-        if( !$this->_executeFetchQuery() ) {
-            throw new \ORM\Exceptions\ORMFetchException(
-                $this->_result->errorMessage()
-            );
-        }
-        
         $results = array();
         
         if( $fetch_style == self::FETCH_ASSOC ) {
@@ -908,11 +921,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     /**
      * Fetch results into the specified class objects
      *
-     * Actually peform the lookup and return the result as a collection of objects
-     * of the specified class. Behaves like ORM_PDOStatement::fetchAllInto().
-     *
-     * \note This function is effected by the ORMModelSDB::EnforceReadConsistency()
-     *      setting.
+     * Behaves like ORM_PDOStatement::fetchAllInto().
      *
      * @throws Exceptions\ORMFetchIntoClassNotFoundException for invalid classname
      * @throws Exceptions\ORMFetchIntoException for AmazonSDB errors
@@ -926,9 +935,6 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         if( !class_exists($className) ) {
             throw new Exceptions\ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
-
-        $this->_simplifyQuery($className);
-        $this->_executeFetchQuery($className::EnforceReadConsistency());
 
         $collection = new \ORM\ModelCollection();
         
@@ -954,15 +960,16 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     /**
      * Execute a fetchAll query and deal with offsets and limits
      * 
-     * Populates the _result variable
+     * Populates the _result variable. Uses the $_consistentRead property to
+     * determine whether consistency needs to be enforced for the SDB request
      * 
-     * @param string $consistentRead
      * @return boolean
      *      \c true on success
      */
-    private function _executeFetchQuery( $consistentRead = 'false' ) {
+    private function _executeFetchQuery() {
+        $this->_simplifyQuery();
         $optionsArray = array(
-            'ConsistentRead' => $consistentRead
+            'ConsistentRead' => $this->_consistentRead ? 'true' : 'false'
         );
         
         // If we already know some tokens, don't start from the begining (for speed)
@@ -981,7 +988,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         
         $this->_result = self::$_sdb->select(
                 $this->_queryString, $optionsArray 
-        )->getAll($consistentRead == 'true', $this->_limit, $this->_offset, $initialOffset );
+        )->getAll( $this->_consistentRead, $this->_limit, $this->_offset, $initialOffset );
         
         return $this->_result->isOK();
     }

@@ -14,17 +14,20 @@ interface DataFactory {
     /**
      * Get a prepared statement that can be executed / bound
      *
-     * return DataStatement
+     * @param string $sql
+     * @param string $database
+     * @param string $callingClass
+     * @return DataStatement
      *      A DataFactory should return a prepared statement class that implements
      *      the DataStatement interface.
      */
-     public static function Get( $sql, $database );
+     public static function Get( $sql, $database, $callingClass );
 
     /**
      * Returns the ID of the last inserted row, or the last value from a sequence
      * object, depending on the underlying driver.
      *
-     * return mixed
+     * @return mixed
      *      Key value
      */
     public static function LastInsertId();

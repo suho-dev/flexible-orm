@@ -67,13 +67,10 @@ class ORMModelSDB extends \ORM\ORM_Model {
      * const ENFORCE_READ_CONSISTENCY = true
      * @endcode
      *
-     * @return string
-     *      Either 'true' or 'false' for use with AmazonSDB
+     * @return boolean
      */
     public static function EnforceReadConsistency() {
-        $enforce = defined("static::ENFORCE_READ_CONSISTENCY") ? static::ENFORCE_READ_CONSISTENCY : true;
-
-        return $enforce ? 'true' : 'false';
+        return defined("static::ENFORCE_READ_CONSISTENCY") ? static::ENFORCE_READ_CONSISTENCY : true;
     }
 
     /**

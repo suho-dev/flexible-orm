@@ -17,8 +17,13 @@ class SDBFactory implements \ORM\Interfaces\DataFactory {
      *
      * return SDBStatement
      */
-     public static function Get( $sql, $database = null ) {
-         return new SDBStatement( $sql );
+     public static function Get( $sql, $database = null, $callingClass = null ) {
+         $statement = new SDBStatement( $sql );
+         if( !is_null($callingClass) && is_subclass_of($callingClass, '\ORM\SDB\ORMModelSDB') ) {
+             $statement->setConsistentRead( $callingClass::EnforceReadConsistency() );
+         }
+         
+         return $statement;
      }
 
     /**

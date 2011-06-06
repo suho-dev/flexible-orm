@@ -174,7 +174,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     public static function FindAll( $optionsArray = array(), $findWith = false ) {
         $df     = static::DataFactory();
         $sql    = static::_BuildSQL( $optionsArray, static::TableName(), $findWith );
-        $query  = $df::Get( $sql, static::DatabaseConfigName() );
+        $query  = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() );
 
         $query->execute( isset($optionsArray['values']) ? $optionsArray['values'] : null);
 
@@ -214,7 +214,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
             $findWith
         );
         
-        $query = $df::Get( $sql, static::DatabaseConfigName() );
+        $query = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() );
 
         $query->bindParam( ":$field", $value );
 
@@ -238,7 +238,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     public static function CountFindAll( $optionsArray = array() ) {
         $df     = static::DataFactory();
         $sql    = static::_BuildSQL( $optionsArray, static::TableName(), false, self::QUERY_COUNT_ONLY );
-        $query  = $df::Get( $sql, static::DatabaseConfigName() );
+        $query  = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() );
         
         $query->execute( isset($optionsArray['values']) ? $optionsArray['values'] : null);
 
@@ -269,7 +269,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
             self::QUERY_COUNT_ONLY
         );
         
-        $query = $df::Get( $sql, static::DatabaseConfigName() );
+        $query = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() );
 
         $query->bindParam( ":$field", $value );
 
@@ -363,7 +363,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
             $findWith
         );
 
-        $query      = $df::Get( "$sql LIMIT 1", static::DatabaseConfigName() );
+        $query      = $df::Get( "$sql LIMIT 1", static::DatabaseConfigName(), get_called_class() );
         
         $query->bindValue( ":$field", $value );
         $query->execute();
@@ -389,7 +389,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $df     = static::DataFactory();
         $sql    = static::_BuildSQL( $optionsArray, static::TableName(), $findWith );
         $sql    .= "LIMIT 1";
-        $query  = $df::Get( $sql, static::DatabaseConfigName() );
+        $query  = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() );
 
         if( isset($optionsArray['values']) ) {
             $query->execute($optionsArray['values']);
@@ -498,7 +498,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $df         = static::DataFactory();
         $query      = $df::Get(
                 "DELETE FROM `$tableName` WHERE `$key` = :id",
-                static::DatabaseConfigName()
+                static::DatabaseConfigName(), get_called_class()
         );
 
         $query->bindParam( ':id', $id );
@@ -523,7 +523,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $df         = static::DataFactory();
         $query      = $df::Get(
                 "DELETE FROM `$tableName` WHERE `$key` = :id",
-                static::DatabaseConfigName()
+                static::DatabaseConfigName(), get_called_class()
         );
 
         $query->bindParam( ':id', $this->_id );
@@ -634,7 +634,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
 
             $changedFields[] = $key;
             $df              = static::DataFactory();
-            $query = $df::Get( $sql, static::DatabaseConfigName() )->bindObject($this, $changedFields);
+            $query = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() )->bindObject($this, $changedFields);
 
             if( $query->execute() ) {
                 $this->afterUpdate();
@@ -689,7 +689,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
 
         $sql    = "INSERT INTO `$table` (`".implode('`, `',$fields)."`)";
         $sql    .= " VALUES ( :".implode(', :',$fields)." )";
-        $query  = $df::Get( $sql, static::DatabaseConfigName() )->bindObject($this, $fields);
+        $query  = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() )->bindObject($this, $fields);
 
         $result = $query->execute();
         
@@ -736,7 +736,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     public static function DescribeTable() {
         $table  = static::TableName();
         $df     = static::DataFactory();
-        $query  = $df::Get( "DESCRIBE `$table`", static::DatabaseConfigName() );
+        $query  = $df::Get( "DESCRIBE `$table`", static::DatabaseConfigName(), get_called_class() );
         $query->execute();
         $result = $query->fetchAll( \PDO::FETCH_ASSOC );
 
