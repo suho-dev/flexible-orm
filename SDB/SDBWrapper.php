@@ -8,6 +8,8 @@ use \ORM\Utilities\Configuration;
 
 /**
  * Manage connection to and settings for an AmazonSDB connection
+ * 
+ * @see SDBStatement
  */
 abstract class SDBWrapper {
     /**
@@ -141,6 +143,24 @@ abstract class SDBWrapper {
             array('\\', "\0", "\n", "\r", "'", '"', "\x1a"),
             $sanitizedValue
         );
+    }
+    
+    /**
+     * Perform a SELECT statement directly on the SDB service
+     * 
+     * @param string $queryString
+     *      Amazon SDB compatible SELECT querystring
+     * @param boolean $consistent
+     *      Should read consistency be enforced
+     * @param string $nextToken
+     *      Next token for continuing requests
+     * @return SDBResponse
+     */
+    public static function Query( $queryString, $consistentRead = false, $nextToken = null ) {
+        return self::GetSDBConnection()->select( $queryString, array(
+            'ConsistentRead' => $consistentRead ? 'true' : 'false',
+            'NextToken'      => $nextToken
+        ));
     }
 }
 

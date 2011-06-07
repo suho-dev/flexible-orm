@@ -7,8 +7,6 @@ require_once 'ORMTest.php';
 /**
  * Test failures and exceptions for SDBStatement
  *
- * @Todo TEST the SDBStatement class explicitly
- *
  * Most of the features are already tested in ORMModelSDBTest
  */
 class SDBStatementTest extends ORMTest {
@@ -18,8 +16,32 @@ class SDBStatementTest extends ORMTest {
         Mock\SDBCar::CreateDomain();
     }
 
-    public function testInjection() {
-
+    public function testInjectionInsert() {
+        $query = new SDBStatement("INSERT INTO cars (brand, colour, doors) VALUES ( ?, ?, ? )");
+        $query->bindValues(array('\'?\' ? \'red\'', '4', "\'3"));
+        
+        
+        $this->assertEquals( array(
+            'brand'     => '\'?\' ? \'red\'',
+            'colour'    => '4',
+            'doors'     => "\'3"
+        ), $query->attributes() );
+    }
+    
+    public function testInjectionUpdate() {
+        $query = new SDBStatement("UPDATE cars SET manufacturer = ? WHERE itemName() = ?");
+        $query->bindValues(array('\'?\' ? \'red\'', '4'));
+        
+        $this->assertEquals(array(
+            'manufacturer'     => '\'?\' ? \'red\''
+        ), $query->attributes());
+    }
+    
+    public function testInjectionSelect() {
+        $query = new SDBStatement("SELECT * FROM cars WHERE doors > ? AND brand = ?");
+        $query->bindValues(array( "'4'", '\'?\' ? \'red\''));
+       
+        $this->assertEquals("SELECT * FROM cars WHERE doors > '''4''' AND brand = '''?'' ? ''red'''", (string)$query);
     }
 
     public function testNotAllBound() {

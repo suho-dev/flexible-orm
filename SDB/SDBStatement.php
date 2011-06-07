@@ -66,6 +66,12 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * @var array $_binds
      */
     private $_binds = array();
+    
+    /**
+     * A numerically index array of values to bind in order to anonymous placeholders
+     * @var type $_anonymousBinds
+     */
+    private $_anonymousBinds = array();
 
     /**
      * @var SDBResponse $_result
@@ -181,29 +187,34 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     /**
      * Bind a value to an anonymous placeholder
      * 
-     * \note This will be fooled easily- still in testing
+     * 
      * @param string $value 
      *      The value to bind to the first anonymous placeholder
      */
     private function _bindAnonymousValue( $value ) {
-        list($unquoted, $quoted) = $this->_extractQuotedValues();
+        $this->_anonymousBinds[] = $value;
         
-        $replacedCount  = 0;
-        $output         = '';
-        foreach( $unquoted as $string ) {
-            if( !$replacedCount ) {
-                $string = preg_replace( '/\?/', "'$value'", $string, 1, $replacedCount );
+        if( $this->queryType() == 'SELECT' ) {
+            list($unquoted, $quoted) = $this->_extractQuotedValues();
+            $sanitizedValue = $this->_sanitizeValue($value);
+            $replacedCount  = 0;
+            $output         = '';
+
+            foreach( $unquoted as $string ) {
+                if( !$replacedCount ) {
+                    $string = preg_replace( '/\?/', "'$sanitizedValue'", $string, 1, $replacedCount );
+                }
+
+                $quotedString = array_shift($quoted);
+                if(strlen($quotedString) > 0 ) {
+                    $output .= "$string'$quotedString'";
+                } else {
+                    $output .= $string;
+                }
             }
-            
-            $quotedString = array_shift($quoted);
-            if(strlen($quotedString) > 0 ) {
-                $output .= "$string'$quotedString'";
-            } else {
-                $output .= $string;
-            }
+
+            $this->_queryString = $output;
         }
-        
-        $this->_queryString = $output;
     }
     
     /**
@@ -386,13 +397,22 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * quoted stuff
      */
     private function _extractQuotedValues() {
-        $quotedToken = strtok( $this->_queryString, '"\'' );
+        $quotedToken = strtok( $this->_queryString, "'" );
+        
         $output      = array(array(), array());
         $count       = 1;
+        $tokenEscaped = false; // only valid when inside a quoted value
 
         while( $quotedToken !== false ) {
             if( $count++ % 2 ) {
                 $output[0][] = $quotedToken;
+            } elseif( substr($quotedToken, -1) == '\\') {
+                // This string ends with the escape character, so the next is still quoted
+                $tokenEscaped = $tokenEscaped === false ? $quotedToken : $tokenEscaped."'".$quotedToken;
+                $count--;
+            } elseif( $tokenEscaped !== false ) {
+                $output[1][] = $tokenEscaped."'".$quotedToken;
+                $tokenEscaped = false;
             } else {
                 $output[1][] = $quotedToken;
             }
@@ -415,10 +435,10 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * @todo throw an exception if all placeholders aren't bound yet
      * @todo Define exception for this action
      * 
-     * @todo work with non-named placeholders also
-     *
      * @param array $values
-     *      [optional] Array of values to bind.
+     *      [optional] Array of values to bind. May be a mixture of named placeholders
+     *      or numerically indexed anonymous values which will be bound in statement
+     *      order to anonymous placeholders (marked as '?')
      * @return boolean
      *      True on success.
      */
@@ -491,10 +511,10 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      */
     private function _emulateInsert() {
         $this->_simplifyQuery();
-echo "Query: $this->_queryString\n";
+
         $attributes = $this->_getAttributesFromInsertQuery( $this->_queryString );
         $domain     = $this->_getDomainFromQuery();
-print_r($attributes);
+
         // Remove itemName and store it or generate our own itemName
         if( isset($attributes['itemName()']) ) {
             $itemName = $attributes['itemName()'];
@@ -534,7 +554,7 @@ print_r($attributes);
             $i = array_search('itemName[]', $fields);
             $fields[$i] = 'itemName()';
         }
-
+        
         if( $itemNamePresent > 1 ) {
             $i = array_search(':itemName[]', $values);
             if( $i !== false ) $values[$i] = ':itemName()';
@@ -542,10 +562,13 @@ print_r($attributes);
 
         $attributes = array();
         foreach($values as $i => $value ) {
-            if( array_key_exists( trim($value), $this->_binds) ) {
-                $attributes[$fields[$i]] = $this->_binds[trim($value)];
+            $trimmedValue = trim( $value );
+            if( array_key_exists( $trimmedValue, $this->_binds) ) {
+                $attributes[$fields[$i]] = $this->_binds[$trimmedValue];
+            } elseif( $trimmedValue == '?' ) {
+                $attributes[$fields[$i]] = array_shift($this->_anonymousBinds);
             } else {
-                $attributes[$fields[$i]] = substr(trim($value), 1, -1);
+                $attributes[$fields[$i]] = substr($trimmedValue, 1, -1);
             }
         }
 
@@ -565,16 +588,19 @@ print_r($attributes);
         preg_match('/^UPDATE ([a-z_0-9A-Z]+) SET (.+) WHERE/i', $this->_queryString, $matches );
         $setString = $matches[2];
 
-        $regex = '/[a-z_]+ = (\'.*?(?<!\\\)\'|:[^, )]+)/i';
+        $regex      = '/[a-z_]+ = ((\'.*?(?<!\\\)\'|:[^, )]+)|\\?)/i';
         preg_match_all($regex, $setString, $matches);
-        $set = $matches[0];
-        
+        $set        = $matches[0];
         $attributes = array();
+        
         foreach($set as $pair) {
             list( $field, $value ) = explode( ' = ', trim($pair), 2 );
+            $trimmedValue = trim( $value );
             
-            if( array_key_exists(trim($value), $this->_binds) ) {
-                $attributes[$field] = $this->_binds[trim($value)];
+            if( array_key_exists($trimmedValue, $this->_binds) ) {
+                $attributes[$field] = $this->_binds[$trimmedValue];
+            } elseif( $trimmedValue == '?' ) {
+                $attributes[$field] = array_shift($this->_anonymousBinds);
             } else {
                 $attributes[$field] = substr($value, 1, -1);
             }
@@ -973,23 +999,24 @@ print_r($attributes);
     public static function LastInsertId() {
         return self::$_lastInsertID;
     }
-
+    
     /**
-     * Perform a SELECT statement directly on the SDB service
+     * Get a description of the attributes being modified in an update or insert
+     * statement.
      * 
-     * @param string $queryString
-     *      Amazon SDB compatible SELECT querystring
-     * @param boolean $consistent
-     *      Should read consistency be enforced
-     * @param string $nextToken
-     *      Next token for continuing requests
-     * @return SDBResponse
+     * Returns an empty array for other query types.
+     * 
+     * @return array
      */
-    public static function Query( $queryString, $consistentRead = false, $nextToken = null ) {
-        return self::GetSDBConnection()->select( $queryString, array(
-            'ConsistentRead' => $consistentRead ? 'true' : 'false',
-            'NextToken'      => $nextToken
-        ));
+    public function attributes() {
+        switch($this->queryType()) {
+            case 'INSERT':
+                return $this->_getAttributesFromInsertQuery($this->_queryString);
+            case 'UPDATE':
+                return $this->_getAttributesFromUpdateQuery();
+            default:
+                return array();
+        }
     }
 }
 ?>
