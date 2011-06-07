@@ -30,14 +30,21 @@ class SDBStatementTest extends ORMTest {
 
     }
     
-    public function testBindNonNamed() {
+    public function testBindAnonymous() {
         $query = new SDBStatement("SELECT * FROM cars WHERE doors > ? AND colour = ? LIMIT 10");
         
-        $this->assertTrue( $query->execute(array(1, 'black')) );
+        $query->bindValues(array(1, 'black'));
         $this->assertEquals( 'SELECT * FROM cars WHERE doors > \'1\' AND colour = \'black\' LIMIT 10', (string)$query );
     }
     
-    public function testBindInsertNotNamed() {
+    public function testComplicatedAnonymous() {
+        $query = new SDBStatement("SELECT * FROM cars WHERE doors > ? AND brand = 'silly? brand?' AND colour = ? LIMIT 10");
+        
+        $query->bindValues(array(1, 'black'));
+        $this->assertEquals( 'SELECT * FROM cars WHERE doors > \'1\' AND brand = \'silly? brand?\' AND colour = \'black\' LIMIT 10', (string)$query );
+    }
+    
+    public function testBindInsertAnonymous() {
         $query = new SDBStatement("INSERT INTO cars (brand, colour, doors) VALUES ( ?, 'black', ? )");
         $this->assertTrue( $query->execute(array('Dodge', 2)) );
         

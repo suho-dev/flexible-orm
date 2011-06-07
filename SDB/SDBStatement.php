@@ -5,6 +5,7 @@
  */
 namespace ORM\SDB;
 use \ORM\Utilities\Configuration;
+
 /**
  * Mimick the behaviour of ORM_PDOStatement for AmazonSDB
  *
@@ -31,13 +32,7 @@ use \ORM\Utilities\Configuration;
  *
  * @see SDBFactory, ORMModelSDB, SDBResponse
  */
-class SDBStatement implements \ORM\Interfaces\DataStatement {
-    /**
-     * The maximum size a single attribute is allowed to be (in bytes)
-     * Currently the Amazon SimpleDB limit is 1K
-     */
-    const MAX_ATTRIBUTE_SIZE = 1024;
-    
+class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     /**
      * Fetch as both associative and indexed array
      * @see fetch(), fetchAll()
@@ -71,11 +66,6 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @var array $_binds
      */
     private $_binds = array();
-
-    /**
-     * @var AmazonSDB $_sdb
-     */
-    private static $_sdb;
 
     /**
      * @var SDBResponse $_result
@@ -139,98 +129,16 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     /**
      * Create an SDBStatement object for a query
      *
-     * @todo Change this to not be forcing the APAC region
-     *
      * @param string $sql
      *      Simple SQL statement. See class description for detailed information
      *      about the types of SQL statements that are available for SDB.
      */
     public function __construct( $sql ) {
         $this->_queryString = $sql;
-        self::_InitSDBConnection();
-
         $this->_findWith    = self::$findWith;
         self::$findWith     = array();
-    }
-
-    /**
-     * Setup the SDB connection
-     *
-     *   - Use the Configuration value AWS->region to set the region for the SDB
-     *   - Use the Configuration value AWS->apc_enabled to enable/disable APC
-     * 
-     * Valid regions for AWS->region are:
-     *   - us-east
-     *   - us-west
-     *   - ap-southeast
-     *   - ap-northeast
-     *   - eu-west
-     * 
-     * All other values will be ignored.
-     */
-    private static function _InitSDBConnection() {
-        if( is_null(self::$_sdb) ){
-            list( $key, $secret ) = self::_GetAWSKeys();
-            $region = self::_SDBRegion();
-            
-            self::$_sdb = new \AmazonSDB( $key, $secret );
-            self::$_sdb->set_response_class( __NAMESPACE__.'\SDBResponse');
-            
-            if( $region ) {
-                self::$_sdb->set_region( $region );
-            }
-            
-            if( Configuration::AWS()->apc_enabled ) {
-                self::$_sdb->set_cache_config('apc');
-            }
-        }
-    }
-    
-    /**
-     * Get the SDB region from the ini file
-     * 
-     * Converts from short form names (like 'us-west') to urls ('sdb.us-west-1.amazonaws.com')
-     * 
-     * @see _InitSDBConnection()
-     * @return string 
-     */
-    private static function _SDBRegion() {
-        switch(Configuration::AWS()->region) {
-            case 'us-east':
-                return false;
-            case 'us-west':
-                return \AmazonSDB::REGION_US_W1;
-            case 'ap-northeast':
-                return \AmazonSDB::REGION_APAC_NE1;
-            case 'eu-west':
-                return \AmazonSDB::REGION_EU_W1;
-            case 'ap-southeast':
-            default:
-                return \AmazonSDB::REGION_APAC_SE1;
-        }
-    }
-    
-    /**
-     * Get array containing the public and private keys for accessing AmazonSDB
-     * 
-     * \note These can be retrieved through the Accounts panel of the AWS website.
-     * 
-     * Looks for ini settings below, or the constants AWS_KEY and AWS_SECRET_KEY
-     * @code
-     * [AWS]
-     * key = "aaaa"
-     * secret_key = "aaaaa"
-     * @endcode
-     * 
-     * @return array
-     *      2 elements to the array: [0] => public, [1] => private
-     */
-    private static function _GetAWSKeys() {
-        $aws        = \ORM\Utilities\Configuration::AWS();
-        $key        = $aws->key ?: AWS_KEY;
-        $secret_key = $aws->secret_key ?: AWS_SECRET_KEY;
         
-        return array( $key, $secret_key );
+        parent::__construct();
     }
 
     /**
@@ -267,6 +175,52 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             $this->_bindToSQL($placeholder, $value);
         } else {
             $this->_bindToArray($placeholder, $value);
+        }
+    }
+    
+    /**
+     * Bind a value to an anonymous placeholder
+     * 
+     * \note This will be fooled easily- still in testing
+     * @param string $value 
+     *      The value to bind to the first anonymous placeholder
+     */
+    private function _bindAnonymousValue( $value ) {
+        list($unquoted, $quoted) = $this->_extractQuotedValues();
+        
+        $replacedCount  = 0;
+        $output         = '';
+        foreach( $unquoted as $string ) {
+            if( !$replacedCount ) {
+                $string = preg_replace( '/\?/', "'$value'", $string, 1, $replacedCount );
+            }
+            
+            $quotedString = array_shift($quoted);
+            if(strlen($quotedString) > 0 ) {
+                $output .= "$string'$quotedString'";
+            } else {
+                $output .= $string;
+            }
+        }
+        
+        $this->_queryString = $output;
+    }
+    
+    /**
+     * Bind a series of values at once
+     * 
+     * @param array $values 
+     *      Array of values to bind. Associative arrays are bound to named keys,
+     *      indexed arrays are bound to anonymous placeholders ('?'). Mixed arrays
+     *      attempts to do both
+     */
+    public function bindValues( $values ) {
+        foreach($values as $key => $value ) {
+            if( is_numeric($key) ){
+                $this->_bindAnonymousValue( $value );
+            } else {
+                $this->bindValue( $key, $value );
+            }
         }
     }
 
@@ -357,23 +311,6 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
     }
 
     /**
-     * Un-escape a value stored using SDBStatement
-     *
-     * @see bindValue()
-     * @param string $sanitizedValue
-     *      A value that has been stored using bindValue
-     * @return string
-     *      That should match the originally saved data
-     */
-    public static function DecodeValue( $sanitizedValue ) {
-        return str_replace(
-            array('\\\\', '\\0', '\\n', '\\r', "\\'", '\\"'),
-            array('\\', "\0", "\n", "\r", "'", '"', "\x1a"),
-            $sanitizedValue
-        );
-    }
-
-    /**
      * Bind all of an object's properties to corresponding placeholders
      *
      * See ORM_PDOStatement::bindObject()
@@ -398,23 +335,22 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
 
     /**
      * Get all the placeholders in the current query string
+     * 
+     * That is \c "SELECT * FROM cars WHERE doors > :doors AND brand = :brand"
+     * would return <code>array( 'doors', 'brand' )</code>
+     * 
+     * 
      * @return array
-     *      of placeholder names
+     *      of placeholder names or an empty array if there are no named placeholders
      */
     public function placeholders() {
         $pattern = '/(?<=:)([a-zA-Z0-9_]+(?![^\'"]*["\']))/';
 
-        if( strstr($this->_queryString, "'") !== false || strstr($this->_queryString, '"') !== false ) {
-            $query = $this->_removeQuotedValues();
-        } else {
-            $query = $this->_queryString;
-        }
-
-        if( preg_match_all( $pattern, $query, $placeholders ) ) {
+        if( preg_match_all( $pattern, $this->_removeQuotedValues(), $placeholders ) ) {
             return $placeholders[1];
+        } else {
+            return array();
         }
-
-        return array();
     }
 
     /**
@@ -444,6 +380,30 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
 
         return $output;
     }
+    
+    /**
+     * Return 2 dimension array, first array is unquoted stuff, second array is
+     * quoted stuff
+     */
+    private function _extractQuotedValues() {
+        $quotedToken = strtok( $this->_queryString, '"\'' );
+        $output      = array(array(), array());
+        $count       = 1;
+
+        while( $quotedToken !== false ) {
+            if( $count++ % 2 ) {
+                $output[0][] = $quotedToken;
+            } else {
+                $output[1][] = $quotedToken;
+            }
+            
+            $quotedToken = strtok( '"\'' );
+        }
+
+        unset($quotedToken); //!< ensure that the tokeniser is destroyed
+        
+        return $output;
+    }
 
     /**
      * Execute the query
@@ -464,13 +424,10 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      */
     public function execute( array $values = null ) {
         if( !is_null($values) ) {
-            foreach( $values as $key => $value ) {
-                $this->bindValue( $key, $value );
-            }
+            $this->bindValues( $values );
         }
 
-        $this->_items = null;
-        $this->_bind();
+        $this->bindValues( $this->_binds );
         $queryType = $this->queryType();
 
         switch( $queryType ) {
@@ -534,10 +491,10 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      */
     private function _emulateInsert() {
         $this->_simplifyQuery();
-
+echo "Query: $this->_queryString\n";
         $attributes = $this->_getAttributesFromInsertQuery( $this->_queryString );
         $domain     = $this->_getDomainFromQuery();
-
+print_r($attributes);
         // Remove itemName and store it or generate our own itemName
         if( isset($attributes['itemName()']) ) {
             $itemName = $attributes['itemName()'];
@@ -588,7 +545,7 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
             if( array_key_exists( trim($value), $this->_binds) ) {
                 $attributes[$fields[$i]] = $this->_binds[trim($value)];
             } else {
-                $attributes[$fields[$i]] = substr($value, 1, -1);
+                $attributes[$fields[$i]] = substr(trim($value), 1, -1);
             }
         }
 
@@ -994,16 +951,6 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
         return $this->_result->isOK();
     }
 
-    /**
-     * Bind all the placeholders
-     *
-     * Should be called before executing the fetch* functions
-     */
-    private function _bind() {
-        foreach( $this->_binds as $key => $value ) {
-            $this->bindValue( $key, $value );
-        }
-    }
 
     /**
      * The queryString value is output when this class is cast to string
@@ -1039,20 +986,10 @@ class SDBStatement implements \ORM\Interfaces\DataStatement {
      * @return SDBResponse
      */
     public static function Query( $queryString, $consistentRead = false, $nextToken = null ) {
-        self::_InitSDBConnection();
-        return self::$_sdb->select( $queryString, array(
+        return self::GetSDBConnection()->select( $queryString, array(
             'ConsistentRead' => $consistentRead ? 'true' : 'false',
             'NextToken'      => $nextToken
         ));
-    }
-
-    /**
-     * Get the active SDB connection
-     * @return AmazonSDB
-     */
-    public static function GetSDBConnection() {
-        self::_InitSDBConnection();
-        return self::$_sdb;
     }
 }
 ?>
