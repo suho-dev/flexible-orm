@@ -172,7 +172,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      *      [optional] defaults to false. Tell SDB whether or not to force consistency.
      *      This must be the same as the original query (ie if the original query
      *      enforced consistent read, this must be true)
-     * @param int $limit
+     * @param int $resultsLimit
      *      [optional] Maximum number of records to return (including the original items)
      *      Defaults to no limit (other than those imposed by MAX_QUERIES).
      * @param int $offset
@@ -183,7 +183,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      * @return SDBResponse
      *      The current SDBResponse item is returned for convenience
      */
-    public function getAll($consistentRead = false, $limit = null, $offset = 0, $currentOffset = 0) {
+    public function getAll($consistentRead = false, $resultsLimit = null, $offset = 0, $currentOffset = 0) {
         if( isset($this->body->SelectResult) ) {
             $result = $this;
             $query  = $this->getQuery();
@@ -193,7 +193,8 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
                 $this->clear();
             }
             
-            if( $limit ) {
+            if( $resultsLimit ) {
+                $limit = $resultsLimit;
                 $currentOffset += count($this->_items);
                 NextTokenCache::Store($query, $limit, $currentOffset, $result->nextToken());
                 $query = str_replace("LIMIT $limit", '', $query);
@@ -202,7 +203,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
             }
             
             // Continue querying SDB until all items have been fetched or limit is reached
-            while( count($this->_items) < $limit && $result->nextToken() ) {
+            while( (is_null($resultsLimit) || (count($this->_items) < $resultsLimit)) && $result->nextToken() ) {
                 $limitRemaining = $this->_limitRemaining($limit, $offset, $currentOffset);
                 
                 $result = SDBStatement::Query(
