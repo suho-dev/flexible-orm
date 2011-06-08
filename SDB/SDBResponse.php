@@ -204,7 +204,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
             
             // Continue querying SDB until all items have been fetched or limit is reached
             while( (is_null($resultsLimit) || (count($this->_items) < $resultsLimit)) && $result->nextToken() ) {
-                $limitRemaining = $this->_limitRemaining($limit, $offset, $currentOffset);
+                $limitRemaining = is_null($resultsLimit) ? $limit : $this->_limitRemaining($limit, $offset, $currentOffset);
                 
                 $result = SDBStatement::Query(
                     "$query LIMIT $limitRemaining", $consistentRead, $result->nextToken()
