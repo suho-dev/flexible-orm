@@ -393,40 +393,36 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     }
     
     /**
-     * Return 2 dimension array, first array is unquoted stuff, second array is
-     * quoted stuff
+     * Deconstruct a query to determine which bits are inside single quotes
+     * 
+     * @return array
+     *      First key is the parts of the query not inside of quotes, the second
+     *      is those parts that are.
      */
     private function _extractQuotedValues() {
-        echo "Query: $this->_queryString\n";
-        $query       = str_replace(array(" '''", "''"), array(" '\'", "\'"), $this->_queryString );
-        $quotedToken = strtok( $query, "'" );
-        
-        echo "\tAnalysing: $query\n";
         $output      = array(array(), array());
-        $count       = 1;
-        $tokenEscaped = false; // only valid when inside a quoted value
-
-        while( $quotedToken !== false ) {
-            if( $count++ % 2 ) {
-                $output[0][] = $quotedToken;
-            } elseif( substr($quotedToken, -1) == "\\") {
-                // This string ends with the escape character, so the next is still quoted
-                $tokenEscaped = $tokenEscaped === false ? $quotedToken : $tokenEscaped."'".$quotedToken;
-                echo "\t\tEscaping: $tokenEscaped\n";
-                $count--;
-            } elseif( $tokenEscaped !== false ) {
-                echo "\tGot: \"$tokenEscaped'$quotedToken\"\n";
-                
-                $output[1][] = str_replace( "\'", "''", $tokenEscaped."''".$quotedToken );
-                $tokenEscaped = false;
+        $insideQuotes = false;
+        $offset     = 0;
+        $length     = strlen($this->_queryString);
+        
+        while( ($i = strpos($this->_queryString, "'", $offset)) !== false && $offset < $length ) {
+            if( $insideQuotes ) {
+                // Currently inside a quoted block
+                if( substr($this->_queryString, $i+1, 1) != "'" ) {
+                    $output[1][] = substr($this->_queryString, $insideQuotes, $i - $insideQuotes );
+                    $insideQuotes = false;
+                }
             } else {
-                $output[1][] = $quotedToken;
+                // This is the start of a new quoted block
+                $insideQuotes   = $i+1;
+                $output[0][]    = substr($this->_queryString, $offset, $i - $offset  );
             }
             
-            $quotedToken = strtok( "'" );
-        }
-        print_r($output);
-        unset($quotedToken); //!< ensure that the tokeniser is destroyed
+            $offset = $i+1;
+        } 
+        
+        // Add remaining outside quote
+        $output[0][] = substr($this->_queryString, $offset );
         
         return $output;
     }

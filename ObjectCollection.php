@@ -419,5 +419,37 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
     public function toArray() {
         return $this->_collection;
     }
+    
+    /**
+     * Reduce this collection to a single value
+     * 
+     * Works exactly the same as array_reduce().
+     * 
+     * <b>Usage Example:</b>
+     * @code
+     * // Get the Result object with the highest total from a collection of
+     * // Result objects
+     * $highest = $results->reduce(function($best, $current){
+     *      return $current->total > $best->total ? $current : $best;
+     * }, new Result() );
+     * 
+     * // Get the sum of all results
+     * $sum = $results->reduce(function($sum, $current){
+     *      return $sum + $current->total;
+     * });
+     * @endcode
+     * 
+     * @param string $function
+     *      Either an anonymous function (closure) or a function name. The function
+     *      should accept two parameters, the first being the current reduced value
+     *      (which starts at $initial) and the second is the current element in
+     *      the collection.
+     * @param mixed $initial
+     *      [Optional] Initial value. Defaults to null
+     * @return mixed
+     */
+    public function reduce( $function, $initial = null ) {
+        return array_reduce( $this->toArray(), $function, $initial );
+    }
 }
 ?>
