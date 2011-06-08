@@ -397,8 +397,11 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * quoted stuff
      */
     private function _extractQuotedValues() {
-        $quotedToken = strtok( $this->_queryString, "'" );
+        echo "Query: $this->_queryString\n";
+        $query       = str_replace(array(" '''", "''"), array(" '\'", "\'"), $this->_queryString );
+        $quotedToken = strtok( $query, "'" );
         
+        echo "\tAnalysing: $query\n";
         $output      = array(array(), array());
         $count       = 1;
         $tokenEscaped = false; // only valid when inside a quoted value
@@ -406,20 +409,23 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         while( $quotedToken !== false ) {
             if( $count++ % 2 ) {
                 $output[0][] = $quotedToken;
-            } elseif( substr($quotedToken, -1) == '\\') {
+            } elseif( substr($quotedToken, -1) == "\\") {
                 // This string ends with the escape character, so the next is still quoted
                 $tokenEscaped = $tokenEscaped === false ? $quotedToken : $tokenEscaped."'".$quotedToken;
+                echo "\t\tEscaping: $tokenEscaped\n";
                 $count--;
             } elseif( $tokenEscaped !== false ) {
-                $output[1][] = $tokenEscaped."'".$quotedToken;
+                echo "\tGot: \"$tokenEscaped'$quotedToken\"\n";
+                
+                $output[1][] = str_replace( "\'", "''", $tokenEscaped."''".$quotedToken );
                 $tokenEscaped = false;
             } else {
                 $output[1][] = $quotedToken;
             }
             
-            $quotedToken = strtok( '"\'' );
+            $quotedToken = strtok( "'" );
         }
-
+        print_r($output);
         unset($quotedToken); //!< ensure that the tokeniser is destroyed
         
         return $output;

@@ -408,5 +408,16 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
 
         return false;
     }
+    
+    /**
+     * Return the collection as an array
+     * 
+     * Needed for PHP functions that only work with arrays, not the array interfaces
+     * 
+     * @return array
+     */
+    public function toArray() {
+        return $this->_collection;
+    }
 }
 ?>

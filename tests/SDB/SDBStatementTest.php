@@ -1,15 +1,15 @@
 <?php
-namespace ORM\Tests;
+namespace ORM\Tests\SDB;
 use \ORM\Tests\Mock, \ORM\SDB\SDBStatement;
 
-require_once 'ORMTest.php';
+require_once '../ORMTest.php';
 
 /**
  * Test failures and exceptions for SDBStatement
  *
  * Most of the features are already tested in ORMModelSDBTest
  */
-class SDBStatementTest extends ORMTest {
+class SDBStatementTest extends \ORM\Tests\ORMTest {
     const DOMAIN = 'SDBStatementTest';
 
     public function setUp() {
@@ -40,7 +40,7 @@ class SDBStatementTest extends ORMTest {
     public function testInjectionSelect() {
         $query = new SDBStatement("SELECT * FROM cars WHERE doors > ? AND brand = ?");
         $query->bindValues(array( "'4'", '\'?\' ? \'red\''));
-       
+        
         $this->assertEquals("SELECT * FROM cars WHERE doors > '''4''' AND brand = '''?'' ? ''red'''", (string)$query);
     }
 
