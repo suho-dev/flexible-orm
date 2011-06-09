@@ -5,7 +5,8 @@ namespace ORM;
  * \section intro_sec Introduction
  *
  * Simple PHP 5.3 based ORM allowing cloud-based models and traditional database
- * models to coexist.
+ * models to coexist. Download the source and log bugs at our 
+ * <a href="http://code.google.com/p/flexible-orm/">google code site</a>.
  *
  * It aims to simplify the relationship between the database and the application
  * by presenting database rows in an Object-Oriented fashion.
