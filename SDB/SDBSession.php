@@ -18,4 +18,3 @@ class SDBSession extends ORMModelSDB {
         $this->lastModifiedTime = time();
     }
 }
-?>

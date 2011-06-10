@@ -419,4 +419,3 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
         return count( $this->_items );
     }
 }
-?>

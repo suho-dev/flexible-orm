@@ -112,4 +112,3 @@ class SDBSessionHandler {
         session_write_close();
     }
 }
-?>

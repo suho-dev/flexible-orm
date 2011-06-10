@@ -1021,5 +1021,3 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         }
     }
 }
-?>
-

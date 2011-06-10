@@ -36,4 +36,3 @@ class SDBFactory implements \ORM\Interfaces\DataFactory {
         return SDBStatement::LastInsertId();
     }
 }
-?>

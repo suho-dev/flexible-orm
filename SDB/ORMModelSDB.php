@@ -135,4 +135,3 @@ class ORMModelSDB extends \ORM\ORM_Model {
         return "SELECT `$className`.* FROM `$table` AS `$className` ";
     }
 }
-?>

@@ -163,5 +163,3 @@ abstract class SDBWrapper {
         ));
     }
 }
-
-?>

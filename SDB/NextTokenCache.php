@@ -100,4 +100,3 @@ class NextTokenCache {
         return trim($query)."-$limit-$offset";
     }
 }
-?>
