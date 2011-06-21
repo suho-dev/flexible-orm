@@ -109,7 +109,7 @@ abstract class ORM_Core {
     /**
      * Return a string of error messages
      * 
-     * Each error is listed comma seperated as '<propertyname>' <error message>
+     * Each error is listed comma seperated as "'PropertyName' ErrorMessage"
      *
      * See \ref validation "Model Validation" for more information.
      * 

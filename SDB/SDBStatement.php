@@ -122,7 +122,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     
     /**
      * The maximum number of results to return, if null then return all
-     * @var int limit
+     * @var int $_limit
      */
     private $_limit;
     

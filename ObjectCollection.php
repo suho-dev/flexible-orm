@@ -10,10 +10,26 @@ namespace ORM;
  *
  * Provides a more Object-Oriented interface for standard PHP functions like
  * \c array_map() and \c array_filter()
+ * 
+ * Also allows you to access items from the object as an array (ArrayAccess).
  * \n\n
  * 
  * <b>Useful Methods:</b>
  * 
+ * Array access:
+ * @code
+ * $collection = new ObjectCollection(array(
+ *      'my'    => 'collection',
+ *      'size'  => 'small'
+ * ));
+ * 
+ * foreach( $collection as $key => $value ) {
+ *      echo "Key: $key, Value: $value \n";
+ * }
+ * 
+ * echo "Size: ".$collection['size'];
+ * @endcode
+ * \n\n
  * ObjectCollection::each()
  * \copydetails each
  * \n\n
@@ -77,7 +93,7 @@ class ObjectCollection extends \ArrayObject {
      * @endcode
      *
      *
-     * @see each(), select(), auto_map()
+     * @see each(), select(), _autoMap()
      * @param sring $functionOrProperty
      *      Either an object property to map (see _autoMap()) or a function to 
      *      apply to each element. The function may either be an anonymous function

@@ -47,7 +47,7 @@ interface DataStatement {
     
     /**
      * Fetch a row from the database
-     * @sse http://www.php.net/manual/en/pdostatement.fetch.php
+     * @see http://www.php.net/manual/en/pdostatement.fetch.php
      */
     public function fetch( $fetch_style );
     

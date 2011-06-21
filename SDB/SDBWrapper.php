@@ -150,7 +150,7 @@ abstract class SDBWrapper {
      * 
      * @param string $queryString
      *      Amazon SDB compatible SELECT querystring
-     * @param boolean $consistent
+     * @param boolean $consistentRead
      *      Should read consistency be enforced
      * @param string $nextToken
      *      Next token for continuing requests

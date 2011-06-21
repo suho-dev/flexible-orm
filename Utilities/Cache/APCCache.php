@@ -7,6 +7,8 @@
  * @file
  */
 namespace ORM\Utilities\Cache;
+use \ORM\Interfaces\Cache;
+
 /**
  * Object-oriented wrapper for APCcache
  *
@@ -17,7 +19,7 @@ namespace ORM\Utilities\Cache;
  * @see Cache
  *
  */
-class APCCache implements \ORM\Interfaces\Cache {
+class APCCache implements Cache {
     /**
      * Prefix to add to all objects cached (allows other systems to use APC
      * simultaneously.

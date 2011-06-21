@@ -131,6 +131,8 @@ class PDOFactory implements Interfaces\DataFactory {
      *      [optional] The name of the database Configuration group. If not supplied
      *      uses the group DEFAULT_DATABASE = "database". Allows one application
      *      to connect to multiple databases.
+     * @param string $callingClass
+     *      [optional] Not used for PDOFactory, required for DataFactory interface
      * @return ORM_PDOStatement
      */
     public static function Get( $sql, $database = self::DEFAULT_DATABASE, $callingClass = null ) {

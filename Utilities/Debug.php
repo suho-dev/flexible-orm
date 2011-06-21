@@ -23,7 +23,7 @@ use \ORM\Interfaces\DebugLog;
  * Debug::Dump($myObject);
  * 
  * // Would output the contents of $myObject
- * @encode
+ * @endcode
  * 
  * <b>Options</b>
  * You can disable output system wide by calling \c Debug::SetDisplayOutput(false)
@@ -31,7 +31,7 @@ use \ORM\Interfaces\DebugLog;
  * for display_errors.
  * 
  * You can enable logging of errors by defining a class that implements the
- * Interfaces\DebugLog interface and then nominating it \c Debug::SetLogStore( $classname )
+ * Interfaces\\DebugLog interface and then nominating it \c Debug::SetLogStore( $classname )
  * 
  * @see DebugCorrectLog in tests/Mock
  * 
@@ -87,7 +87,7 @@ class Debug {
      * A class name to use for storing logs
      * 
      * @param string $storeClass 
-     *      A class name. Must implement the Interfaces\DebugLog
+     *      A class name. Must implement the Interfaces\\DebugLog
      */
     public static function SetLogStore( $storeClass ) {
         if( !is_null($storeClass) && !in_array( 'ORM\Interfaces\DebugLog', class_implements($storeClass) ) ) {
