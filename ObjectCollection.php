@@ -23,161 +23,14 @@ namespace ORM;
  * ObjectCollection::map()
  * \copydetails map
  */
-class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
-    /**
-     * The array of items
-     * @var array $_collection
-     */
-    protected $_collection;
-
-    /**
-     * Create a new ObjectCollection
-     *
-     * If arguments are supplied, they are added to the collection
-     * in the order they are supplied. If only one paramater is given
-     * and it is an array, add each element (convert array to ModelIterator)
-     *
-     * @param array $objects
-     *      Array of objects to "convert" into an ObjectCollection. Array keys
-     *      are removed (ie it will be zero indexed).
-     * @return ModelIterator
-     */
-    public function __construct(array $objects = array()) {
-        $this->_collection = array_values( $objects );
-    }
-
-    /**
-     * Check to see whether an item exists matching offset
-     *
-     * Part of the ArrayAccess interface
-     *
-     * @param mixed $index
-     * @return bool
-     */
-    public function offsetExists( $index ) {
-        return array_key_exists( $index, $this->_collection );
-    }
-
-    /**
-     * Return the object at a specific index
-     *
-     * Part of the ArrayAccess interface
-     *
-     * @return mixed
-     * @param mixed $index
-     */
-    public function offsetGet( $index ) {
-        return $this->_collection[$index];
-    }
-
-    /**
-     * Set the value of a key pair
-     *
-     * Part of the ArrayAccess interface
-     *
-     * @return void
-     * @param string $offset
-     * @param mixed $value
-     */
-    public function offsetSet( $offset, $value ) {
-        if( is_null($offset) ) {
-            $this->_collection[] = $value;
-        } else {
-            $this->_collection[$offset] = $value;
-        }
-    }
-
-    /**
-     * Remove an item from the collection at specified index
-     *
-     * Part of the ArrayAccess interface
-     * 
-     * @return void
-     * @param mixed $index
-     */
-    public function offsetUnset( $index ) {
-        unset( $this->_collection[$index] );
-    }
-
+class ObjectCollection extends \ArrayObject {
     /**
      * Reverse the collection
      *
      * @return void
      */
     public function reverse() {
-        $this->_collection = array_reverse( $this->_collection );
-    }
-
-    /**
-     * Get the element at the current pointer position
-     *
-     * Part of the Iterator interface
-     *
-     * @see next(), rewind()
-     * @return mixed
-     */
-    public function current() {
-        return current( $this->_collection );
-    }
-
-    /**
-     * Return the key at the current position in the collection
-     *
-     * Part of the Iterator interface
-     *
-     * @see current()
-     * @return mixed
-     */
-    public function key() {
-        return key( $this->_collection );
-    }
-
-    /**
-     * Get the next element and advance the current pointer position
-     *
-     * Part of the Iterator interface
-     *
-     * @see current(), rewind()
-     * @return mixed
-     */
-    public function next() {
-        next( $this->_collection );
-    }
-
-    /**
-     * Rewind the pointer to the beginning of the collection
-     *
-     * Part of the Iterator interface
-     *
-     * @see current(), next()
-     * @return mixed
-     */
-    public function rewind() {
-        reset( $this->_collection );
-    }
-
-    /**
-     * Check to see if the collection pointer is pointing at
-     * a valid element.
-     *
-     * Part of the Iterator interface
-     *
-     * @see current()
-     * @return bool
-     */
-    public function valid() {
-        return (current($this->_collection) !== FALSE);
-    }
-
-    /**
-     * Get the number of items in the collection
-     *
-     * Part of the Countable interface
-     *
-     * @return int
-     */
-    public function count() {
-        return count( $this->_collection );
+        $this->exchangeArray( array_reverse( $this->getArrayCopy() ) );
     }
 
     /**
@@ -197,7 +50,7 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
      *      Function name or anonymous function to execute
      */
     public function each( $function ) {
-        array_walk( $this->_collection, $function, $this );
+        array_walk( $this, $function, $this );
     }
 
     /**
@@ -234,7 +87,7 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
      */
     public function map( $functionOrProperty ) {
         if( is_callable($functionOrProperty) ) {
-            return array_map( $functionOrProperty, $this->_collection );
+            return array_map( $functionOrProperty, $this->getArrayCopy() );
         } else {
             return $this->_autoMap( $functionOrProperty );
         }
@@ -263,11 +116,18 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
     /**
      * Pop an element of the end of the collection
      *
-     * Removes the last added element
+     * Removes the last added element. Not very efficient, since it has to make
+     * a copy of the array (since there's no access to the ArrayObject internal
+     * array).
+     * 
      * @return mixed
      */
     public function pop() {
-        return array_pop( $this->_collection );
+        $newValues  = $this->getArrayCopy();
+        $output     = array_pop( $newValues );
+        $this->exchangeArray( $newValues );
+        
+        return $output;
     }
 
     /**
@@ -276,6 +136,8 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
      * May be used in two ways:
      * - Selecting by property
      * - Selecting by function
+     * 
+     * Array keys are lost on the selection.
      *
      * <b>Selecting by Property</b>
      *
@@ -329,7 +191,7 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
         
         $class = get_class($this);
 
-        return new $class( $selected );
+        return new $class( array_values($selected) );
     }
 
     /**
@@ -344,7 +206,7 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
      *      Array of selected items
      */
     private function _selectByFunction( $function ) {
-        return array_filter( $this->_collection, $function );
+        return array_filter( $this->toArray(), $function );
     }
 
     /**
@@ -371,7 +233,7 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
         $value = is_null($value) ? true : $value;
 
         return array_filter(
-            $this->_collection,
+            $this->toArray(),
             function( $item ) use( $propertyName, $value ) {
                 return $item->$propertyName == $value;
         });
@@ -400,7 +262,7 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
      *      True if at least one object returned true
      */
     public function detect( $function ) {
-        foreach( $this->_collection as $item ) {
+        foreach( $this as $item ) {
             if( call_user_func( $function, $item ) ) {
                 return true;
             }
@@ -417,7 +279,7 @@ class ObjectCollection implements \ArrayAccess, \Iterator, \Countable {
      * @return array
      */
     public function toArray() {
-        return $this->_collection;
+        return $this->getArrayCopy();
     }
     
     /**

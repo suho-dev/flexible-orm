@@ -90,7 +90,7 @@ class ORMModelSDB extends \ORM\ORM_Model {
 
         return $domain_name;
     }
-
+    
     /**
      * (re)sets the all the attribute values for this object
      *
