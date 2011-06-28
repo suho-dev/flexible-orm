@@ -138,7 +138,7 @@ class Request {
      *      If the value is 'get', 'post', 'cookies' or 'request' then the
      *      Variables object will be returned that matches the type.\n\n
      *      If the value is anything else, it is the equivalent of calling
-     *      this function on the $_request object.
+     *      this function on the \c $_request object.
      * @return Variables|string
      *      Either a set of variables or the value of a request variable (see
      *      usage). The value from a html form is always a string.

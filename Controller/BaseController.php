@@ -7,9 +7,13 @@ namespace ORM\Controller;
 use \ORM\Interfaces\Template;
 
 /**
- * Description of BaseController
+ * Simple controller class for implementing a MVC stack
  *
- * With PHP5.4 this may work well as a trait instead
+ * An independent class (ie can be used without the ORM functions and vice-versa)
+ * to implement the Controller part of an Model-View-Controller stack.
+ * 
+ * For usage instructions see \ref controller_tutorial "the controller tutorial".
+ * 
  */
 abstract class BaseController {
     /**
