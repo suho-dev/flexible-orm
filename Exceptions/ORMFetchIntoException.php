@@ -6,7 +6,7 @@
 namespace ORM\Exceptions;
 
 /**
- * Description of ORMFetchIntoException
+ * Raised when fetching data into a class
  *
  */
 class ORMFetchIntoException extends ORMPDOException {

@@ -6,10 +6,8 @@
 namespace ORM\Exceptions;
 
 /**
- * Description of ORMInsertException
+ * Raised when unable to insert an object into the datastore
  *
  */
 class ORMInsertException extends ORMPDOException {
-    //put your code here
 }
-?>

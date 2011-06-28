@@ -6,10 +6,8 @@
 namespace ORM\Exceptions;
 
 /**
- * Description of ORMFetchIntoClassNotFound
+ * Raised when the class specifiec for fetching into is not defined
  *
  */
 class ORMFetchIntoClassNotFoundException extends ORMFetchIntoException {
-    //put your code here
 }
-?>
