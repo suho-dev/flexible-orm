@@ -196,9 +196,12 @@ class Request {
     }
     
     /**
-     *
+     * Merge an associative array of variables into the request array
+     * 
+     * Existing values are overriden.
+     * 
      * @param Variables $request 
-     *      Merge the variables from this object into the $_requestArray property.
+     *      Merge the variables from this object into the \c $_requestArray property.
      *      New values will override existing ones.
      */
     private function _mergeRequest( Variables $request ) {

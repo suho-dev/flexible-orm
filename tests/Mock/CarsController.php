@@ -17,12 +17,16 @@ class CarsController extends \ORM\Controller\BaseController {
     }
     
     public function index() {
+        $this->_useLayout = false;
         $this->id = $this->_request->post->id;
+    }
+    
+    public function alternateView() {
+        $this->view();
+        $this->_templateName = 'cars/view';
     }
     
     private function create() {
         $this->id = $this->_request->cookies->id;
     }
 }
-
-?>
