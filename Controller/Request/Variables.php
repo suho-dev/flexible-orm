@@ -14,7 +14,7 @@ namespace ORM\Controller\Request;
  * Default values can be specified if the variable is not set or doesn't meet
  * the criteria of the rule (see matchesRule()).
  * 
- * @see Request
+ * Used by the Request class to represent each set of request variables.
  */
 class Variables extends \ArrayObject {
     /**
