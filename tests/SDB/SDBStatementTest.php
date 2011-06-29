@@ -5,7 +5,8 @@
 namespace ORM\Tests\SDB;
 use \ORM\Tests\Mock, \ORM\SDB\SDBStatement;
 
-require_once '../ORMTest.php';
+set_include_path(get_include_path(). PATH_SEPARATOR . __DIR__.'/..');
+require_once 'ORMTest.php';
 
 /**
  * Test failures and exceptions for SDBStatement
