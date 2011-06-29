@@ -14,6 +14,10 @@ use \ORM\Interfaces\Template;
  * 
  * For usage instructions see \ref controller_tutorial "the controller tutorial".
  * 
+ * There are two hooks available, beforeAction() and afterAction(). Overriding
+ * these methods allows for controller-wide functionality such as checking
+ * for a logged in user.
+ * 
  */
 abstract class BaseController {
     /**
@@ -151,7 +155,10 @@ abstract class BaseController {
             throw new \ORM\Exceptions\InvalidActionException("Unknown action $this->actionName");
         }
         
+        $this->beforeAction();
         $this->{$this->actionName}();
+        $this->afterAction();
+        
         $this->_assignTemplateVariables();
         
         $this->_templateName = $this->_templateName ?: "$this->controllerName/$this->actionName";
@@ -266,5 +273,32 @@ abstract class BaseController {
         return basename( strtolower( str_replace(
                 array('Controller', '_', '\\'), array('','','/'), get_called_class() 
         )));
+    }
+    
+    /**
+     * Called before the action method is called
+     * 
+     * Override this method for things that need to be run for each request in
+     * a controller. The value of \c $actionName will be set before this is called
+     * 
+     * The default method does nothing
+     * 
+     * @see afterAction()
+     */
+    public function beforeAction() {
+    }
+    
+    /**
+     * Called after the action method is called
+     * 
+     * Override this method for things that need to be run for each request in
+     * a controller, after the action. Called before variables are assigned to
+     * the template.
+     * 
+     * The default method does nothing
+     * 
+     * @see beforeAction()
+     */
+    public function afterAction() {
     }
 }
