@@ -1,10 +1,7 @@
 <?php
 /**
- * Define basic model operations
- * 
- * @package ORM
- * @author Jarrod Swift
  * @file
+ * @author jarrod.swift
  */
 namespace ORM;
 

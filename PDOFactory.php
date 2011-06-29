@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @file
  * @author jarrod.swift
  */

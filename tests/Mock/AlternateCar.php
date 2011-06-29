@@ -3,6 +3,9 @@
  * @file
  * @author jarrod.swift
  */
+/**
+ * Mock object classes for testing
+ */
 namespace ORM\Tests\Mock;
 use ORM\ORM_Model;
 /**

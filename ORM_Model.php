@@ -1,6 +1,5 @@
 <?php
 /**
- * Definition of the ORM_Model class
  * @file
  * @author jarrod.swift
  */

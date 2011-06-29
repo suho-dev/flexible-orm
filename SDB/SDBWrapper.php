@@ -3,6 +3,9 @@
  * @file
  * @author jarrod.swift
  */
+/**
+ * Amazon Simple DB resources
+ */
 namespace ORM\SDB;
 use \ORM\Utilities\Configuration;
 

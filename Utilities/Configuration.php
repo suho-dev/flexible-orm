@@ -1,8 +1,7 @@
 <?php
 /**
- * Configuration Package Definition
- * @package Utilities
- * @author Jarrod Swift
+ * @file
+ * @author jarrod.swift
  */
 namespace ORM\Utilities;
 

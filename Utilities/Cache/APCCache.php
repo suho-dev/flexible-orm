@@ -1,10 +1,7 @@
 <?php
 /**
- * APCcache Implementation
- * 
- * @package Utilities
- * @author Jarrod Swift
  * @file
+ * @author jarrod.swift
  */
 namespace ORM\Utilities\Cache;
 use \ORM\Interfaces\Cache;

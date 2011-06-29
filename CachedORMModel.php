@@ -5,8 +5,6 @@
  */
 namespace ORM;
 /**
- * Description of CachedORMModel
- *
  * An ORM Model class that implements caching on Find/FindAll actions and keeps
  * the cache updated on save() actions.
  *
@@ -181,4 +179,3 @@ class CachedORMModel extends ORM_Model {
         return get_called_class()." [$id]";
     }
 }
-?>

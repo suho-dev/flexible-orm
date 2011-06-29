@@ -3,6 +3,9 @@
  * @file
  * @author jarrod.swift
  */
+/**
+ * Tests specific to the Controller package
+ */
 namespace ORM\Tests\Controller;
 use \ORM\Controller\BaseController, 
     \ORM\Controller\Request, 

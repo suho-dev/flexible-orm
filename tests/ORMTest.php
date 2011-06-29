@@ -3,6 +3,9 @@
  * @file
  * @author jarrod.swift
  */
+/**
+ * PHPUnit tests for flexible-orm
+ */
 namespace ORM\Tests;
 error_reporting(E_ALL);
 

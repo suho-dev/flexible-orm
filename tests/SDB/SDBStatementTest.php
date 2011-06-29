@@ -1,4 +1,7 @@
 <?php
+/**
+ * Tests specific to AmazonSDB packages (SDB)
+ */
 namespace ORM\Tests\SDB;
 use \ORM\Tests\Mock, \ORM\SDB\SDBStatement;
 

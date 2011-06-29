@@ -1,9 +1,7 @@
 <?php
 /**
- * Iterator for ORM Models
- * 
- * @package ORM
- * @author Jarrod Swift
+ * @file
+ * @author jarrod.swift
  */
 namespace ORM;
 /**

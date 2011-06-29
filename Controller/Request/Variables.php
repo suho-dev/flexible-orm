@@ -3,6 +3,9 @@
  * @file
  * @author jarrod.swift
  */
+/**
+ * HTTP request handling
+ */
 namespace ORM\Controller\Request;
 
 /**

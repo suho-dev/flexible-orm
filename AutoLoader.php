@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * @author jarrod.swift
+ */
 namespace ORM;
 
 require 'Utilities/Configuration.php';

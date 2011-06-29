@@ -3,6 +3,9 @@
  * @file
  * @author jarrod.swift
  */
+/**
+ * Custom flexible-orm exceptions
+ */
 namespace ORM\Exceptions;
 
 /**

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Package for implementing the controller part of the Model-View-Controller pattern
+ * 
+ * See the \ref controller_tutorial "Controller Tutorial"
+ */
 namespace ORM\Controller;
 use ORM\Interfaces\Template;
 
