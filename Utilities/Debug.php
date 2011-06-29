@@ -1,12 +1,7 @@
 <?php
 /**
- * DEBUG Class Module
- * 
- * This file is self-contained so can be used independantly on other projects.
- * 
- * @package Utilities
- * @author Jarrod Swift
  * @file
+ * @author jarrod.swift
  */
 namespace ORM\Utilities;
 use \ORM\Interfaces\DebugLog;

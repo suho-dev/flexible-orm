@@ -6,10 +6,8 @@
 namespace ORM\Exceptions;
 
 /**
- * Description of ORMPDOException
+ * Base class for data expections
  *
  */
 class ORMPDOException extends ORMException {
-    //put your code here
 }
-?>

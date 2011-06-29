@@ -6,7 +6,7 @@
 namespace ORM;
 
 /**
- * Description of ObjectCollection
+ * Represents an array of anything
  *
  * Provides a more Object-Oriented interface for standard PHP functions like
  * \c array_map() and \c array_filter()
@@ -330,4 +330,3 @@ class ObjectCollection extends \ArrayObject {
         return array_reduce( $this->toArray(), $function, $initial );
     }
 }
-?>

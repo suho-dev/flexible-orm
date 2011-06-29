@@ -11,5 +11,3 @@ namespace ORM\Exceptions;
  */
 class ORMConfigurationException extends ORMException {
 }
-
-?>

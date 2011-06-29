@@ -5,7 +5,6 @@
  */
 namespace ORM\Exceptions;
 
-
 /**
  * Thrown when attempt to connect to a database with invalid connection details
  * or none at all.
@@ -13,5 +12,3 @@ namespace ORM\Exceptions;
  */
 class ORMPDOInvalidDatabaseConfigurationException extends ORMPDOException {
 }
-
-?>

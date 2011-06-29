@@ -32,4 +32,3 @@ interface DataFactory {
      */
     public static function LastInsertId();
 }
-?>

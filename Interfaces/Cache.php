@@ -1,9 +1,10 @@
 <?php
 /**
- * Cache Interface definition
- * 
- * @package Utilities
- * @author Jarrod Swift
+ * @file
+ * @author jarrod.swift
+ */
+/**
+ * Contains all defined flexible-orm interfaces
  */
 namespace ORM\Interfaces;
 /**

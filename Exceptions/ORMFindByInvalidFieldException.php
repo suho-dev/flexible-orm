@@ -6,10 +6,8 @@
 namespace ORM\Exceptions;
 
 /**
- * Description of ORMException
+ * Raised if FindBy is called on a field that does not exist
  *
  */
 class ORMFindByInvalidFieldException extends ORMException {
-    //put your code here
 }
-?>

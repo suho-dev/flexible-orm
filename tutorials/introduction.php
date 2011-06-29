@@ -1,4 +1,9 @@
 <?php
+/**
+ * The base namespace for flexible-orm
+ * 
+ * See \ref getting_started "the getting started guide"
+ */
 namespace ORM;
 /*! @mainpage Introduction to flexible-orm
  * 

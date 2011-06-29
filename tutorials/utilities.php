@@ -1,5 +1,10 @@
 <?php
-namespace ORM;
+/**
+ * Utility classes for configuration, caching, debug etc.
+ * 
+ * See \ref utilities_tutorial "the utilities tutorial"
+ */
+namespace ORM\Utilities;
 /*! @page utilities_tutorial Utilities Tutorial
  *
  * \section utilities_tutorial_intro Introduction

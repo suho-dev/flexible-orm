@@ -5,12 +5,9 @@
  */
 namespace ORM\Exceptions;
 
-
 /**
- * Description of ORMUpdateException
+ * Raised when unable to update an record in datastorage
  *
  */
 class ORMUpdateException extends ORMPDOException {
 }
-
-?>

@@ -1,8 +1,7 @@
 <?php
 /**
- * Configuration Package Definition
- * @package Utilities
- * @author Jarrod Swift
+ * @file
+ * @author jarrod.swift
  */
 namespace ORM\Utilities;
 
@@ -182,7 +181,6 @@ class Configuration {
      * Clear all the configuration settings
      *
      * @see Load()
-     * @static
      */
     public static function Clear() {
         self::$_settings = null;
