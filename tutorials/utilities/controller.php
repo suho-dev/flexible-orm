@@ -32,6 +32,25 @@ use ORM\Interfaces\Template;
  * values to a \e template (the view layer). All public methods are callable as
  * actions. All public properties are assigned to the template.
  * 
+ * The basic process is:
+ * -# Get the request variables and create a Request object
+ * -# Create and setup a Template object (such as SmartyTemplate)
+ * -# Create a new controller object from a class that extends BaseController
+ *     - Pass the controller object the Request and Template objects
+ * -# Call performAction() on the controller object
+ * -# Do something with the output (usually just \c echo it out).
+ * 
+ * 
+ * \subsection ctrl_layout Layouts
+ * Usually you would want most templates on a site to contain a lot of identical
+ * code (navigation, layout, etc). To avoid having to write this into every template
+ * you simply create a template file named 'layout' in your route template folder.
+ * This template will be called for every action unless the property \c _useLayout
+ * is set to \c FALSE .
+ * 
+ * The layout will get all the assigned variables from the action, plus a special
+ * variable named \c $action_content which is the output of the template.
+ * 
  * <b>Basic Controller Class</b>
  * @code
  * class MyController extends BaseController {
@@ -76,6 +95,10 @@ use ORM\Interfaces\Template;
  * 
  * \n\n
  * \section ctrl_options Overriding The Defaults
+ * By default each action will attempt to load a template 'controllerName/actionName'.
+ * You can change this in the action by setting the \c $_templateName variable
+ * to the template you wish to load.
+ * 
  * 
  * \n\n
  * \section ctrl_template Implementing Your Own Template Class
