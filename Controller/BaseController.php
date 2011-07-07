@@ -29,6 +29,11 @@ abstract class BaseController {
     const LAYOUT_TEMPLATE = 'layout';
     
     /**
+     * The default action name if none provided
+     */
+    const DEFAULT_ACTION = 'index';
+    
+    /**
      * The request variables (ie GET, POST and COOKIE values)
      * @var Request $_request
      */
@@ -133,6 +138,10 @@ abstract class BaseController {
      * output of the action's template will be assigned to a variable \c action_content
      * in the layout template.
      * 
+     * If no action name can be found (i.e. none is provided either in the $action
+     * parameter nor the 'action' value of the get parameters) then \c DEFAULT_ACTION
+     * is used from the current class.
+     * 
      * <b><i>Example Layout File</i></b>\n
      * The following is an example Smarty template for layout.
      * 
@@ -150,6 +159,9 @@ abstract class BaseController {
     public function performAction( $action = null ) {
         $this->actionName = is_null($action) ? $this->_actionName : $action;
         
+        if( is_null($this->actionName) ){
+            $this->actionName = static::DEFAULT_ACTION;
+        }
         
         if( !is_callable(array($this, $this->actionName))) {
             throw new \ORM\Exceptions\InvalidActionException("Unknown action $this->actionName");
