@@ -104,7 +104,7 @@ abstract class BaseController {
      */
     public function __construct( Request $request, Template $template ) {
         $this->_request         = $request;
-        $this->_actionName      = $request->get->action;
+        $this->_actionName      = $request->get->action ?: static::DEFAULT_ACTION;
         $this->_template        = $template;
         $this->controllerName   = static::ControllerName();
     }
@@ -158,11 +158,7 @@ abstract class BaseController {
      */
     public function performAction( $action = null ) {
         $this->actionName = is_null($action) ? $this->_actionName : $action;
-        
-        if( is_null($this->actionName) ){
-            $this->actionName = static::DEFAULT_ACTION;
-        }
-        
+               
         if( !is_callable(array($this, $this->actionName))) {
             throw new \ORM\Exceptions\InvalidActionException("Unknown action $this->actionName");
         }
