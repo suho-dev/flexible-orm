@@ -160,7 +160,7 @@ abstract class BaseController {
         $this->actionName = is_null($action) ? $this->_actionName : $action;
                
         if( !is_callable(array($this, $this->actionName))) {
-            throw new \ORM\Exceptions\InvalidActionException("Unknown action $this->actionName");
+            throw new \ORM\Exceptions\InvalidActionException("Unknown action, '$this->actionName' for the class, '".get_class($this)."'.");
         }
         
         $this->beforeAction();
