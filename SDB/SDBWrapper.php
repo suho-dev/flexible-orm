@@ -36,8 +36,10 @@ abstract class SDBWrapper {
     /**
      * Setup the SDB connection
      *
-     *   - Use the Configuration value AWS->region to set the region for the SDB
-     *   - Use the Configuration value AWS->apc_enabled to enable/disable APC
+     *   - Use the Configuration value \c AWS->region to set the region for the SDB
+     *   - Use the Configuration value \c AWS->apc_enabled to enable/disable APC
+     *   - Use the Configuration value \c AWS->key and \c AWS->secret_key to determine
+     * the account settings for Amazon SimpleDB
      * 
      * Valid regions for AWS->region are:
      *   - us-east
@@ -123,6 +125,10 @@ abstract class SDBWrapper {
     
     /**
      * Get the active SDB connection
+     * 
+     * Connect and set settings if required. See _InitSDBConnection() for all 
+     * options that are set and configurable.
+     * 
      * @return AmazonSDB
      */
     public static function GetSDBConnection() {

@@ -162,7 +162,7 @@ class Configuration {
      * @return Cache
      */
     public static function GetCache() {
-        if( $cacheClass = self::Value('cacheClass', 'Cache') ) {
+        if( $cacheClass = self::Value('class', 'Cache') ) {
             return new $cacheClass;
         }
         
@@ -174,7 +174,7 @@ class Configuration {
      * @param string|null $className 
      */
     public static function SetCacheClass( $className ) {
-        self::$_settings->_options['Cache'] = array('cacheClass' => $className);
+        self::$_settings->_options['Cache'] = array('class' => $className);
     }
 
     /**

@@ -76,9 +76,11 @@ class ORMModelSDB extends \ORM\ORM_Model {
     /**
      * Create the SDB domain for this model
      *
-     * This action is idempotent (can be called repeatedly with no ill-effect)
+     * This action is idempotent (can be called repeatedly with no side-effect)
      * though it should not be called every time the script is run, since it
      * may be slightly slower.
+     * 
+     * \note Uses the [AWS]region setting to chose where to create the domain.
      *
      * @return string
      *      Returns the domain name created (will be the same as calling
