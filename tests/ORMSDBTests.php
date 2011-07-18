@@ -113,5 +113,18 @@ class ORMSDBTests extends ORMTest {
         $this->assertEquals(count($cars), $carCount);
     }
     
+    public function testDefaultValue() {
+        $car = new Mock\SDBCar;
+        
+        $this->assertEquals( 'black', $car->colour );
+        
+        $car->colour = 'red';
+        
+        $this->assertTrue( $car->save() );
+        
+        $savedCar = Mock\SDBCar::Find( $car->id() );
+        $this->assertEquals( 'red', $savedCar->colour );
+    }
+    
 }
 ?>
