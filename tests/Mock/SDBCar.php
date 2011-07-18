@@ -13,7 +13,7 @@ class SDBCar extends \ORM\SDB\ORMModelSDB {
     const FOREIGN_KEY_SDBOWNER = 'owner_id';
     
     public $brand;
-    public $colour;
+    public $colour = 'black';
     public $doors;
     public $owner_id;
 
