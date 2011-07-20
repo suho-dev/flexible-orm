@@ -631,5 +631,18 @@ class ORM_ModelTest extends ORMTest {
         
         $this->assertEquals( 2, $carCount );
     }
+    
+    public function testAfterGet() {
+        $car = Mock\Car::Find();
+        $this->assertEquals( $car->brand, $car->testValue() );
+        
+        $newCar = new Mock\Car(array('brand' => 'ferrari'));
+        $this->assertEquals( 'initial', $newCar->testValue() );
+        
+        $cars = Mock\Car::FindAll();
+        
+        foreach( $cars as $car ) {
+            $this->assertEquals( $car->brand, $car->testValue() );
+        }
+    }
 }
-?>

@@ -52,7 +52,7 @@ use ORM\Exceptions;
  * \n\n
  * @todo Exceptions - if model is poorly coded, it should raise a more descriptive
  *      exception than a PDOException
- *
+ * 
  */
 abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     /**
@@ -95,12 +95,13 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         parent::__construct( $values );
     }
 
-    /*! Find a single object
-     * 
+    /**
+     * Find a single object
      *
      * May be used two ways: as a simple lookup by primary key, or as a more complex
      * lookup using an array of options.
      *
+     * \n\n
      * <b>Usage: Primary key lookup</b>
      * @code
      * // Find car with id=2
@@ -123,6 +124,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * For more information about the options array, see \ref intro_step4_options "Options Array"
      * in the \ref getting_started "Getting Started" tutorial.
      * 
+     * \n\n
      * <b>Foreign Keys</b>
      *
      * It is possible to fetch an object with related object(s) in a single query. This
@@ -134,7 +136,13 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * @car = Car::Find( 1, 'Owner' );
      * echo "This car is owned by ", $car->Owner->name;
      * @endcode
-     *
+     * 
+     * \n\n
+     * <b>Other</b>\n
+     * There is a hook for all \e get methods named \c afterGet(), to allow actions
+     * to be performed when an object is fetched (as opposed to the constructor, 
+     * which is called both when a new object is created or fetched).
+     * 
      * @see FindByOptions(), FindAll()
      * @param mixed $idOrArray
      *      Either an array of search options or a primary key value. If nothing
@@ -158,6 +166,10 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * Same syntax as Find() except will return a ModelCollection of all matched
      * items, rather than just the first matching object.
      *
+     * \note There is a hook for all \e get methods named \c afterGet(), to allow actions
+     *      to be performed when an object is fetched (as opposed to the constructor, 
+     *      which is called both when a new object is created or fetched).
+     * 
      * @see Find(), FindAllBy()
      * @param array $optionsArray
      *      [optional] An array of options for finding objects. If not supplied, this will
@@ -177,7 +189,12 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
 
         $query->execute( isset($optionsArray['values']) ? $optionsArray['values'] : null);
 
-        return $query->fetchAllInto( get_called_class() );
+        $items = $query->fetchAllInto( get_called_class() );
+        $items->each(function($item){
+            $item->afterGet();
+        });
+        
+        return $items;
     }
     
     /**
@@ -189,6 +206,11 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * <b>Usage</b>:
      * \include orm_model.findAllBy.example.php
      *
+     * \note There is a hook for all \e get methods named \c afterGet(), to allow actions
+     *      to be performed when an object is fetched (as opposed to the constructor, 
+     *      which is called both when a new object is created or fetched).
+     * 
+     * 
      * @todo if operator is IN then allow $value to be an array
      * @todo verify operator type
      *
@@ -216,10 +238,14 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $query = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() );
 
         $query->bindParam( ":$field", $value );
-
         $query->execute();
 
-        return $query->fetchAllInto( get_called_class() );
+        $items = $query->fetchAllInto( get_called_class() );
+        $items->each(function($item){
+            $item->afterGet();
+        });
+        
+        return $items;
     }
     
     /**
@@ -343,6 +369,10 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * // Get the first car owned by owner_id 4
      * $car = Car::FindByOwner_id( 4 );
      * @endcode
+     * 
+     * \note There is a hook for all \e get methods named \c afterGet(), to allow actions
+     *      to be performed when an object is fetched (as opposed to the constructor, 
+     *      which is called both when a new object is created or fetched).
      *
      * @param string $field
      *      The field name to search on
@@ -367,7 +397,10 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $query->bindValue( ":$field", $value );
         $query->execute();
 
-        return $query->fetchInto( get_called_class() );
+        $item = $query->fetchInto( get_called_class() );
+        if( $item ) { $item->afterGet(); }
+        
+        return $item;
     }
 
     /**
@@ -396,7 +429,10 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
             $query->execute();
         }
 
-        return $query->fetchInto( get_called_class() );
+        $item = $query->fetchInto( get_called_class() );
+        if( $item ) { $item->afterGet(); }
+        
+        return $item;
     }
 
     /**
@@ -1006,4 +1042,16 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * the database (creating and updating). Only called on success.
      */
     public function afterSave() {}
+    
+    /**
+     * Override this method to perform an action \e after an object is retrieved
+     * from the database (Find(), FindAll(), etc).
+     * 
+     * Called after the constructor and with all the data populated.
+     * 
+     * <b>Example</b>
+     * 
+     * \include orm_model.serialised.example.php
+     */
+    public function afterGet() {}
 }

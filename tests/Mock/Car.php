@@ -11,10 +11,22 @@ use ORM\ORM_Model;
  * A simple Model showing a custom foreign key.
  */
 class Car extends ORM_Model {
+    private $_testValue = 'initial';
+    
     /**
      * Define that the model Manufacturer is related to this model through
      * the "brand" property.
      */
     const FOREIGN_KEY_MANUFACTURER = 'brand';
+
+    /**
+     * Test the afterGet hook (set the test value to the brand)
+     */
+    public function afterGet() {
+        $this->_testValue = $this->brand;
+    }
+    
+    public function testValue() {
+        return $this->_testValue;
+    }
 }
-?>
