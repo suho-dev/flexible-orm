@@ -64,8 +64,18 @@ class PDOFactory implements Interfaces\DataFactory {
      * host = "localhost"  #This is optional [default='localhost']
      * user = "test"
      * pass = "password"
+     * prefix = "pgsql" # optional DSN prefix (default='mysql')
+     * @endcode
+     * 
+     * <i>Alternative Method:</i>
+     * @code
+     * [database]
+     * dsn  = "sqlite:/opt/databases/mydb.sq3"
+     * user = "test"
+     * pass = "password"
      * @endcode
      *
+     * \n\n
      * <i>PHP:</i>
      * @code
      * Configuration::Load('test.ini');
@@ -89,11 +99,13 @@ class PDOFactory implements Interfaces\DataFactory {
             );
         }
         
-        $db_name = Configuration::$databaseConfig()->name;
-        $db_host = Configuration::$databaseConfig()->host ?: 'localhost';
-        $db_user = Configuration::$databaseConfig()->user;
-        $db_pswd = Configuration::$databaseConfig()->pass;
-        $dsn     = "mysql:host={$db_host};dbname={$db_name};";
+        $db_name    = Configuration::$databaseConfig()->name;
+        $db_host    = Configuration::$databaseConfig()->host ?: 'localhost';
+        $db_user    = Configuration::$databaseConfig()->user;
+        $db_pswd    = Configuration::$databaseConfig()->pass;
+        $db_prefix  = Configuration::$databaseConfig()->prefix ?: 'mysql';
+        $dsn        = Configuration::$databaseConfig()->dsn;
+        $dsn        = $dsn ?: "$db_prefix:host={$db_host};dbname={$db_name};";
         
         try {
             $this->_db = new \PDO( $dsn, $db_user, $db_pswd );
