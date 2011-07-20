@@ -31,4 +31,14 @@ interface DataFactory {
      *      Key value
      */
     public static function LastInsertId();
+    
+    /**
+     * Get the names of each field from the database table structure
+     * 
+     * @param string $table
+     *      The table name 
+     * @return array
+     *      Field names in a numerically indexed array
+     */
+    public function fieldNames( $table );
 }

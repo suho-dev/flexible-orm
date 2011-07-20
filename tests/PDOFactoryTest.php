@@ -71,5 +71,11 @@ class PDOFactoryTest extends ORMTest {
     public function testNoDetails() {
         $factory = PDOFactory::GetFactory('noDetails');
     }
+    
+    public function testGetType() {
+        $factory = PDOFactory::GetFactory();
+        
+        $this->assertEquals( 'mysql', $factory->databaseType() );
+    }
 }
 ?>

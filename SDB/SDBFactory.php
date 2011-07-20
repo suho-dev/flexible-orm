@@ -35,4 +35,16 @@ class SDBFactory implements \ORM\Interfaces\DataFactory {
     public static function LastInsertId() {
         return SDBStatement::LastInsertId();
     }
+    
+    /**
+     * Required for DataFactory interface
+     * 
+     * \note not currently used
+     * 
+     * @param string $table
+     * @return array
+     */
+    public function fieldNames( $table ) {
+        return array();
+    }
 }

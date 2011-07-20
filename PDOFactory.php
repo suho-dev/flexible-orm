@@ -48,6 +48,12 @@ class PDOFactory implements Interfaces\DataFactory {
      * @var PDO $_db
      */
     private $_db;
+    
+    /**
+     * Description of the database type
+     * @var string $_databaseType
+     */
+    private $_databaseType;
 
     /**
      * Connect to the database when creating the PDOFactory instance
@@ -107,6 +113,8 @@ class PDOFactory implements Interfaces\DataFactory {
         $dsn        = Configuration::$databaseConfig()->dsn;
         $dsn        = $dsn ?: "$db_prefix:host={$db_host};dbname={$db_name};";
         
+        $this->_setDatabaseType( $dsn );
+        
         try {
             $this->_db = new \PDO( $dsn, $db_user, $db_pswd );
             $this->_db->setAttribute( \PDO::ATTR_EMULATE_PREPARES, TRUE);
@@ -115,6 +123,30 @@ class PDOFactory implements Interfaces\DataFactory {
         } catch( \PDOException $e ) {
             throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException( $e->getMessage() );
         }
+    }
+    
+    /**
+     * Use the database prefix as the database "type"
+     * 
+     * Sets the $_databaseType property
+     * 
+     * @param string $dsn
+     *      The database connection string
+     */
+    private function _setDatabaseType( $dsn ) {
+        list( $this->_databaseType, ) = explode( ':', $dsn, 2 );
+    }
+    
+    /**
+     * Get the type of database this Factory is connected to
+     * 
+     * \note Rough- just uses the DSN prefix
+     * 
+     * @return string
+     *      Database type as a string
+     */
+    public function databaseType() {
+        return $this->_databaseType;
     }
 
     /**
@@ -149,11 +181,22 @@ class PDOFactory implements Interfaces\DataFactory {
     public static function Get( $sql, $database = self::DEFAULT_DATABASE, $callingClass = null ) {
         $factory = self::GetFactory( $database );
 
-        return $factory->statementPrepared($sql) ?
-                    $factory->getStatement($sql) :
-                    $factory->setStatement($sql);
+        return $factory->statement( $sql );
     }
 
+    /**
+     * Get (and set if required) the prepared statement
+     * 
+     * @param string $sql 
+     *      The SQL to prepare
+     * @return ORM_PDOStatement
+     */
+    public function statement( $sql ) {
+        return $this->statementPrepared($sql) ?
+                $this->getStatement($sql) :
+                $this->setStatement($sql);
+    }
+    
     /**
      * Check to see whether a matching prepared statement has already been prepared
      * for the supplied SQL
@@ -249,5 +292,104 @@ class PDOFactory implements Interfaces\DataFactory {
 
         return $profiles;
     }
+    
+    /**
+     * Get the names of each field from the database table structure
+     * 
+     * @todo Improve this so that it is easier to add to and maintain
+     * 
+     * @param string $table
+     *      The table name 
+     * @return array
+     *      Field names in a numerically indexed array
+     */
+    public function fieldNames( $table ) {
+        switch( $this->databaseType() ) {
+            case 'sqlite':
+                return $this->_describeTableSQLite( $table );
+            case 'pgsql':
+                return $this->_describeTablePostgres( $table );
+            case 'sqlsrv':
+                return $this->_describeTableMSSql( $table );
+            case 'mysql':
+            default:
+                return $this->_describeTableMysql( $table );
+        }
+    }
+    
+    /**
+     * Get the column names from a MySQL database
+     * 
+     * @param string $table
+     *      Table name
+     * @return array
+     *      Array of field names
+     */
+    private function _describeTableMysql( $table ) {
+        $query  = $this->statement( "DESCRIBE `$table`" );
+        $query->execute();
+        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+
+        return array_map(function($row){
+            return $row['Field'];
+        }, $result );
+    }
+    
+    /**
+     * Get the column names from a Postgres database
+     * 
+     * @todo test this
+     * @param string $table
+     *      Table name
+     * @return array
+     *      Array of field names
+     */
+    private function _describeTablePostgres( $table ) {
+        $query  = $this->statement( "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'" );
+        $query->execute();
+        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+
+        return array_map(function($row){
+            return $row['column_name'];
+        }, $result );
+    }
+    
+    /**
+     * Get the column names from a MS SQL database
+     * 
+     * @todo test this
+     * @param string $table
+     *      Table name
+     * @return array
+     *      Array of field names
+     */
+    private function _describeTableMSSql( $table ) {
+        $query  = $this->statement( "EXEC sp_columns @table_name= N'$table'" );
+        $query->execute();
+        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+
+        return array_map(function($row){
+            return $row['COLUMN_NAME'];
+        }, $result );
+    }
+    
+    /**
+     * Get the column names from a SQLite database
+     * 
+     * @param string $table
+     *      Table name
+     * @return array
+     *      Array of field names
+     */
+    private function _describeTableSQLite( $table ) {
+        //pragma table_info(ABC);
+        
+        $query  = $this->statement( "PRAGMA table_info($table)" );
+        $query->execute();
+        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+
+        return array_map(function($row){
+            return $row['name'];
+        }, $result );
+    }
 }
-?>

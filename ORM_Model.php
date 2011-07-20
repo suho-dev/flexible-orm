@@ -769,15 +769,26 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *      An array of field names representing each database field
      */
     public static function DescribeTable() {
-        $table  = static::TableName();
-        $df     = static::DataFactory();
-        $query  = $df::Get( "DESCRIBE `$table`", static::DatabaseConfigName(), get_called_class() );
-        $query->execute();
-        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+        $df         = static::DataFactory();
+        $database   = $df::GetFactory( static::DatabaseConfigName() );
+        
+        return $database->fieldNames( static::TableName() );
+        
+        /*
+         * try {
+            return $database->fieldNames( static::TableName() );
+            
+        } catch( Exception $e ) {
+            // just use the public properties
+            $publicPropertiesFunction = (function() use( $item ) {
+                $vars = get_object_vars($item);
 
-        return array_map(function($row){
-            return $row['Field'];
-        }, $result );
+                return array_keys($vars);
+            });
+
+            return $publicPropertiesFunction();
+        }
+         */
     }
 
     /**
