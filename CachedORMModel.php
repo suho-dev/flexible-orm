@@ -37,14 +37,14 @@ class CachedORMModel extends ORM_Model {
      * @return CachedORMModel|false
      */
     public static function Find( $idOrArray = array(), $findWith = false ) {
-        if( is_array($idOrArray) ) {
+        if ( is_array($idOrArray) ) {
             $object = static::FindByOptions( $idOrArray, $findWith );
             static::_AddToCache( $object, $findWith );
 
         } else {
             $object = static::RetrieveFromCache( $idOrArray, $findWith );
 
-            if( !$object ) {
+            if ( !$object ) {
                 $object = static::FindBy( static::PrimaryKeyName(), $idOrArray, $findWith );
                 static::_AddToCache( $object, $findWith );
             }
@@ -64,10 +64,10 @@ class CachedORMModel extends ORM_Model {
      *      object.
      */
     protected static function _AddToCache( $fetchedObject, $findWith ) {
-        if( $fetchedObject ) {
+        if ( $fetchedObject ) {
             $object = clone $fetchedObject;
             
-            if( $findWith ) {
+            if ( $findWith ) {
                 $findWithArray = (array)$findWith;
                 foreach( $findWithArray as $nsFetchClass ) {
                     $fetchClass = basename( $nsFetchClass );
@@ -98,7 +98,7 @@ class CachedORMModel extends ORM_Model {
     public static function RetrieveFromCache( $id, $findWith = false ) {
         $object = self::_cache()->get( static::CacheId($id) );
 
-        if( $object && $findWith ) {
+        if ( $object && $findWith ) {
             $findWithArray = (array)$findWith;
             foreach( $findWithArray as $nsFetchClass ) {
                 $fetchClass     = basename( $nsFetchClass );
@@ -125,7 +125,7 @@ class CachedORMModel extends ORM_Model {
     public function save() {
         $result = parent::save();
 
-        if( $result ) {
+        if ( $result ) {
             $this->_cache()->set( (string)$this, $this, self::CACHE_TTL );
         }
 
@@ -161,7 +161,7 @@ class CachedORMModel extends ORM_Model {
      *      Can return any Cache class that implements Cache or a Memcache object
      */
     private function _cache() {
-        if( is_null(self::$_cache) ) {
+        if ( is_null(self::$_cache) ) {
             self::$_cache = new Utilities\Cache\APCCache();
         }
 

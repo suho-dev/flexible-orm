@@ -102,7 +102,7 @@ class ORMModelSDB extends \ORM\ORM_Model {
      *      Associative array of field names and their values
      */
     public function setValues( array $values = null) {
-        if( !is_null($values) ) {
+        if ( !is_null($values) ) {
             foreach( $values as $field => $sanitizedValue ) {
                 $decodedValue = SDBStatement::DecodeValue($sanitizedValue);
 

@@ -177,7 +177,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      */
     public function bindValue( $placeholder, $value ) {
         $queryType = $this->queryType();
-        if( $queryType == 'SELECT' || $queryType == 'DELETE' ) {
+        if ( $queryType == 'SELECT' || $queryType == 'DELETE' ) {
             $this->_bindToSQL($placeholder, $value);
         } else {
             $this->_bindToArray($placeholder, $value);
@@ -194,19 +194,19 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     private function _bindAnonymousValue( $value ) {
         $this->_anonymousBinds[] = $value;
         
-        if( $this->queryType() == 'SELECT' ) {
+        if ( $this->queryType() == 'SELECT' ) {
             list($unquoted, $quoted) = $this->_extractQuotedValues();
             $sanitizedValue = $this->_sanitizeValue($value);
             $replacedCount  = 0;
             $output         = '';
 
             foreach( $unquoted as $string ) {
-                if( !$replacedCount ) {
+                if ( !$replacedCount ) {
                     $string = preg_replace( '/\?/', "'$sanitizedValue'", $string, 1, $replacedCount );
                 }
 
                 $quotedString = array_shift($quoted);
-                if(strlen($quotedString) > 0 ) {
+                if (strlen($quotedString) > 0 ) {
                     $output .= "$string'$quotedString'";
                 } else {
                     $output .= $string;
@@ -227,7 +227,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      */
     public function bindValues( $values ) {
         foreach($values as $key => $value ) {
-            if( is_numeric($key) ){
+            if ( is_numeric($key) ){
                 $this->_bindAnonymousValue( $value );
             } else {
                 $this->bindValue( $key, $value );
@@ -287,13 +287,13 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $chunkedAttributes = array();
         
         foreach( $attributes as $field => $value ) {
-            if( strlen($field) && strlen($value) > self::MAX_ATTRIBUTE_SIZE ) {
+            if ( strlen($field) && strlen($value) > self::MAX_ATTRIBUTE_SIZE ) {
                 $chunks = str_split( $value, self::MAX_ATTRIBUTE_SIZE );
                 foreach($chunks as $i => $chunk ) {
                     $chunkedAttributes["{$field}[$i]"] = $chunk;
                 }
                 
-            } elseif( strlen($field) ) {
+            } elseif ( strlen($field) ) {
                 $chunkedAttributes[$field] = $value;
             }
         }
@@ -308,7 +308,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * @return string
      */
     private function _sanitizeValue( $value ) {
-        if( $this->queryType() == 'SELECT' ) {
+        if ( $this->queryType() == 'SELECT' ) {
             $sanitizedValue = str_replace("'", "''", $value );
         } else {
             $sanitizedValue = str_replace(
@@ -357,7 +357,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     public function placeholders() {
         $pattern = '/(?<=:)([a-zA-Z0-9_]+(?![^\'"]*["\']))/';
 
-        if( preg_match_all( $pattern, $this->_removeQuotedValues(), $placeholders ) ) {
+        if ( preg_match_all( $pattern, $this->_removeQuotedValues(), $placeholders ) ) {
             return $placeholders[1];
         } else {
             return array();
@@ -381,7 +381,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $count       = 1;
 
         while( $quotedToken !== false ) {
-            if( $count++ % 2 ) {
+            if ( $count++ % 2 ) {
                 $output .= $quotedToken;
             }
             $quotedToken = strtok( '"\'' );
@@ -406,9 +406,9 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $length     = strlen($this->_queryString);
         
         while( ($i = strpos($this->_queryString, "'", $offset)) !== false && $offset < $length ) {
-            if( $insideQuotes ) {
+            if ( $insideQuotes ) {
                 // Currently inside a quoted block
-                if( substr($this->_queryString, $i+1, 1) != "'" ) {
+                if ( substr($this->_queryString, $i+1, 1) != "'" ) {
                     $output[1][] = substr($this->_queryString, $insideQuotes, $i - $insideQuotes );
                     $insideQuotes = false;
                 }
@@ -445,7 +445,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      *      True on success.
      */
     public function execute( array $values = null ) {
-        if( !is_null($values) ) {
+        if ( !is_null($values) ) {
             $this->bindValues( $values );
         }
 
@@ -490,7 +490,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      *      Either 'DELETE', 'INSERT', 'UPDATE' or 'SELECT'
      */
     public function queryType() {
-        if( is_null($this->_queryType) ) {
+        if ( is_null($this->_queryType) ) {
             preg_match('/^\w+/i', $this->_queryString, $matches );
             $this->_queryType = strtoupper($matches[0]);
         }
@@ -518,7 +518,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $domain     = $this->_getDomainFromQuery();
 
         // Remove itemName and store it or generate our own itemName
-        if( isset($attributes['itemName()']) ) {
+        if ( isset($attributes['itemName()']) ) {
             $itemName = $attributes['itemName()'];
             unset($attributes['itemName()']);
         } else {
@@ -529,7 +529,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
 
         $response = self::$_sdb->put_attributes( $domain, $itemName, $attributes );
 
-        if( !$response->isOK() ) {
+        if ( !$response->isOK() ) {
             throw new \ORM\Exceptions\ORMInsertException( $response->errorMessage() );
         }
         
@@ -552,22 +552,22 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $fields = explode( ', ', $matches[2][0] );
         $values = explode( ', ', $matches[3][0] );
 
-        if( $itemNamePresent ) {
+        if ( $itemNamePresent ) {
             $i = array_search('itemName[]', $fields);
             $fields[$i] = 'itemName()';
         }
         
-        if( $itemNamePresent > 1 ) {
+        if ( $itemNamePresent > 1 ) {
             $i = array_search(':itemName[]', $values);
-            if( $i !== false ) $values[$i] = ':itemName()';
+            if ( $i !== false ) $values[$i] = ':itemName()';
         }
 
         $attributes = array();
         foreach($values as $i => $value ) {
             $trimmedValue = trim( $value );
-            if( array_key_exists( $trimmedValue, $this->_binds) ) {
+            if ( array_key_exists( $trimmedValue, $this->_binds) ) {
                 $attributes[$fields[$i]] = $this->_binds[$trimmedValue];
-            } elseif( $trimmedValue == '?' ) {
+            } elseif ( $trimmedValue == '?' ) {
                 $attributes[$fields[$i]] = array_shift($this->_anonymousBinds);
             } else {
                 $attributes[$fields[$i]] = substr($trimmedValue, 1, -1);
@@ -599,9 +599,9 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
             list( $field, $value ) = explode( ' = ', trim($pair), 2 );
             $trimmedValue = trim( $value );
             
-            if( array_key_exists($trimmedValue, $this->_binds) ) {
+            if ( array_key_exists($trimmedValue, $this->_binds) ) {
                 $attributes[$field] = $this->_binds[$trimmedValue];
-            } elseif( $trimmedValue == '?' ) {
+            } elseif ( $trimmedValue == '?' ) {
                 $attributes[$field] = array_shift($this->_anonymousBinds);
             } else {
                 $attributes[$field] = substr($value, 1, -1);
@@ -621,7 +621,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * @return string
      */
     private function _getDomainFromQuery() {
-        if( !preg_match('/^UPDATE ([a-z_0-9A-Z]+) /i', $this->_queryString, $matches ) ) {
+        if ( !preg_match('/^UPDATE ([a-z_0-9A-Z]+) /i', $this->_queryString, $matches ) ) {
             preg_match('/INTO ([a-z_0-9A-Z]+) /i', $this->_queryString, $matches );
         }
 
@@ -636,9 +636,9 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      *      query string
      */
     private function _getItemNameFromQuery() {
-        if( preg_match('/itemName\(\) = \'(.+)\'/i', $this->_queryString, $matches ) ) {
+        if ( preg_match('/itemName\(\) = \'(.+)\'/i', $this->_queryString, $matches ) ) {
             return $matches[1];
-        } elseif(isset($this->_binds[':itemName()'])) { 
+        } elseif (isset($this->_binds[':itemName()'])) { 
             return $this->_binds[':itemName()'];
         } else {
             return false;
@@ -662,7 +662,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $attributes = $this->_getAttributesFromUpdateQuery();
         $result     = self::$_sdb->put_attributes( $domain, $itemName, $attributes, true );
 
-        if( !$result->isOK() ) {
+        if ( !$result->isOK() ) {
             throw new \ORM\Exceptions\ORMUpdateException( $result->errorMessage() );
         }
         
@@ -685,7 +685,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     private function _emulateDelete() {
         $this->_simplifyQuery();
         
-        if( preg_match( '/DELETE FROM ([a-z_0-9A-Z]+) WHERE itemName\(\) = \'([^\']*)/i', $this->_queryString, $matches ) ){
+        if ( preg_match( '/DELETE FROM ([a-z_0-9A-Z]+) WHERE itemName\(\) = \'([^\']*)/i', $this->_queryString, $matches ) ){
             // There is only going to be one item to delete
             return self::$_sdb->delete_attributes( $matches[1], $matches[2] )->isOK();
         } else {
@@ -739,15 +739,15 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      *      Object of type $className
      */
     public function fetchInto( $className ) {
-        if( !class_exists($className) ) {
+        if ( !class_exists($className) ) {
             throw new Exceptions\ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
-        if( !$this->_result->isOK() ) {
+        if ( !$this->_result->isOK() ) {
             throw new \ORM\Exceptions\ORMFetchIntoException(
                 $this->_result->errorMessage()
             );
-        } else if( count($this->_result) ) {
+        } else if ( count($this->_result) ) {
             $keys   = $this->_result->itemNames();
             $object = new $className;
             $object->id( $keys[0] );
@@ -772,7 +772,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $className = get_class($object);
         
         foreach( $this->_findWith as $fetchClassName ) {
-            if( !is_subclass_of($fetchClassName, '\ORM\ORM_Model') ) {
+            if ( !is_subclass_of($fetchClassName, '\ORM\ORM_Model') ) {
                 throw new \ORM\Exceptions\ORMFetchIntoException(
                     "Find with class '$fetchClassName' does not extend class ORM_Model"
                 );
@@ -800,16 +800,16 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     private function _simplifyQuery() {
         $replace    = array();
         
-        if( preg_match('/LIMIT (\d+), (\d+) $/', $this->_queryString, $matches) ) {
+        if ( preg_match('/LIMIT (\d+), (\d+) $/', $this->_queryString, $matches) ) {
             $replace[]      = $matches[0];
             $this->_offset  = (int)$matches[1];
             $this->_limit   = (int)$matches[2];
-        } elseif( preg_match('/LIMIT (\d+)$/', $this->_queryString, $matches) ) {
+        } elseif ( preg_match('/LIMIT (\d+)$/', $this->_queryString, $matches) ) {
             $replace[]      = $matches[0];
             $this->_limit   = (int)$matches[1];
         }
         
-        if( preg_match('/AS `([^`]+)`/i', $this->_queryString, $matches ) ) {
+        if ( preg_match('/AS `([^`]+)`/i', $this->_queryString, $matches ) ) {
             $className = $matches[1];
             $replace[] = "`$className`.";
             $replace[] = "AS `$className`";
@@ -820,7 +820,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $replace[] = "`";
         $this->_queryString = str_replace( $replace, '', $this->_queryString );
         
-        if( !is_null($this->_limit) ) {
+        if ( !is_null($this->_limit) ) {
             $this->_queryString .= " LIMIT {$this->_limit}";
         }
         
@@ -847,7 +847,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * @return array|false
      */
     public function fetch( $fetch_style = self::FETCH_BOTH ) {
-        if( count($this->_items) === 0 ) return false;
+        if ( count($this->_items) === 0 ) return false;
         
         $result = array_shift($this->_items);
 
@@ -893,7 +893,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     public function fetchAll( $fetch_style = self::FETCH_BOTH ) {
         $results = array();
         
-        if( $fetch_style == self::FETCH_ASSOC ) {
+        if ( $fetch_style == self::FETCH_ASSOC ) {
             $results = $this->_items;
         } else {
             while( $results[] = $this->fetch($fetch_style) ) {}
@@ -917,17 +917,17 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      *      Collection of objects of type $className
      */
     public function fetchAllInto( $className ) {
-        if( !class_exists($className) ) {
+        if ( !class_exists($className) ) {
             throw new Exceptions\ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
         $collection = new \ORM\ModelCollection();
         
-        if( !$this->_result->isOK() ) {
+        if ( !$this->_result->isOK() ) {
             throw new \ORM\Exceptions\ORMFetchIntoException(
                 $this->_result->errorMessage()
             );
-        } elseif( count($this->_result) ) {
+        } elseif ( count($this->_result) ) {
             foreach( $this->_result as $key => $attributes ) {
                 $object = new $className;
                 $object->id( $key );
@@ -959,14 +959,14 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         
         // If we already know some tokens, don't start from the begining (for speed)
         $initialOffset = 0;
-        if( $this->_offset > 0 ) {
+        if ( $this->_offset > 0 ) {
             list( $initialOffset, $token ) = NextTokenCache::GetNearestToken(
                 $this->_queryString, 
                 $this->_limit, 
                 $this->_offset
             );
             
-            if( $token ) {
+            if ( $token ) {
                 $optionsArray['NextToken'] = $token;
             }
         }

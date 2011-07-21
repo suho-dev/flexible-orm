@@ -81,7 +81,7 @@ abstract class ORM_Core {
      * 
      * <b>Usage</b>
      * @code
-     * if( !$car->save() ) {
+     * if ( !$car->save() ) {
      *     // Validation issue, echo each error message
      *     foreach( $car->errorMessages() as $property => $message ) { 
      *         echo "Error with the $property field - $message \n";
@@ -99,7 +99,7 @@ abstract class ORM_Core {
      * @return array
      */
     public function errorMessages() {
-        if( !is_array($this->_errorMessages) )  $this->_errorMessages = array();
+        if ( !is_array($this->_errorMessages) )  $this->_errorMessages = array();
         return $this->_errorMessages;
     }
 
@@ -129,7 +129,7 @@ abstract class ORM_Core {
      *
      * <b>Usage</b>
      * @code
-     * if( $error_msg = $person->errorMessage( 'name' ) ) {
+     * if ( $error_msg = $person->errorMessage( 'name' ) ) {
      *   echo 'There is an error with the name field. Details: '. $error_msg;
      * } else {
      *   echo "There was no error on the name field";
@@ -152,7 +152,7 @@ abstract class ORM_Core {
      *
      * @code
      * // Usually within a classes valid() function...
-     * if( strlen( $this->name ) < 5 ) {
+     * if ( strlen( $this->name ) < 5 ) {
      *   $this->validationError( 'name', 'Must be at least 5 characters long' );
      * }
      *
@@ -167,7 +167,7 @@ abstract class ORM_Core {
      * @see base_model::errorMessage(), base_model::valid()
      */
     public function validationError( $field, $message ) {
-        if( !is_array($this->_errorMessages) )		$this->_errorMessages = array();
+        if ( !is_array($this->_errorMessages) )		$this->_errorMessages = array();
         $this->_errorMessages[$field] = $message;
     }
 
@@ -202,7 +202,7 @@ abstract class ORM_Core {
         $attributes = $this->values();
 
         foreach( $attributes as $key => $value ) {
-            if( !isset($original_values[$key]) || $original_values[$key] != $value ) {
+            if ( !isset($original_values[$key]) || $original_values[$key] != $value ) {
                 $changed[] = $key;
             }
         }
@@ -248,7 +248,7 @@ abstract class ORM_Core {
      *      Associative array of field names and their values
      */
     public function setValues( array $values = null ) {
-        if( !is_null($values) ) {
+        if ( !is_null($values) ) {
             foreach( $values as $field => $value ) {
                 $this->$field = $value;
             }

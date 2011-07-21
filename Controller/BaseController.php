@@ -159,7 +159,7 @@ abstract class BaseController {
     public function performAction( $action = null ) {
         $this->actionName = is_null($action) ? $this->_actionName : $action;
                
-        if( !is_callable(array($this, $this->actionName))) {
+        if ( !is_callable(array($this, $this->actionName))) {
             throw new \ORM\Exceptions\InvalidActionException("Unknown action, '$this->actionName' for the class, '".get_class($this)."'.");
         }
         
@@ -204,7 +204,7 @@ abstract class BaseController {
     private function _fetchTemplate( $templateName ) {
         $actionOutput = $this->_template->fetch($templateName);
         
-        if( $this->_useLayout && $this->_template->templateExists(self::LAYOUT_TEMPLATE) ) {
+        if ( $this->_useLayout && $this->_template->templateExists(self::LAYOUT_TEMPLATE) ) {
             $this->_template->assign( 'action_content', $actionOutput );
             return $this->_template->fetch(self::LAYOUT_TEMPLATE);
             

@@ -13,7 +13,7 @@ class ORM_PDOTest extends ORMTest {
     }
     
     protected function tearDown() {
-        if( !is_null($this->_owner) ) {
+        if ( !is_null($this->_owner) ) {
             $this->_owner->delete();
         }
 

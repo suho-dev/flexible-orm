@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../plugins/aws-sdk-1.3.2/sdk.class.php';
 \ORM\Utilities\Configuration::Load(__DIR__.'/test.ini');
 \ORM\Utilities\Configuration::SetCacheClass('\ORM\Utilities\Cache\APCCache');
 
-if( function_exists('apc_clear_cache') ) {
+if ( function_exists('apc_clear_cache') ) {
     $cache = new \ORM\Utilities\Cache\APCCache();
     $cache->flush();
 }

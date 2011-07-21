@@ -151,13 +151,13 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      *      Object of type $className. Returns false if no row to be fetched.
      */
     private function _getObject( $className, $qualifiedColumnNames ) {
-        if( !class_exists($className) ) {
+        if ( !class_exists($className) ) {
             throw new Exceptions\ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
         $row = $this->fetch( \PDO::FETCH_NUM );
 
-        if( $row ) {
+        if ( $row ) {
             $classPath  = str_replace( '\\', '/', $className );// This is so basename/dirname work on *nix
             $results    = array_combine($qualifiedColumnNames, $row );
             $class      = basename($classPath);
@@ -167,7 +167,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
             foreach( $results as $field => $value ) {
                 list( $classDestination, $property ) = explode( '.', $field, 2 );
 
-                if( $class == $classDestination ) {
+                if ( $class == $classDestination ) {
                     // This is the requested (base) class
                     $object->$property = $value;
                     $object->setOriginalValue($property, $value);
@@ -176,10 +176,10 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
                     // This is not the requested class, rather it's a subclass
                     // belonging to the $classDestination class
                     
-                    if( !isset($object->$classDestination) ) {
+                    if ( !isset($object->$classDestination) ) {
                         // Create new object if there isn't one for this $class
                         $fullClassName = "$namespace\\$classDestination";
-                        if( !class_exists($fullClassName) ) {
+                        if ( !class_exists($fullClassName) ) {
                             throw new Exceptions\ORMFetchIntoRelatedClassNotFoundException("Unknown class $fullClassName in '{$this}'");
                         }
 
@@ -273,13 +273,13 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
     public function placeholders() {
         $pattern = '/(?<=:)([a-zA-Z0-9_]+(?![^\'"]*["\']))/';
 
-        if( strstr($this->queryString, "'") !== false || strstr($this->queryString, '"') !== false ) {
+        if ( strstr($this->queryString, "'") !== false || strstr($this->queryString, '"') !== false ) {
             $query = $this->_removeQuotedValues();
         } else {
             $query = $this->queryString;
         }
 
-        if( preg_match_all( $pattern, $query, $placeholders ) ) {
+        if ( preg_match_all( $pattern, $query, $placeholders ) ) {
             return $placeholders[1];
         }
 
@@ -311,7 +311,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
         $count       = 1;
         
         while( $quotedToken !== false ) {
-            if( $count++ % 2 ) {
+            if ( $count++ % 2 ) {
                 $output .= $quotedToken;
             }
             $quotedToken = strtok( '"\'' );
@@ -348,7 +348,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
             return parent::execute($input);
 
         } catch( \PDOException $e ) {
-            if( strpos( $e->getMessage(), 'Column not found') !== false ) {
+            if ( strpos( $e->getMessage(), 'Column not found') !== false ) {
                 throw new Exceptions\ORMFindByInvalidFieldException( $e->getMessage() );
             } else {
                 throw new Exceptions\ORMPDOException( $e->getMessage() );

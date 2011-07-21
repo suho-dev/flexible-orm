@@ -40,7 +40,7 @@ class Variables extends \ArrayObject {
      *      The value of the specified variable or \c null if it doesn't exist.
      */
     public function __get( $name ) {
-        if( isset($this[$name]) ) {
+        if ( isset($this[$name]) ) {
             return $this[$name];
         }
         
@@ -125,7 +125,7 @@ class Variables extends \ArrayObject {
      *      True if the rule is passed, false otherwise.
      */
     public function matchesRule( $rule, $value ) {
-        if( function_exists($rule) ) {
+        if ( function_exists($rule) ) {
             return $rule($value);
         } else {
             return preg_match( $rule, $value );
@@ -162,7 +162,7 @@ class Variables extends \ArrayObject {
      *      Either the value of the \c $name variable or the value of \c $default.
      */
     private function _getParam( $name, $default = null, $rule = null ) {
-        if( array_key_exists( $name, $this ) 
+        if ( array_key_exists( $name, $this ) 
             && ( is_null($rule) || $this->matchesRule( $rule, $this[$name] ) ) ) 
         {
             return $this[$name];

@@ -75,7 +75,7 @@ class Elephant extends ORM_Model {
     public function valid() {
         $this->clearValidationErrors();
 
-        if( $this->weight <= 0 ) {
+        if ( $this->weight <= 0 ) {
             $this->validationError('weight', 'must be more than zero');
         }
         

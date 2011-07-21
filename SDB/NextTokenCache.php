@@ -79,7 +79,7 @@ class NextTokenCache {
      * @return Cache
      */
     private static function _Cache() {
-        if( is_null(self::$_cache) ) {
+        if ( is_null(self::$_cache) ) {
             self::$_cache = \ORM\Utilities\Configuration::GetCache();
         }
         

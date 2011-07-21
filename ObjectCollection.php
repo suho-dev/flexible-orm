@@ -102,7 +102,7 @@ class ObjectCollection extends \ArrayObject {
      * @return array
      */
     public function map( $functionOrProperty ) {
-        if( is_callable($functionOrProperty) ) {
+        if ( is_callable($functionOrProperty) ) {
             return array_map( $functionOrProperty, $this->getArrayCopy() );
         } else {
             return $this->_autoMap( $functionOrProperty );
@@ -199,7 +199,7 @@ class ObjectCollection extends \ArrayObject {
      *      is) containing the subset of selected items
      */
     public function select( $propertyOrFunction, $value = null ) {
-        if( is_callable($propertyOrFunction) ) {
+        if ( is_callable($propertyOrFunction) ) {
             $selected = $this->_selectByFunction( $propertyOrFunction );
         } else {
             $selected = $this->_selectByProperty( $propertyOrFunction, $value );
@@ -279,7 +279,7 @@ class ObjectCollection extends \ArrayObject {
      */
     public function detect( $function ) {
         foreach( $this as $item ) {
-            if( call_user_func( $function, $item ) ) {
+            if ( call_user_func( $function, $item ) ) {
                 return true;
             }
         }

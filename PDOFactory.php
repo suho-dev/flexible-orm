@@ -99,7 +99,7 @@ class PDOFactory implements Interfaces\DataFactory {
      * @return PDOFactory
      */
     private function __construct( $databaseConfig ) {
-        if( !Configuration::GroupExists($databaseConfig) ) {
+        if ( !Configuration::GroupExists($databaseConfig) ) {
             throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException(
                 "No database configuration details for $databaseConfig"
             );
@@ -256,7 +256,7 @@ class PDOFactory implements Interfaces\DataFactory {
      * @return PDOFactory
      */
     public static function GetFactory( $database = self::DEFAULT_DATABASE ) {
-        if( !isset(self::$_factories[$database]) ) {
+        if ( !isset(self::$_factories[$database]) ) {
             self::$_factories[$database] = new PDOFactory($database);
         }
         

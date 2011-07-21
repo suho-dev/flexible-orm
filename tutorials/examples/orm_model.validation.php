@@ -12,10 +12,10 @@ class Car extends \ORM\ORM_Model {
      *   Manufacturer must be set
      */
     public function valid() {
-        if( $this->doors <= 0 ) {
+        if ( $this->doors <= 0 ) {
             $this->validationError('doors', 'must be greater than zero');
         }
-        if( strlen($this->manufacturer) == 0 ) {
+        if ( strlen($this->manufacturer) == 0 ) {
             $this->validationError('manufacturer', 'must be set');
         }
         

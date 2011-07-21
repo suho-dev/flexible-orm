@@ -153,7 +153,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * @return ORM_Model
      */
     public static function Find( $idOrArray = array(), $findWith = false ) {
-        if( is_array($idOrArray) ) {
+        if ( is_array($idOrArray) ) {
             return static::FindByOptions( $idOrArray, $findWith );
         } else {
             return static::FindBy( static::PrimaryKeyName(), $idOrArray, $findWith );
@@ -321,18 +321,18 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * @return mixed
      */
     public static function  __callStatic($name, $arguments) {
-        if( preg_match('/^FindBy(.+)$/', $name, $matches) ) {
+        if ( preg_match('/^FindBy(.+)$/', $name, $matches) ) {
             $findWith = isset($arguments[1]) ? $arguments[1] : false;
 
             return static::FindBy( self::_LowercaseFirst($matches[1]), $arguments[0], $findWith );
 
-        } elseif( preg_match('/^FindAllBy(.+)$/', $name, $matches) ) {
+        } elseif ( preg_match('/^FindAllBy(.+)$/', $name, $matches) ) {
             $findWith = isset( $arguments[2] ) ? $arguments[2] : false;
             $operator = isset( $arguments[1] ) ? $arguments[1] : '=';
 
             return static::FindAllBy( self::_LowercaseFirst($matches[1]), $arguments[0], $operator, $findWith );
             
-        } elseif( preg_match('/^CountFindAllBy(.+)$/', $name, $matches) ) {
+        } elseif ( preg_match('/^CountFindAllBy(.+)$/', $name, $matches) ) {
             $findWith = isset( $arguments[2] ) ? $arguments[2] : false;
             $operator = isset( $arguments[1] ) ? $arguments[1] : '=';
             
@@ -398,7 +398,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $query->execute();
 
         $item = $query->fetchInto( get_called_class() );
-        if( $item ) { $item->afterGet(); }
+        if ( $item ) { $item->afterGet(); }
         
         return $item;
     }
@@ -423,14 +423,14 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $sql    .= "LIMIT 1";
         $query  = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() );
 
-        if( isset($optionsArray['values']) ) {
+        if ( isset($optionsArray['values']) ) {
             $query->execute($optionsArray['values']);
         } else {
             $query->execute();
         }
 
         $item = $query->fetchInto( get_called_class() );
-        if( $item ) { $item->afterGet(); }
+        if ( $item ) { $item->afterGet(); }
         
         return $item;
     }
@@ -457,7 +457,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     protected static function _BuildSQL( $optionsArray, $table, $findWith = false, $queryOption = self::QUERY_REGULAR ) {
         $className  = static::ClassName();
 
-        if( $queryOption == self::QUERY_COUNT_ONLY ) {
+        if ( $queryOption == self::QUERY_COUNT_ONLY ) {
             $sql = "SELECT COUNT(*) FROM `$table` ";
         } else {
             $sql = $findWith ? 
@@ -465,15 +465,15 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
                     : "SELECT `$className`.* FROM `$table` AS `$className` ";
         }
 
-        if( isset($optionsArray['where']) ) {
+        if ( isset($optionsArray['where']) ) {
             $sql .= "WHERE {$optionsArray['where']} ";
         }
 
-        if( isset($optionsArray['order']) ) {
+        if ( isset($optionsArray['order']) ) {
             $sql .= "ORDER BY {$optionsArray['order']} ";
         }
         
-        if( isset($optionsArray['limit']) ) {
+        if ( isset($optionsArray['limit']) ) {
             $offset = isset($optionsArray['offset']) ? $optionsArray['offset'] : 0;
             $sql .= "LIMIT $offset, {$optionsArray['limit']} ";
         }
@@ -620,13 +620,13 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     public function save( $forceCreate = false) {
         $this->beforeSave();
 
-        if( !$forceCreate && isset($this->_id) && $this->load() ) {
+        if ( !$forceCreate && isset($this->_id) && $this->load() ) {
             $result = $this->_update();
         } else {
             $result = $this->_create();
         }
 
-        if( $result ) $this->_originalValues = $this->values();
+        if ( $result ) $this->_originalValues = $this->values();
 
         return $result ? $this->afterSave() || true : false;
     }
@@ -651,13 +651,13 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         
         $this->beforeUpdate();
 
-         if( !$this->valid() ) {
+         if ( !$this->valid() ) {
             return false;
         }
         
         $changedFields = $this->changedFields();
 
-        if( count($changedFields) ) {
+        if ( count($changedFields) ) {
             $table  = static::TableName();
             $key    = static::PrimaryKeyName();
             $set    = array_map(function($field) {
@@ -671,7 +671,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
             $df              = static::DataFactory();
             $query = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() )->bindObject($this, $changedFields);
 
-            if( $query->execute() ) {
+            if ( $query->execute() ) {
                 $this->afterUpdate();
 
                 return true;
@@ -714,7 +714,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     private function _create() {
         $this->beforeCreate();
 
-         if( !$this->valid() ) {
+         if ( !$this->valid() ) {
             return false;
         }
 
@@ -728,8 +728,8 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
 
         $result = $query->execute();
         
-        if( $result ) {
-            if( is_null($this->_id) ) {
+        if ( $result ) {
+            if ( is_null($this->_id) ) {
                 $this->_id = $df::LastInsertId();
             }
 
@@ -799,7 +799,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * @return mixed
      */
     public function id( $value = null ) {
-        if( !is_null($value) ) {
+        if ( !is_null($value) ) {
             $this->_id = $value;
         }
         
@@ -912,7 +912,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     private static function _makeTableName( $model_name ) {
         $class = strtolower( basename(str_replace( '\\', '/', $model_name)) );
 
-        if( substr($class, -1) == 'y' ) {
+        if ( substr($class, -1) == 'y' ) {
             return substr($class, 0, -1)."ies";
         } else {
             return "{$class}s";
@@ -953,7 +953,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $results = $query->fetch();
         $fields  = array();
 
-        if( preg_match_all('/\'(.*?)\'/', $results[1], $fieldsZeroIndexed) ) {
+        if ( preg_match_all('/\'(.*?)\'/', $results[1], $fieldsZeroIndexed) ) {
             // Convert to 1-indexed array
             $fields = array_combine(
                     range( 1 ,count($fieldsZeroIndexed[1])),
@@ -981,11 +981,11 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *      true if an existing object existed
      */
     public function load() {
-        if( $stored_object = static::Find( $this->_id ) ) {
+        if ( $stored_object = static::Find( $this->_id ) ) {
             $attributes = $stored_object->attributes();
 
             foreach( $attributes as $attribute ) {
-                if( !isset($this->$attribute) ) {
+                if ( !isset($this->$attribute) ) {
                     $this->$attribute = $stored_object->$attribute;
                 }
 

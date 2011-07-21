@@ -67,7 +67,7 @@ class AutoLoader {
      * @return AutoLoader
      */
     public static function Get() {
-        if( is_null(self::$_autoLoader) ) {
+        if ( is_null(self::$_autoLoader) ) {
             self::$_autoLoader = new Autoloader();
         }
 
@@ -86,7 +86,7 @@ class AutoLoader {
     public function load( $class ) {
         $pathName = $this->locate($class);
         
-        if( $pathName && file_exists($pathName) ) {
+        if ( $pathName && file_exists($pathName) ) {
             require $pathName;
         }
     }
@@ -100,7 +100,7 @@ class AutoLoader {
     public function loadZend( $class ) {
         $pathName = str_replace( array('_', '\\'),'/', $class );
 
-        if( $this->_locateInIncludePath($pathName) ) {
+        if ( $this->_locateInIncludePath($pathName) ) {
             require "$pathName.php";
         }
     }
@@ -113,7 +113,7 @@ class AutoLoader {
      * @return string
      */
     public function locate( $class ) {
-        if( $this->_rootNamespace( $class ) == '.' ) {
+        if ( $this->_rootNamespace( $class ) == '.' ) {
             return $this->_setToLowerCaseIfRequired($class.self::EXTENSION);
         }
 
@@ -137,7 +137,7 @@ class AutoLoader {
         $packages = Utilities\Configuration::packages();
 
         foreach( $packages as $package => $path ) {
-            if( preg_match("/^\\\?$package\\\(.*)$/", $class, $matches ) ) {
+            if ( preg_match("/^\\\?$package\\\(.*)$/", $class, $matches ) ) {
                 return $path.'/'.str_replace('\\','/', $matches[1]);
             }
         }
@@ -170,7 +170,7 @@ class AutoLoader {
 
         foreach( $paths as $path ) {
             $fullPath = "$path/$classPath.php";
-            if( file_exists($fullPath) ) {
+            if ( file_exists($fullPath) ) {
                 return $fullPath;
             }
         }
@@ -190,7 +190,7 @@ class AutoLoader {
      * @return string
      */
     private function _setToLowerCaseIfRequired( $pathName ) {
-        if( file_exists($pathName) ) {
+        if ( file_exists($pathName) ) {
             return $pathName;
         } else {
             return strtolower($pathName);

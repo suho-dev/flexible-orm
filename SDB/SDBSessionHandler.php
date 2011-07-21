@@ -57,7 +57,7 @@ class SDBSessionHandler {
      * @return SDBSessionHandler
      */
     public static function Get() {
-        if( is_null(self::$_sessionHandler) ) {
+        if ( is_null(self::$_sessionHandler) ) {
             self::$_sessionHandler = new SDBSessionHandler();
         }
 

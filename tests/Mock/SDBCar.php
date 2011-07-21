@@ -20,7 +20,7 @@ class SDBCar extends \ORM\SDB\ORMModelSDB {
     private $_privateTest = 'should not be saved';
 
     public function privateTest( $value = null) {
-        if( !is_null($value) ) {
+        if ( !is_null($value) ) {
             $this->_privateTest = $value;
         }
 

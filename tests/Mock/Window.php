@@ -27,9 +27,9 @@ class Window extends ORM_Model {
     }
 
     public static function FindMostLikely( $accurateWindowDescription ) {
-        if( stripos($accurateWindowDescription, 'Low-E') !== false ) {
+        if ( stripos($accurateWindowDescription, 'Low-E') !== false ) {
             preg_match( '/^([^:]+):([^-:]*-?)([^-]+)-([^-:]+):?([^:]*Low-E)$/', $accurateWindowDescription, $matches );
-        } elseif( !preg_match('/^([^:]+):([^-:]*-?)([^-]+)-([^-:]+):?([^:-]*)$/', $accurateWindowDescription, $matches ) ) {
+        } elseif ( !preg_match('/^([^:]+):([^-:]*-?)([^-]+)-([^-:]+):?([^:-]*)$/', $accurateWindowDescription, $matches ) ) {
             echo( "[ERROR] Unable to split up '$accurateWindowDescription'!\n");
             return false;
         }
@@ -47,7 +47,7 @@ class Window extends ORM_Model {
             'values'    => array("%$description%","$manufacturer%", $glazingSearch)
         ));
 
-        if( count($windows) ) {
+        if ( count($windows) ) {
 //            echo "Found ", count($windows), " results:";
 //            echo "\t {$windows->current()->describe()}\n\n";
 
@@ -64,7 +64,7 @@ class Window extends ORM_Model {
         $layers = explode('/', $glazingDescription);
         $glazing = '';
         foreach($layers as $i => $layer ) {
-            if( $i > 0 ) {
+            if ( $i > 0 ) {
                 $glazing .= '/';
             }
             preg_match('/^([0-9.]+)mm (.*)$/', $layer, $matches);
@@ -72,7 +72,7 @@ class Window extends ORM_Model {
 
             switch( $matches[2] ){
                 case 'Clear':
-                    if( count($layers) == 1 ) {
+                    if ( count($layers) == 1 ) {
                         $glazing .= 'Clr';
                     }
                     break;

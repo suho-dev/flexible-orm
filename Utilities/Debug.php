@@ -60,7 +60,7 @@ class Debug {
      * Private constructor, this is a singleton class (sort of)
      */
     private function __construct() {
-        if( is_null(self::$_displayDebug) ) {
+        if ( is_null(self::$_displayDebug) ) {
             self::$_displayDebug = ini_get('display_errors');
         }
     }
@@ -85,7 +85,7 @@ class Debug {
      *      A class name. Must implement the Interfaces\\DebugLog
      */
     public static function SetLogStore( $storeClass ) {
-        if( !is_null($storeClass) && !in_array( 'ORM\Interfaces\DebugLog', class_implements($storeClass) ) ) {
+        if ( !is_null($storeClass) && !in_array( 'ORM\Interfaces\DebugLog', class_implements($storeClass) ) ) {
             throw new \Exception("Class $storeClass does not implement DebugLog");
         }
         
@@ -107,7 +107,7 @@ class Debug {
      * @return Debug
      */
     public static function Get() {
-        if( is_null(self::$_instance) ) {
+        if ( is_null(self::$_instance) ) {
             self::$_instance = new Debug();
         }
         
@@ -127,11 +127,11 @@ class Debug {
         print_r( $object );
         $output = ob_get_clean();
         
-        if( self::$_displayDebug ) {
+        if ( self::$_displayDebug ) {
             echo $output;
         }
         
-        if( self::$_logStoreClass ) {
+        if ( self::$_logStoreClass ) {
             $this->_lastLogObject = new self::$_logStoreClass;
             $this->_lastLogObject->store( $object );
         }

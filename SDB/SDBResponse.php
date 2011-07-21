@@ -60,9 +60,9 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
     public function __construct( $header, $body, $status = null ) {
         parent::__construct( $header, $body, $status );
         
-        if( isset($this->body->GetAttributesResult) ) {
+        if ( isset($this->body->GetAttributesResult) ) {
             $this->_getAttributesResult();
-        } elseif( isset($this->body->SelectResult) ) {
+        } elseif ( isset($this->body->SelectResult) ) {
             $this->_getSelectResult();
         }
 
@@ -76,7 +76,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
     private function _getSelectResult()  {
         $items = $this->body->SelectResult->Item();
 
-        if( $items ) {
+        if ( $items ) {
             foreach( $items as $item ) {
                 $this->_items[(string)$item->Name] = $this->_getObject($item->Attribute);
             }
@@ -96,13 +96,13 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
 
         foreach($attributes as $attribute ) {
             $name = (string)$attribute->Name;
-            if( isset($att_array[$name]) ) {
+            if ( isset($att_array[$name]) ) {
                 $att_array[$name]   = (array)$att_array[$name];
                 $att_array[$name][] = (string)$attribute->Value;
 
-            } elseif( preg_match('/(\w+)\[(\d+)\]/', $name, $matches) ) {
+            } elseif ( preg_match('/(\w+)\[(\d+)\]/', $name, $matches) ) {
                 // Large attributes are chunked into multiple items <fieldname>_<i>
-                if( !isset($att_array[$matches[1]]) ) {
+                if ( !isset($att_array[$matches[1]]) ) {
                     $att_array[$matches[1]] = array();
                     $toFlatten[] = $matches[1];
                 }
@@ -129,7 +129,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
     private function _getAttributesResult() {
         $attributes = $this->body->GetAttributesResult->Attribute();
 
-        if( $attributes ) {
+        if ( $attributes ) {
             $this->_items = $this->_getObject($attributes);
         }
     }
@@ -184,16 +184,16 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      *      The current SDBResponse item is returned for convenience
      */
     public function getAll($consistentRead = false, $resultsLimit = null, $offset = 0, $currentOffset = 0) {
-        if( isset($this->body->SelectResult) ) {
+        if ( isset($this->body->SelectResult) ) {
             $result = $this;
             $query  = $this->getQuery();
             $count  = 0;
             
-            if( $currentOffset < $offset ) {
+            if ( $currentOffset < $offset ) {
                 $this->clear();
             }
             
-            if( $resultsLimit ) {
+            if ( $resultsLimit ) {
                 $limit = $resultsLimit;
                 $currentOffset += count($this->_items);
                 NextTokenCache::Store($query, $limit, $currentOffset, $result->nextToken());
@@ -215,7 +215,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
                 $currentOffset += count($result);
                 NextTokenCache::Store("$query LIMIT $limitRemaining", $limit, $currentOffset, $result->nextToken());
                 
-                if( ++$count > self::MAX_QUERIES ) break;
+                if ( ++$count > self::MAX_QUERIES ) break;
             }
         }
         
@@ -246,7 +246,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      * @return int
      */
     private function _limitRemaining( $limit, $targetOffset, $currentOffset ) {
-        if( $targetOffset <= $currentOffset ) {
+        if ( $targetOffset <= $currentOffset ) {
             return $limit - count($this->_items);
         } else {
             $this->clear();
@@ -259,7 +259,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      * @param SDBResponse $response 
      */
     private function _setItems( SDBResponse $response ) {
-        if( !$response->isOK() ) {
+        if ( !$response->isOK() ) {
             throw new \ORM\Exceptions\ORMPDOException( $response->errorMessage().' - '.$response->getQuery() );
         }
         
@@ -300,7 +300,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      * @return string
      */
     public function errorMessage() {
-        if( !$this->isOK() ) {
+        if ( !$this->isOK() ) {
             $errors = $this->body->Message();
             return  (string)$errors[0];
         }
@@ -342,7 +342,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
     public function rewind() {
         $this->_position    = 0;
         $this->_itemNames   = array_keys($this->_items);
-        if( count($this->_items) ) {
+        if ( count($this->_items) ) {
             $this->_currentKey  = $this->_itemNames[$this->_position];
         }
     }

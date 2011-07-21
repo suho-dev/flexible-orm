@@ -36,7 +36,7 @@ class DebugCorrectLog extends \ORM\SDB\ORMModelSDB implements \ORM\Interfaces\De
      *      The object 
      */
     public function object( $object = null ) {
-        if( !is_null($object) ) {
+        if ( !is_null($object) ) {
             $this->serializedObject = serialize($object);
         }
         

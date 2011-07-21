@@ -23,7 +23,7 @@ class NullCache implements \ORM\Interfaces\Cache {
     }
 
     public function add( $name, $object, $ttl = 0 ) {
-        if( !array_key_exists( $name, self::$_store) ) {
+        if ( !array_key_exists( $name, self::$_store) ) {
             self::$_store[$name] = $object;
         }
     }

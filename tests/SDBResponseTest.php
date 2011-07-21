@@ -76,7 +76,7 @@ class SDBResponseTest extends ORMTest {
 //
 //            $response = $this->object->batch_put_attributes( 'bigDomain', $items, true);
 //
-//            if( !$response->isOK() ) {
+//            if ( !$response->isOK() ) {
 //                echo "\nInsert failed:\n";
 //                print_r($response);
 //            }

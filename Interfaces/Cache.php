@@ -64,7 +64,7 @@ interface Cache {
      * @code
      * function get_item( $item_id ) {
      *      $cache = new Cache();
-     *      if( $item = $cache->get( $item_id ) ) {
+     *      if ( $item = $cache->get( $item_id ) ) {
      *          return $item;
      *      } else {
      *          $item = get_item_from_database( $item_id );
@@ -90,7 +90,7 @@ interface Cache {
      * @code
      * function get_item( $item_id ) {
      *      $cache = new Cache();
-     *      if( $item = $cache->get( $item_id ) ) {
+     *      if ( $item = $cache->get( $item_id ) ) {
      *          return $item;
      *      } else {
      *          $item = get_item_from_database( $item_id );

@@ -47,7 +47,7 @@ class Configuration {
      *      Return the value of the requested option property
      */
     private function _getValue( $property, $group = null ) {
-        if( !is_null($group) ) {
+        if ( !is_null($group) ) {
             $value = isset($this->_options[$group][$property]) ? $this->_options[$group][$property] : null;
         } else {
             $value = isset($this->_options[$property]) ? $this->_options[$property] : null;
@@ -90,7 +90,7 @@ class Configuration {
      * @return void
      */
     private function _removeValue( $property, $group = null ) {
-        if( !is_null($group) ) {
+        if ( !is_null($group) ) {
             unset( $this->_options[$group][$property] );
         } else {
             unset( $this->_options[$property] );
@@ -104,7 +104,7 @@ class Configuration {
      *
      * <b>Usage</b>
      * @code
-     * if( Configuration::value('debug') ) {
+     * if ( Configuration::value('debug') ) {
      * 	var_dump( $this );
      * }
      * @endcode
@@ -117,7 +117,7 @@ class Configuration {
      * @return mixed
      */
     public static function Value( $attribute, $group = null ) {
-        if( is_null(self::$_settings) ) self::$_settings = new Configuration();
+        if ( is_null(self::$_settings) ) self::$_settings = new Configuration();
         
         return self::$_settings->_getValue( $attribute, $group );
     }
@@ -138,7 +138,7 @@ class Configuration {
      * @return void
      */
     public static function Load( $ini_file ) {
-        if( is_null(self::$_settings) ) self::$_settings = new Configuration();
+        if ( is_null(self::$_settings) ) self::$_settings = new Configuration();
 
         self::$_settings->_add( parse_ini_file($ini_file, true) );
     }
@@ -162,7 +162,7 @@ class Configuration {
      * @return Cache
      */
     public static function GetCache() {
-        if( $cacheClass = self::Value('class', 'Cache') ) {
+        if ( $cacheClass = self::Value('class', 'Cache') ) {
             return new $cacheClass;
         }
         
@@ -241,9 +241,9 @@ class Configuration {
      *      The requested property value
      */
     public static function __callStatic( $group, $arguments ) {
-        if( is_null(self::$_settings) ) self::$_settings = new Configuration();
+        if ( is_null(self::$_settings) ) self::$_settings = new Configuration();
 
-        if( isset($arguments[0]) ) {
+        if ( isset($arguments[0]) ) {
             return self::$_settings->_getValue( $arguments[0], $group );
         } else {
             return self::$_settings->_getGroup( $group );

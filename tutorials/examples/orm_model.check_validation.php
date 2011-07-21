@@ -3,7 +3,7 @@ $car            = new Car();
 $car->doors     = 3;
 $car->colour    = 'red';
 
-if( $car->save() ) {
+if ( $car->save() ) {
     // Car is valid
     
 } else {

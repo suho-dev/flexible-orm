@@ -67,11 +67,11 @@ abstract class SDBWrapper {
      * @see _InitSDBConnection()
      */
     private static function _InitSDBSettings() {
-        if( $region = self::SDBRegion() ) {
+        if ( $region = self::SDBRegion() ) {
             self::$_sdb->set_region( $region );
         }
 
-        if( Configuration::AWS()->apc_enabled ) {
+        if ( Configuration::AWS()->apc_enabled ) {
             self::$_sdb->set_cache_config('apc');
         }
     }
@@ -132,7 +132,7 @@ abstract class SDBWrapper {
      * @return AmazonSDB
      */
     public static function GetSDBConnection() {
-        if( is_null(self::$_sdb) ) self::_InitSDBConnection();
+        if ( is_null(self::$_sdb) ) self::_InitSDBConnection();
         
         return self::$_sdb;
     }

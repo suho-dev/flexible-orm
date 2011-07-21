@@ -8,7 +8,7 @@ $sdb->set_response_class('\ORM\SDB\SDBResponse');
 $attributes = $sdb->get_attributes( 'myDomain', 'item1' );
 
 // You can still use CFResponse features
-if( !$attributes->isOK() ) {
+if ( !$attributes->isOK() ) {
     die( "Oh no! There's a problem");
 }
 
