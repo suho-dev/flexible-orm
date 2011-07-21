@@ -60,9 +60,9 @@ class Session {
     /**
      * This class is a singleton, and the following variable contains the respective data.
      *
-     * @var Session $_session
+     * @var Session $session
      */
-    protected static $_session;
+    protected static $session;
 
     /**
      * Variable to hold the variables retrieved from the session between session openings.
@@ -99,7 +99,8 @@ class Session {
      * Session is a singleton class
      *
      */
-    private function __construct() {}
+    private function __construct() {
+    }
 
     /**
      * Get the static Session instance and instantiate if necessary
@@ -107,13 +108,13 @@ class Session {
      * @return Session
      */
     public static function getSession($lock = false) {
-        if ( is_null(static::$_session) ) {
+        if ( is_null(static::$session) ) {
             $calledClass = get_called_class();
-            static::$_session = new $calledClass();
-            static::$_session->loadSessionVariable($lock);
+            static::$session = new $calledClass();
+            static::$session->loadSessionVariable($lock);
         }
 
-        return static::$_session;
+        return static::$session;
     }
 
     /**
