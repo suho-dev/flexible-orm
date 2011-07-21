@@ -730,7 +730,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         
         if ( $result ) {
             if ( is_null($this->_id) ) {
-                $this->_id = $df::LastInsertId();
+                $this->_id = $df::LastInsertId( static::DatabaseConfigName() );
             }
 
             $this->afterCreate();

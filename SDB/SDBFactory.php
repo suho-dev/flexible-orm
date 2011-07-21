@@ -15,7 +15,7 @@ class SDBFactory implements \ORM\Interfaces\DataFactory {
     /**
      * Get a prepared statement that can be executed / bound
      *
-     * return SDBStatement
+     * @return SDBStatement
      */
      public static function Get( $sql, $database = null, $callingClass = null ) {
          $statement = new SDBStatement( $sql );
@@ -29,10 +29,12 @@ class SDBFactory implements \ORM\Interfaces\DataFactory {
     /**
      * Returns the ID of the last inserted row
      *
-     * return string|null
+     * @param string $database
+     *      Unusued for this factory
+     * @return string|null
      *      Key value
      */
-    public static function LastInsertId() {
+    public static function LastInsertId( $database = null ) {
         return SDBStatement::LastInsertId();
     }
     

@@ -27,10 +27,11 @@ interface DataFactory {
      * Returns the ID of the last inserted row, or the last value from a sequence
      * object, depending on the underlying driver.
      *
+     * @param string $database
      * @return mixed
      *      Key value
      */
-    public static function LastInsertId();
+    public static function LastInsertId( $database );
     
     /**
      * Get the names of each field from the database table structure

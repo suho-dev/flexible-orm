@@ -242,8 +242,8 @@ class PDOFactory implements Interfaces\DataFactory {
      * return mixed
      *      Key value
      */
-    public static function LastInsertId() {
-        return self::GetFactory()->_db->lastInsertId();
+    public static function LastInsertId( $database = self::DEFAULT_DATABASE ) {
+        return self::GetFactory( $database )->_db->lastInsertId();
     }
 
     /**
