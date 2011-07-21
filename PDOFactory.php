@@ -148,6 +148,15 @@ class PDOFactory implements Interfaces\DataFactory {
     public function databaseType() {
         return $this->_databaseType;
     }
+    
+    /**
+     * Get the PDO object behind this object
+     * 
+     * @return PDO
+     */
+    public function PDO() {
+        return $this->_db;
+    }
 
     /**
      * Get a prepared PDOStatement matching the supplied string
@@ -206,7 +215,7 @@ class PDOFactory implements Interfaces\DataFactory {
      * @return boolean
      */
     public function statementPrepared( $sql ) {
-        return isset($this->_statements[$sql]);
+        return !preg_match('/^PRAGMA /i', $sql) && isset($this->_statements[$sql]);
     }
 
     /**

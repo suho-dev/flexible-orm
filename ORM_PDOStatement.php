@@ -117,6 +117,9 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      * its name, and surrounding documentation may change without notice in a future
      * release of PHP. This function should be used at your own risk.
      *
+     * @todo there needs to be an alternative method for databases that do not support this
+     *      functionality
+     * 
      * @return array
      *      Array of field names, each qualified by table name (aliased table
      *      name if there is one).
