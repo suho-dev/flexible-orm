@@ -9,7 +9,7 @@ namespace ORM\Tests;
 use \ORM\Tests\Mock, \ORM\PDOFactory, \ORM\DEBUG;
 
 require_once 'ORMTest.php';
-PDOFactory::GetFactory()->startProfiling();
+//PDOFactory::GetFactory()->startProfiling();
 
 
 /**
