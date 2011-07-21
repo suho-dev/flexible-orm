@@ -63,7 +63,7 @@ class Window extends ORM_Model {
     public static function TranslateGlazing( $glazingDescription ) {
         $layers = explode('/', $glazingDescription);
         $glazing = '';
-        foreach($layers as $i => $layer ) {
+        foreach ($layers as $i => $layer ) {
             if ( $i > 0 ) {
                 $glazing .= '/';
             }

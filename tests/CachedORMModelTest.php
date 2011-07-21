@@ -168,7 +168,7 @@ class CachedORMModelTest extends ORMTest {
             count( $cars )
         );
 
-        foreach( $cars as $car ) {
+        foreach ( $cars as $car ) {
             $this->assertEquals(
                 'ORM\\Tests\\Mock\\CachedCar',
                 get_class( $car )
@@ -303,7 +303,7 @@ class CachedORMModelTest extends ORMTest {
 
 //        $apc = new \APCIterator('user');
 //        echo "\nCached:\n";
-//        foreach( $apc as $cached ) {
+//        foreach ( $apc as $cached ) {
 //            var_dump($cached);
 //        }
 

@@ -77,7 +77,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
         $items = $this->body->SelectResult->Item();
 
         if ( $items ) {
-            foreach( $items as $item ) {
+            foreach ( $items as $item ) {
                 $this->_items[(string)$item->Name] = $this->_getObject($item->Attribute);
             }
         }
@@ -94,7 +94,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
         $att_array = array();
         $toFlatten = array();
 
-        foreach($attributes as $attribute ) {
+        foreach ($attributes as $attribute ) {
             $name = (string)$attribute->Name;
             if ( isset($att_array[$name]) ) {
                 $att_array[$name]   = (array)$att_array[$name];
@@ -114,7 +114,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
             }
         }
 
-        foreach($toFlatten as $key ) {
+        foreach ($toFlatten as $key ) {
             ksort($att_array[$key]);
             $att_array[$key] = implode('', $att_array[$key]);
         }
@@ -263,7 +263,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
             throw new \ORM\Exceptions\ORMPDOException( $response->errorMessage().' - '.$response->getQuery() );
         }
         
-        foreach( $response as $key => $item ) {
+        foreach ( $response as $key => $item ) {
             $this->_items[$key] = $item;
         }
     }

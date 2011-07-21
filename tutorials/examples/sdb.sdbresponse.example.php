@@ -22,7 +22,7 @@ $items = $sdb->select( 'SELECT * FROM myDomain' );
 // Count will work
 echo "Returned ", count($items), " items.";
 
-foreach( $items as $itemName => $itemAttributes ) {
+foreach ( $items as $itemName => $itemAttributes ) {
      echo "Item: $itemName\n";
 
      // Print out all the attributes of this item

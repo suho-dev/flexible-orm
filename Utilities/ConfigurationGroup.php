@@ -22,7 +22,7 @@ class ConfigurationGroup {
      *      Associative array of option names and values
      */
     public function __construct( array $options ) {
-        foreach( $options as $key => $value ) {
+        foreach ( $options as $key => $value ) {
             $this->$key = $value;
         }
     }

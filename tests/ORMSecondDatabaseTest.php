@@ -91,7 +91,7 @@ class ORMSecondDatabaseTest extends ORMTest {
             count( $cars )
         );
 
-        foreach( $cars as $car ) {
+        foreach ( $cars as $car ) {
             $this->assertEquals(
                 'ORM\\Tests\\Mock\\AlternateCar',
                 get_class( $car )
@@ -119,7 +119,7 @@ class ORMSecondDatabaseTest extends ORMTest {
             count( $cars )
         );
 
-        foreach( $cars as $car ) {
+        foreach ( $cars as $car ) {
             $this->assertEquals(
                 'ORM\\Tests\\Mock\\AlternateCar',
                 get_class( $car )

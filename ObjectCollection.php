@@ -23,7 +23,7 @@ namespace ORM;
  *      'size'  => 'small'
  * ));
  * 
- * foreach( $collection as $key => $value ) {
+ * foreach ( $collection as $key => $value ) {
  *      echo "Key: $key, Value: $value \n";
  * }
  * 
@@ -278,7 +278,7 @@ class ObjectCollection extends \ArrayObject {
      *      True if at least one object returned true
      */
     public function detect( $function ) {
-        foreach( $this as $item ) {
+        foreach ( $this as $item ) {
             if ( call_user_func( $function, $item ) ) {
                 return true;
             }

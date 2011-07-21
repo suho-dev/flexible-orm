@@ -253,7 +253,7 @@ class ORM_ModelTest extends ORMTest {
             count( $cars )
         );
 
-        foreach( $cars as $car ) {
+        foreach ( $cars as $car ) {
             $this->assertEquals(
                 'ORM\\Tests\\Mock\\Car',
                 get_class( $car )
@@ -303,7 +303,7 @@ class ORM_ModelTest extends ORMTest {
             count( $cars )
         );
 
-        foreach( $cars as $car ) {
+        foreach ( $cars as $car ) {
             $this->assertEquals(
                 'ORM\\Tests\\Mock\\Car',
                 get_class( $car )
@@ -357,7 +357,7 @@ class ORM_ModelTest extends ORMTest {
             count( $cars )
         );
 
-        foreach( $cars as $car ) {
+        foreach ( $cars as $car ) {
             $this->assertEquals(
                 'ORM\\Tests\\Mock\\Car',
                 get_class( $car )
@@ -641,7 +641,7 @@ class ORM_ModelTest extends ORMTest {
         
         $cars = Mock\Car::FindAll();
         
-        foreach( $cars as $car ) {
+        foreach ( $cars as $car ) {
             $this->assertEquals( $car->brand, $car->testValue() );
         }
     }

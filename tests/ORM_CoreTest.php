@@ -33,7 +33,7 @@ class ORM_CoreTest extends ORMTest {
 
         $this->object = new Mock\Staff($this->_initialValues);
 
-        foreach($this->_initialValues as $property => $value ) {
+        foreach ($this->_initialValues as $property => $value ) {
             $this->object->setOriginalValue($property, $value);
         }
     }

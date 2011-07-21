@@ -64,7 +64,7 @@ abstract class ORM_Core {
         $properties = $this->attributes();
         $values     = array();
         
-        foreach( $properties as $property ) {
+        foreach ( $properties as $property ) {
             $values[$property] = property_exists( $this, $property ) ? $this->$property : null;
         }
 
@@ -83,7 +83,7 @@ abstract class ORM_Core {
      * @code
      * if ( !$car->save() ) {
      *     // Validation issue, echo each error message
-     *     foreach( $car->errorMessages() as $property => $message ) { 
+     *     foreach ( $car->errorMessages() as $property => $message ) { 
      *         echo "Error with the $property field - $message \n";
      *     }
      * 
@@ -115,7 +115,7 @@ abstract class ORM_Core {
      */
     public function errorMessagesString() {
         $msgs = array();
-        foreach( $this->_errorMessages as $key => $value ) {
+        foreach ( $this->_errorMessages as $key => $value ) {
             $msgs[] = "'$key' $value";
         }
 
@@ -201,7 +201,7 @@ abstract class ORM_Core {
 
         $attributes = $this->values();
 
-        foreach( $attributes as $key => $value ) {
+        foreach ( $attributes as $key => $value ) {
             if ( !isset($original_values[$key]) || $original_values[$key] != $value ) {
                 $changed[] = $key;
             }
@@ -249,7 +249,7 @@ abstract class ORM_Core {
      */
     public function setValues( array $values = null ) {
         if ( !is_null($values) ) {
-            foreach( $values as $field => $value ) {
+            foreach ( $values as $field => $value ) {
                 $this->$field = $value;
             }
         }

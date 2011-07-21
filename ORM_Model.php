@@ -502,7 +502,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $models     = array( "`$className`.*" );
         $joins      = '';
 
-        foreach( $findWith as $nsFetchClass ) {
+        foreach ( $findWith as $nsFetchClass ) {
             $fetchTable = $nsFetchClass::TableName();
             $primaryKey = $nsFetchClass::PrimaryKeyName();
             $foreignKey = static::ForeignKey( $nsFetchClass );
@@ -984,7 +984,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         if ( $stored_object = static::Find( $this->_id ) ) {
             $attributes = $stored_object->attributes();
 
-            foreach( $attributes as $attribute ) {
+            foreach ( $attributes as $attribute ) {
                 if ( !isset($this->$attribute) ) {
                     $this->$attribute = $stored_object->$attribute;
                 }

@@ -8,7 +8,7 @@ if ( $car->save() ) {
     
 } else {
     // Car is NOT valid
-    foreach( $car->errorMessages() as $property => $message ) { 
+    foreach ( $car->errorMessages() as $property => $message ) { 
         echo "Error with the $property field - $message \n";
     }
 }

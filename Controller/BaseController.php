@@ -186,7 +186,7 @@ abstract class BaseController {
         
         $properties = $publicPropertiesFunction( $this );
         
-        foreach( $properties as $property ) {
+        foreach ( $properties as $property ) {
             $this->_template->assign( $property, $this->$property );
         }
     }

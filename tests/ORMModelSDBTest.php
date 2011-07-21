@@ -79,7 +79,7 @@ class ORMModelSDBTest extends ORMTest {
         $this->assertEquals( 'ORM\ModelCollection', get_class($cars) );
         $this->assertEquals( 2, count($cars) );
 
-        foreach( $cars as $car ) {
+        foreach ( $cars as $car ) {
             $this->assertEquals( 'Volkswagen', $car->brand );
         }
     }
@@ -296,7 +296,7 @@ class ORMModelSDBTest extends ORMTest {
         $this->_setupForeignKeysTest();
         $carsWithOwners = Mock\SDBCar::FindAll(array(), '\ORM\Tests\Mock\SDBOwner');
 
-        foreach($carsWithOwners as $car ) {
+        foreach ($carsWithOwners as $car ) {
             $this->assertEquals( 'MyCarsOwner', $car->SDBOwner->name );
         }
     }

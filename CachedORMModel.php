@@ -69,7 +69,7 @@ class CachedORMModel extends ORM_Model {
             
             if ( $findWith ) {
                 $findWithArray = (array)$findWith;
-                foreach( $findWithArray as $nsFetchClass ) {
+                foreach ( $findWithArray as $nsFetchClass ) {
                     $fetchClass = basename( $nsFetchClass );
                     self::_cache()->add( (string)$object->$fetchClass, $object->$fetchClass, self::CACHE_TTL );
                     unset($object->$fetchClass);
@@ -100,7 +100,7 @@ class CachedORMModel extends ORM_Model {
 
         if ( $object && $findWith ) {
             $findWithArray = (array)$findWith;
-            foreach( $findWithArray as $nsFetchClass ) {
+            foreach ( $findWithArray as $nsFetchClass ) {
                 $fetchClass     = basename( $nsFetchClass );
                 $foreignKey     = static::ForeignKey( $nsFetchClass );
                 $id             = $object->$foreignKey;

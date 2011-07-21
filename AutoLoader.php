@@ -136,7 +136,7 @@ class AutoLoader {
     public function locatePackage( $class ) {
         $packages = Utilities\Configuration::packages();
 
-        foreach( $packages as $package => $path ) {
+        foreach ( $packages as $package => $path ) {
             if ( preg_match("/^\\\?$package\\\(.*)$/", $class, $matches ) ) {
                 return $path.'/'.str_replace('\\','/', $matches[1]);
             }
@@ -168,7 +168,7 @@ class AutoLoader {
         $paths      = explode( PATH_SEPARATOR, get_include_path() );
         $classPath  = str_replace('\\', '/', $class );
 
-        foreach( $paths as $path ) {
+        foreach ( $paths as $path ) {
             $fullPath = "$path/$classPath.php";
             if ( file_exists($fullPath) ) {
                 return $fullPath;

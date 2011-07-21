@@ -200,7 +200,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
             $replacedCount  = 0;
             $output         = '';
 
-            foreach( $unquoted as $string ) {
+            foreach ( $unquoted as $string ) {
                 if ( !$replacedCount ) {
                     $string = preg_replace( '/\?/', "'$sanitizedValue'", $string, 1, $replacedCount );
                 }
@@ -226,7 +226,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      *      attempts to do both
      */
     public function bindValues( $values ) {
-        foreach($values as $key => $value ) {
+        foreach ($values as $key => $value ) {
             if ( is_numeric($key) ){
                 $this->_bindAnonymousValue( $value );
             } else {
@@ -286,10 +286,10 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     private function _chunkLargeAttributes( array $attributes ) {
         $chunkedAttributes = array();
         
-        foreach( $attributes as $field => $value ) {
+        foreach ( $attributes as $field => $value ) {
             if ( strlen($field) && strlen($value) > self::MAX_ATTRIBUTE_SIZE ) {
                 $chunks = str_split( $value, self::MAX_ATTRIBUTE_SIZE );
-                foreach($chunks as $i => $chunk ) {
+                foreach ($chunks as $i => $chunk ) {
                     $chunkedAttributes["{$field}[$i]"] = $chunk;
                 }
                 
@@ -563,7 +563,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         }
 
         $attributes = array();
-        foreach($values as $i => $value ) {
+        foreach ($values as $i => $value ) {
             $trimmedValue = trim( $value );
             if ( array_key_exists( $trimmedValue, $this->_binds) ) {
                 $attributes[$fields[$i]] = $this->_binds[$trimmedValue];
@@ -595,7 +595,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $set        = $matches[0];
         $attributes = array();
         
-        foreach($set as $pair) {
+        foreach ($set as $pair) {
             list( $field, $value ) = explode( ' = ', trim($pair), 2 );
             $trimmedValue = trim( $value );
             
@@ -771,7 +771,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     private function _fetchWith( ORMModelSDB &$object ) {
         $className = get_class($object);
         
-        foreach( $this->_findWith as $fetchClassName ) {
+        foreach ( $this->_findWith as $fetchClassName ) {
             if ( !is_subclass_of($fetchClassName, '\ORM\ORM_Model') ) {
                 throw new \ORM\Exceptions\ORMFetchIntoException(
                     "Find with class '$fetchClassName' does not extend class ORM_Model"
@@ -928,7 +928,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
                 $this->_result->errorMessage()
             );
         } elseif ( count($this->_result) ) {
-            foreach( $this->_result as $key => $attributes ) {
+            foreach ( $this->_result as $key => $attributes ) {
                 $object = new $className;
                 $object->id( $key );
                 

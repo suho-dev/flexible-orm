@@ -103,7 +103,7 @@ class ORMModelSDB extends \ORM\ORM_Model {
      */
     public function setValues( array $values = null) {
         if ( !is_null($values) ) {
-            foreach( $values as $field => $sanitizedValue ) {
+            foreach ( $values as $field => $sanitizedValue ) {
                 $decodedValue = SDBStatement::DecodeValue($sanitizedValue);
 
                 $this->$field = $sanitizedValue;

@@ -33,7 +33,7 @@ class ObjectCollectionTest extends ORMTest {
      */
     public function testIteratorInterface() {
         $count = 0;
-        foreach( $this->object as $staff ) {
+        foreach ( $this->object as $staff ) {
             $this->assertTrue( $staff instanceof Mock\Staff );
             $count++;
         }
@@ -41,7 +41,7 @@ class ObjectCollectionTest extends ORMTest {
         $this->assertEquals( 4, $count );
 
         // Ensure rewind works by doing it again
-        foreach( $this->object as $staff ) {
+        foreach ( $this->object as $staff ) {
             $this->assertTrue( $staff instanceof Mock\Staff );
             $count++;
         }
@@ -82,7 +82,7 @@ class ObjectCollectionTest extends ORMTest {
            $staff->name = 'Frank';
         });
 
-        foreach( $this->object as $staff ) {
+        foreach ( $this->object as $staff ) {
             $this->assertEquals('Frank', $staff->name);
         }
 

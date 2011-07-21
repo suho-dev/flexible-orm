@@ -164,7 +164,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
             $object     = new $className;
             $namespace  = str_replace( '/', '\\', dirname( $classPath ) );
 
-            foreach( $results as $field => $value ) {
+            foreach ( $results as $field => $value ) {
                 list( $classDestination, $property ) = explode( '.', $field, 2 );
 
                 if ( $class == $classDestination ) {
