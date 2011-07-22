@@ -31,10 +31,12 @@ class SDBFactory implements \ORM\Interfaces\DataFactory {
      *
      * @param string $database
      *      Unusued for this factory
+     * @param string $name
+     *      Unused in this factory class
      * @return string|null
      *      Key value
      */
-    public static function LastInsertId( $database = null ) {
+    public static function LastInsertId( $database = null, $name = null ) {
         return SDBStatement::LastInsertId();
     }
     

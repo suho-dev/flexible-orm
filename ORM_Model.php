@@ -730,7 +730,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         
         if ( $result ) {
             if ( is_null($this->_id) ) {
-                $this->_id = $df::LastInsertId( static::DatabaseConfigName() );
+                $this->_id = $df::LastInsertId( static::DatabaseConfigName(), static::SequenceName() );
             }
 
             $this->afterCreate();
@@ -740,6 +740,10 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         } else {
             return false;
         }
+    }
+    
+    public static function SequenceName() {
+        return static::TableName().'_'.static::PrimaryKeyName().'_seq';
     }
 
     /**

@@ -133,8 +133,12 @@ class PDOFactory implements Interfaces\DataFactory {
      * @param string $dsn
      *      The database connection string
      */
-    private function _setDatabaseType( $dsn ) {
+    private function _setDatabaseType( &$dsn ) {
         list( $this->_databaseType, ) = explode( ':', $dsn, 2 );
+        
+        if( $this->_databaseType == 'sqlsrv' ) {
+            $dsn = preg_replace( array('/host=/','/dbname=/'), array('Server=', 'Database='), $dsn );
+        }
     }
     
     /**
@@ -189,8 +193,26 @@ class PDOFactory implements Interfaces\DataFactory {
      */
     public static function Get( $sql, $database = self::DEFAULT_DATABASE, $callingClass = null ) {
         $factory = self::GetFactory( $database );
-
+        
         return $factory->statement( $sql );
+    }
+    
+    private function _convertToCompatibleSQL( $sql ) {
+        switch( $this->databaseType() ) {
+            case 'sqlsrv':
+                $compatibleSql = preg_replace( "/LIMIT \d+/", '', $sql );
+                $compatibleSql = str_replace( '`', '', $compatibleSql );
+                break;
+                
+            case 'pgsql':
+                $compatibleSql = str_replace( '`', '', $sql );
+                break;
+            
+            default:
+                $compatibleSql = $sql;
+        }
+        
+        return $compatibleSql;
     }
 
     /**
@@ -201,6 +223,7 @@ class PDOFactory implements Interfaces\DataFactory {
      * @return ORM_PDOStatement
      */
     public function statement( $sql ) {
+        $sql = $this->_convertToCompatibleSQL( $sql );
         return $this->statementPrepared($sql) ?
                 $this->getStatement($sql) :
                 $this->setStatement($sql);
@@ -248,11 +271,15 @@ class PDOFactory implements Interfaces\DataFactory {
      *
      * A shortcut to the PDO::lastInsertId()
      *
-     * return mixed
+     * @param string $database
+     *      [optional] The database name. Defaults to DEFAULT_DATABASE
+     * @param string $name
+     *      [optional] The serial name required for Postgres
+     * @return mixed
      *      Key value
      */
-    public static function LastInsertId( $database = self::DEFAULT_DATABASE ) {
-        return self::GetFactory( $database )->_db->lastInsertId();
+    public static function LastInsertId( $database = self::DEFAULT_DATABASE, $name = null ) {
+        return self::GetFactory( $database )->_db->lastInsertId( $name );
     }
 
     /**
@@ -401,4 +428,6 @@ class PDOFactory implements Interfaces\DataFactory {
             return $row['name'];
         }, $result );
     }
+    
+    
 }

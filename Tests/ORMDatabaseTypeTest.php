@@ -17,7 +17,6 @@ abstract class ORMDatabaseTypeTest extends ORMTest {
     }
     
     protected function tearDown() {
-        $cars;
     }
     
     /**
@@ -38,7 +37,8 @@ abstract class ORMDatabaseTypeTest extends ORMTest {
         $foo = new $class();
         $foo->brand     = "BMW";
         $foo->colour    = "Orange";
-        $foo->save();
+        
+        $this->assertTrue( $foo->save() );
     }
     
     public function testCreateAndFind() {
@@ -47,11 +47,29 @@ abstract class ORMDatabaseTypeTest extends ORMTest {
         $foo = new $class();
         $foo->brand     = "BMW";
         $foo->colour    = "Orange";
-        $foo->save();
+        $this->assertTrue( $foo->save() );
         
+        echo "Looking for {$foo->id()}\n";
         $savedCar = $class::Find( $foo->id() );
         
         $this->assertEquals( $foo->brand, $savedCar->brand );
+    }
+    
+    public function testUpdate() {
+        $class = $this->carClass;
+        
+        $car = $class::Find();
+        
+        if( !$car ) {
+            $car = new $class();
+            $car->brand     = "BMW";
+            $car->colour    = "Orange";
+            $car->save();
+        }
+        
+        $car->colour = 'red';
+        
+        $this->assertTrue( $car->save() );
     }
     
 }

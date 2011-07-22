@@ -129,7 +129,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
 
         for ($i = 0; $i < $this->columnCount(); $i++) {
             $meta               = $this->getColumnMeta($i);
-            $qualifiedNames[]   = "{$meta['table']}.{$meta['name']}";
+            $qualifiedNames[]   = isset($meta['table']) ? "{$meta['table']}.{$meta['name']}" : ".{$meta['name']}";
         }
 
         return $qualifiedNames;
@@ -170,7 +170,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
             foreach ( $results as $field => $value ) {
                 list( $classDestination, $property ) = explode( '.', $field, 2 );
 
-                if ( $class == $classDestination ) {
+                if ( $classDestination == '' || $class == $classDestination ) {
                     // This is the requested (base) class
                     $object->$property = $value;
                     $object->setOriginalValue($property, $value);
@@ -347,7 +347,6 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      */
     public function execute( array $input = null) {
         try{
-
             return parent::execute($input);
 
         } catch( \PDOException $e ) {
@@ -361,4 +360,3 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
         return false;
     }
 }
-?>

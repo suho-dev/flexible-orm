@@ -28,10 +28,12 @@ interface DataFactory {
      * object, depending on the underlying driver.
      *
      * @param string $database
+     * @param string $name
+     *      [optional] required name of the serial field for PostgreSQL
      * @return mixed
      *      Key value
      */
-    public static function LastInsertId( $database );
+    public static function LastInsertId( $database, $name = null );
     
     /**
      * Get the names of each field from the database table structure

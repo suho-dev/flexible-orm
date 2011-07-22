@@ -11,7 +11,7 @@ use \ORM\Utilities\Configuration;
 require_once 'ORMTest.php';
 
 // Delete existing SQLite file
-$dsn = Configuration::alternateCarSqlite('dsn');
+$dsn = Configuration::sqliteDB('dsn');
 $sqlDBLocation = str_replace("sqlite:", "", $dsn);
 
 if (file_exists($sqlDBLocation)) {
@@ -19,7 +19,7 @@ if (file_exists($sqlDBLocation)) {
 }
 
 // Create sqlite database
-$db = new \PDO(Configuration::alternateCarSqlite('dsn'));
+$db = new \PDO($dsn);
 $db->exec('CREATE TABLE cars(id integer primary key asc, brand varchar(255), colour varchar(32));');
 $db = null;
 
@@ -28,6 +28,6 @@ $db = null;
  */
 class ORMSqliteDatabaseTest extends ORMDatabaseTypeTest {
     protected $carClass         = '\ORM\Tests\Mock\AlternateCarSqlite';
-    protected $databaseConfig   = 'alternateCarSqlite';
+    protected $databaseConfig   = 'sqliteDB';
 
 }
