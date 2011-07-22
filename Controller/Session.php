@@ -96,6 +96,11 @@ class Session {
     const FIELD_NAME = 'ORM';
 
     /**
+     * Index for the lock stack
+     */
+    private $_lockStackIndex = 0;
+
+    /**
      * Session is a singleton class
      *
      */
@@ -179,6 +184,47 @@ class Session {
 
     public function __destruct() {
         if ($this->_unsavedData) {
+            $this->saveSessionVariable();
+        }
+    }
+
+    /*
+     * Increments the number of times locking has been requested.  To
+     * be used in conjunction with unlockStack which indicates a lock
+     * release.
+     *
+     * Locking is performed on when the lockStack index reaches 1, and unlocked
+     * when it reaches 0 again. An error is thrown if a unlock is attempted
+     *
+     * This solves an issue of nested lockings as follows: (where $s is the global session object)
+     *
+     * function one() {$lockStackIndex = $s->lockStack(); two(); ... $s->unlockStack($lockStackIndex); }
+     * function two() {$lockStackIndex = $s->lockStack();        ... $s->unlockStack($lockStackIndex); }
+     *
+     * @return int
+     *
+     * @todo - not sure if we should though.. use debug_backtrace to
+     * monitor which file called each lock.
+     */
+    public function lockStack() {
+        $this->_lockStackIndex++;
+        if ($this->_lockStackIndex == 1) {
+            $this->loadSessionVariable(true);
+        }
+        return ($this->_lockStackIndex);
+    }
+
+    /*
+     * Decrements the number of times locking has been requested to perform a lock release.
+     *
+     * @see lockStack()
+     */
+    public function unlockStack($lockStackIndex) {
+        if ($this->_lockStackIndex != $lockStackIndex) {
+            throw \Exception("Stack was not unlocked in order they were opened.");
+        }
+        $this->_lockStackIndex --;
+        if ($this->_lockStackIndex == 0) {
             $this->saveSessionVariable();
         }
     }
