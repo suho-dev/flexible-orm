@@ -228,4 +228,11 @@ class Session {
             $this->saveSessionVariable();
         }
     }
+
+    /*
+     * Returns if the session is locked.
+     */
+    public function isLocked() {
+        return $this->_locked;
+    }
 }
