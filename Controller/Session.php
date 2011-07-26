@@ -122,6 +122,30 @@ class Session {
         return static::$_staticSession;
     }
 
+
+    /*
+     * Save all the unsaved variables if the PHP script finished
+     * without calling saveSessionVariables().
+     */
+    public function __destruct() {
+        if ($this->_unsavedData) {
+            $this->saveSessionVariable();
+        }
+    }
+
+
+    /*
+     * Destroy the session.
+     */
+    public function destroySession() {
+        session_name(static::SESSION_NAME);
+        if (!$this->_locked) {
+            session_start();
+        }
+        session_destroy();
+    }
+
+
     /**
      * Retrieve variables from global session variable and store it in local cache
      */
@@ -182,11 +206,6 @@ class Session {
         unset($this->_sessionVariableCache[$var]);
     }
 
-    public function __destruct() {
-        if ($this->_unsavedData) {
-            $this->saveSessionVariable();
-        }
-    }
 
     /*
      * Increments the number of times locking has been requested.  To
