@@ -211,7 +211,6 @@ class Session {
         unset($this->_sessionVariableCache[$var]);
     }
 
-
     /*
      * Increments the number of times locking has been requested.  To
      * be used in conjunction with unlockStack which indicates a lock
