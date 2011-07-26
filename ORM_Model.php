@@ -398,7 +398,9 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $query->execute();
 
         $item = $query->fetchInto( get_called_class() );
-        if ( $item ) { $item->afterGet(); }
+        if ( $item ) {
+            $item->afterGet();
+        }
         
         return $item;
     }
@@ -430,7 +432,9 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         }
 
         $item = $query->fetchInto( get_called_class() );
-        if ( $item ) { $item->afterGet(); }
+        if ( $item ) {
+            $item->afterGet();
+        }
         
         return $item;
     }
@@ -651,7 +655,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         
         $this->beforeUpdate();
 
-         if ( !$this->valid() ) {
+        if ( !$this->valid() ) {
             return false;
         }
         
@@ -714,7 +718,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     private function _create() {
         $this->beforeCreate();
 
-         if ( !$this->valid() ) {
+        if ( !$this->valid() ) {
             return false;
         }
 

@@ -247,12 +247,13 @@ class ObjectCollection extends \ArrayObject {
      */
     private function _selectByProperty( $propertyName, $value ) {
         $value = is_null($value) ? true : $value;
-
+        // @codingStandardsIgnoreStart
         return array_filter(
             $this->toArray(),
             function( $item ) use( $propertyName, $value ) {
                 return $item->$propertyName == $value;
         });
+        // @codingStandardsIgnoreEnd
     }
 
     /**
