@@ -112,7 +112,7 @@ class Session {
      *
      * @return Session
      */
-    public static function getSession($lock = false) {
+    public static function &getSession($lock = false) {
         if ( is_null(static::$_staticSession) ) {
             $calledClass = get_called_class();
             static::$_staticSession = new $calledClass();
