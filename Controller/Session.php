@@ -181,8 +181,13 @@ class Session {
      *
      * @return mixed
      */
-    public function get($var) {
-        return array_key_exists($var, $this->_sessionVariableCache) ? $this->_sessionVariableCache[$var] : null;
+    public function &get($var) {
+        if (array_key_exists($var, $this->_sessionVariableCache)) {
+            return  $this->_sessionVariableCache[$var];
+        } else {
+            $variableNotValid = null;
+            return $variableNotValid;
+        }
     }
 
     /**
