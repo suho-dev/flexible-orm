@@ -162,9 +162,9 @@ class Variables extends \ArrayObject {
      *      Either the value of the \c $name variable or the value of \c $default.
      */
     private function _getParam( $name, $default = null, $rule = null ) {
-        if ( array_key_exists( $name, $this ) 
-            && ( is_null($rule) || $this->matchesRule( $rule, $this[$name] ) ) ) 
-        {
+        if (array_key_exists( $name, $this )
+            && ( is_null($rule) || $this->matchesRule( $rule, $this[$name] ) )
+        ) {
             return $this[$name];
         }
         

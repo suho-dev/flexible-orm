@@ -144,13 +144,13 @@ class Request {
      *      usage). The value from a html form is always a string.
      */
     public function __get( $name ) {
-        switch($name){
-            case 'get':     return $this->_get;
-            case 'post':    return $this->_post;
-            case 'cookies': return $this->_cookies;
-            case 'request': return $this->_request;
-            default:
-                return $this->_request->$name;
+        switch($name) {
+        case 'get':     return $this->_get;
+        case 'post':    return $this->_post;
+        case 'cookies': return $this->_cookies;
+        case 'request': return $this->_request;
+        default:
+            return $this->_request->$name;
         }
     }
     
@@ -178,17 +178,17 @@ class Request {
     private function _initRequest() {
         $order = ini_get('request_order') ?: ini_get('variables_order');
         
-        for( $i=0; $i < strlen($order); $i++ ) {
+        for ( $i=0; $i < strlen($order); $i++ ) {
             switch( $order[$i] ) {
-                case 'G': 
-                    $this->_mergeRequest( $this->_get );
-                    break;
-                case 'P':
-                    $this->_mergeRequest( $this->_post );
-                    break;
-                case 'C':
-                    $this->_mergeRequest( $this->_cookies );
-                    break;
+            case 'G':
+                $this->_mergeRequest( $this->_get );
+                break;
+            case 'P':
+                $this->_mergeRequest( $this->_post );
+                break;
+            case 'C':
+                $this->_mergeRequest( $this->_cookies );
+                break;
             }
         }
         
