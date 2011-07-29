@@ -98,7 +98,7 @@ class AutoLoader {
      * @param string $class
      */
     public function loadZend( $class ) {
-        $pathName = str_replace( array('_', '\\'),'/', $class );
+        $pathName = str_replace( array('_', '\\'), '/', $class );
 
         if ( $this->_locateInIncludePath($pathName) ) {
             require "$pathName.php";
@@ -138,7 +138,7 @@ class AutoLoader {
 
         foreach ( $packages as $package => $path ) {
             if ( preg_match("/^\\\?$package\\\(.*)$/", $class, $matches ) ) {
-                return $path.'/'.str_replace('\\','/', $matches[1]);
+                return $path.'/'.str_replace('\\', '/', $matches[1]);
             }
         }
 

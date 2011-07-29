@@ -726,8 +726,8 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $fields = $this->_includedFields( $this->DescribeTable() );
         $df     = static::DataFactory();
 
-        $sql    = "INSERT INTO `$table` (`".implode('`, `',$fields)."`)";
-        $sql    .= " VALUES ( :".implode(', :',$fields)." )";
+        $sql    = "INSERT INTO `$table` (`".implode('`, `', $fields)."`)";
+        $sql    .= " VALUES ( :".implode(', :', $fields)." )";
         $query  = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() )->bindObject($this, $fields);
 
         $result = $query->execute();
@@ -964,7 +964,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         if ( preg_match_all('/\'(.*?)\'/', $results[1], $fieldsZeroIndexed) ) {
             // Convert to 1-indexed array
             $fields = array_combine(
-                    range( 1 ,count($fieldsZeroIndexed[1])),
+                    range( 1, count($fieldsZeroIndexed[1]) ),
                     $fieldsZeroIndexed[1]
             );
         }
