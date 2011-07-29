@@ -90,6 +90,9 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      */
     public function __construct( $values = array() ) {
         // Get the primary key variable and assign $_id to be a pointer to it
+        if (!isset($this->{$this->PrimaryKeyName()})) {
+            $this->{$this->PrimaryKeyName()} = null;
+        }
         $this->_id  = &$this->{$this->PrimaryKeyName()};
 
         parent::__construct( $values );
