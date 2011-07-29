@@ -630,7 +630,9 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
             $result = $this->_create();
         }
 
-        if ( $result ) $this->_originalValues = $this->values();
+        if ( $result ) {
+            $this->_originalValues = $this->values();
+        }
 
         return $result ? $this->afterSave() || true : false;
     }
