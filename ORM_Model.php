@@ -865,10 +865,10 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * See \ref intro_step2 "Getting Started: 2. Define Model Classes" for more information
      *
      * @return string
-     * @see _makeTableName()
+     * @see _MakeTableName()
      */
     public static function TableName() {
-        return defined("static::TABLE") ? static::TABLE : self::_makeTableName(get_called_class());
+        return defined("static::TABLE") ? static::TABLE : self::_MakeTableName(get_called_class());
     }
 
     /**
@@ -919,7 +919,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *      The name of the model.
      * @return string
      */
-    private static function _makeTableName( $model_name ) {
+    private static function _MakeTableName( $model_name ) {
         $class = strtolower( basename(str_replace( '\\', '/', $model_name)) );
 
         if ( substr($class, -1) == 'y' ) {

@@ -21,7 +21,7 @@ namespace ORM\Controller;
  * Where an update is performed:
  *
  * @code
- * $session = \ORM\Controller\Session::getSession(true);
+ * $session = \ORM\Controller\Session::GetSession(true);
  * $session->set("i", 1, false);
  * $session->set("j", 1, false);
  * $session->set("k", 1);
@@ -30,7 +30,7 @@ namespace ORM\Controller;
  * Where data only needs to be retrieved:
  *
  * @code
- * $session = \ORM\Controller\Session::getSession();
+ * $session = \ORM\Controller\Session::GetSession();
  * $i = $session->get("i");
  * echo "The value of i is $i";
  * @endcode
@@ -39,7 +39,7 @@ namespace ORM\Controller;
  *
  * @code
  * // Construction results in loading with a default of non-blocking behaviour
- * $session = \ORM\Controller\Session::getSession();
+ * $session = \ORM\Controller\Session::GetSession();
  *
  * // How to set variables.
  *
@@ -111,7 +111,7 @@ class Session {
      *
      * @return Session
      */
-    public static function &getSession($lock = false) {
+    public static function &GetSession($lock = false) {
         if ( is_null(static::$_staticSession) ) {
             $calledClass = get_called_class();
             static::$_staticSession = new $calledClass();
