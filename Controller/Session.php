@@ -104,8 +104,7 @@ class Session {
      * Session is a singleton class
      *
      */
-    private function __construct() {
-    }
+    private function __construct() {}
 
     /**
      * Get the static Session instance and instantiate if necessary

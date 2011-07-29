@@ -25,8 +25,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      * Currently this does not do anything, but it is required for using this
      * as a PDO::ATTR_STATEMENT_CLASS
      */
-    protected function __construct() {
-    }
+    protected function __construct() {}
     
     /**
      * For simplicity, the fetch method has fewer options when using the DataStatement

@@ -293,8 +293,7 @@ abstract class BaseController {
      * 
      * @see afterAction()
      */
-    public function beforeAction() {
-    }
+    public function beforeAction() {}
     
     /**
      * Called after the action method is called
@@ -307,6 +306,5 @@ abstract class BaseController {
      * 
      * @see beforeAction()
      */
-    public function afterAction() {
-    }
+    public function afterAction() {}
 }
