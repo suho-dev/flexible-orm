@@ -77,7 +77,7 @@ namespace ORM;
  * - <b>Step 4: \subpage intro_step4 "Access your data!"</b>
  *
  * \section using_the_documentation Using This Documentation
- * This documentation comes in two parts, the \ref getting_started "Getting Started"
+ * This documentation comes in two parts, the <i>Getting Started</i>
  * tutorial and the API docs.
  *
  * - ORM Key API Classes
