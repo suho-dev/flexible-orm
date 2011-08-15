@@ -16,6 +16,37 @@ namespace ORM;
  */
 abstract class ORM_Core {
     /**
+     * Optional array of aliases for field names in the database
+     * 
+     * For example, if you have a database with fields \c my_first_address
+     * and \c first_name you may wish to have them accessable through different
+     * object properties:
+     * 
+     * @code
+     * $myClass->firstName; // references 'first_name'
+     * $myClass->address;   // references 'my_first_address'
+     * @endcode
+     * 
+     * \n\n
+     * To do this, you would define the \c FIELD_ALIASES constant in your class:
+     * @code
+     * class MyClass extends ORM_Core {
+     *     const FIELD_ALIASES = array(
+     *          'first_name'        => 'firstName',
+     *          'my_first_address'  => 'address',
+     *     );
+     * }
+     * @endcode
+     * 
+     * \note Will not affect the occasions where SQL is used directly, eg when
+     *       supplying a 'where' option to a Find function. The recommendation
+     *       when using SQL is to call the FieldAlias() function.
+     * 
+     * @var array $_fieldAliases
+     */
+    protected static $_fieldAliases = array();
+    
+    /**
      * Array of key > values of fields with errors.
      * 
      * @see errorMessages()
@@ -257,5 +288,53 @@ abstract class ORM_Core {
                 $this->$field = $value;
             }
         }
+    }
+    
+    /**
+     * Translate a database field name to a model property name
+     * 
+     * If no alias has been defined for this field in \c $_fieldAliases then
+     * the model property and field name will be identical.
+     * 
+     * @see Opposite of TranslatePropertyToField()
+     *      Aliases are defined in $_fieldAliases
+     * @param string $fieldName
+     *      The field name in the database
+     * @return string 
+     *      Model property name
+     */
+    public static function TranslateFieldToProperty( $fieldName ) {
+        return isset(static::$_fieldAliases[$fieldName]) ? static::$_fieldAliases[$fieldName] : $fieldName;
+    }
+    
+    /**
+     * Translate a model property name to a database field name
+     * 
+     * If no alias has been defined in \c $_fieldAliases then the database
+     * field name will be identical to the model property name.
+     * 
+     * @see $_fieldAliases
+     *      Opposite of TranslateFieldToProperty()
+     * @param string $propertyName
+     *      The property name in the model
+     * @return string
+     *      The field name in the database for this model (will default to $propertyName
+     *      if no alias is set.
+     */
+    public static function TranslatePropertyToField( $propertyName ) {
+        $fieldName = array_search( $propertyName, static::$_fieldAliases );
+        return $fieldName === false ? $propertyName : static::$_fieldAliases[$fieldName];
+    }
+    
+    /**
+     * An alias for TranslatePropertyToField()
+     *  
+     * @param string $propertyName
+     *      The property name in the model
+     * @return string
+     *      The field name in the database for this model
+     */
+    public static function FieldAlias( $propertyName ) {
+        return static::TranslatePropertyToField( $propertyName );
     }
 }

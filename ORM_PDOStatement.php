@@ -171,8 +171,9 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
 
                 if ( $classDestination == '' || $class == $classDestination ) {
                     // This is the requested (base) class
-                    $object->$property = $value;
-                    $object->setOriginalValue($property, $value);
+                    $propertyName = $object->TranslateFieldToProperty($property);
+                    $object->{$propertyName} = $value;
+                    $object->setOriginalValue($propertyName, $value);
                     
                 } else {
                     // This is not the requested class, rather it's a subclass
@@ -188,8 +189,10 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
                         $object->$classDestination = new $fullClassName;
                     }
 
-                    // Set the value $class property
-                    $object->$classDestination->$property = $value;
+                    // Set the value $class property (using the alias to convert the field name into a property name)
+                    $propertyName = $object->$classDestination->TranslateFieldToProperty($property);
+                    $object->$classDestination->{$propertyName} = $value;
+                    $object->$classDestination->setOriginalValue($propertyName, $value);
                 }
             }
 

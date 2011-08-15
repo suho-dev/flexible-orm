@@ -99,6 +99,14 @@ class ORM_CoreTest extends ORMTest {
 
         $this->assertEquals(array(), $this->object->changedFields() );
     }
+    
+    public function testTranslateFieldToProperty() {
+        $this->assertEquals('doors', Mock\Car::TranslateFieldToProperty('doors'));
+    }
+    
+    public function testTranslatePropertyToField() {
+        $this->assertEquals('doors', Mock\Car::TranslatePropertyToField('doors'));
+    }
 
 }
 

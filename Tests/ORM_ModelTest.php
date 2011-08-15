@@ -9,13 +9,25 @@ namespace ORM\Tests;
 use \ORM\Tests\Mock, \ORM\PDOFactory, \ORM\DEBUG;
 
 require_once 'ORMTest.php';
-PDOFactory::GetFactory()->startProfiling();
 
+PDOFactory::Get("TRUNCATE TABLE `cars`")->execute();
 
 /**
  * Test class for ORM_Model
  */
 class ORM_ModelTest extends ORMTest {
+    public function setUp() {
+        PDOFactory::Get("INSERT INTO `cars` (`id`, `brand`, `colour`, `doors`, `owner_id`, `name`, `age`, `type`) VALUES
+            (1, 'Alfa Romeo', 'red', 4, 1, '156Ti', 4, 'Sedan'),
+            (2, 'Volkswagen', 'black', 5, 1, NULL, 0, NULL),
+            (3, 'Volkswagen', 'black', 2, 2, NULL, 0, NULL),
+            (4, 'Toyota', 'White', 4, 2, NULL, 62, NULL)")->execute();
+    }
+    
+    public function tearDown() {
+        PDOFactory::Get("TRUNCATE TABLE `cars`")->execute();
+    }
+    
     public function testTableName() {
         $this->assertEquals(
             'cars',

@@ -230,6 +230,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *      Return the ModelCollection of objects
      */
     public static function FindAllBy( $field, $value, $operator = '=', $findWith = false ) {
+        $field      = static::TranslatePropertyToField( $field );
         $df         = static::DataFactory();
         $className  = static::ClassName();
         $sql        = static::_BuildSQL(
@@ -288,6 +289,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *      The total number of values that match this query
      */
     public static function CountFindAllBy( $field, $value, $operator = '=' ) {
+        $field      = static::TranslatePropertyToField( $field );
         $df         = static::DataFactory();
         $className  = static::ClassName();
         $sql        = static::_BuildSQL(
@@ -387,6 +389,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * @return ORM_Model
      */
     public static function FindBy( $field, $value, $findWith = false ) {
+        $field      = static::TranslatePropertyToField( $field );
         $df         = static::DataFactory();
         $tableName  = static::ClassName();
         $sql        = static::_BuildSQL(
@@ -879,13 +882,17 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *
      * This is assumed to be <i>"id"</i> except for models where the constant \c PRIMARY_KEY
      * has been set.
+     * 
+     * Will be effected by TranslatePropertyToField().
      *
      * See \ref intro_step2 "Getting Started: 2. Define Model Classes" for more information
      * 
      * @return string
      */
     public static function PrimaryKeyName() {
-        return defined("static::PRIMARY_KEY") ? static::PRIMARY_KEY : 'id';
+        return static::TranslatePropertyToField(
+            defined("static::PRIMARY_KEY") ? static::PRIMARY_KEY : 'id'
+        );
     }
 
     /**
@@ -960,16 +967,17 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *      (ie it's not a MySQL table or it's not an ENUM field).
      */
     public static function PossibleValues( $fieldName ) {
-        $query = PDOFactory::Get('SHOW COLUMNS FROM `' . static::TableName() . '` LIKE "' . $fieldName . '"');
+        $fieldName  = static::TranslatePropertyToField( $fieldName );
+        $query      = PDOFactory::Get('SHOW COLUMNS FROM `' . static::TableName() . '` LIKE "' . $fieldName . '"');
         $query->execute();
 
-        $results = $query->fetch();
-        $fields  = array();
+        $results    = $query->fetch();
+        $fields     = array();
 
         if ( preg_match_all('/\'(.*?)\'/', $results[1], $fieldsZeroIndexed) ) {
             // Convert to 1-indexed array
             $fields = array_combine(
-                    range( 1, count($fieldsZeroIndexed[1]) ),
+                    range( 1 ,count($fieldsZeroIndexed[1])),
                     $fieldsZeroIndexed[1]
             );
         }
