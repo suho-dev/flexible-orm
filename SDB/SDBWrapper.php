@@ -86,17 +86,17 @@ abstract class SDBWrapper {
      */
     public static function SDBRegion() {
         switch(Configuration::AWS()->region) {
-            case 'us-east':
-                return false;
-            case 'us-west':
-                return \AmazonSDB::REGION_US_W1;
-            case 'ap-northeast':
-                return \AmazonSDB::REGION_APAC_NE1;
-            case 'eu-west':
-                return \AmazonSDB::REGION_EU_W1;
-            case 'ap-southeast':
-            default:
-                return \AmazonSDB::REGION_APAC_SE1;
+        case 'us-east':
+            return false;
+        case 'us-west':
+            return \AmazonSDB::REGION_US_W1;
+        case 'ap-northeast':
+            return \AmazonSDB::REGION_APAC_NE1;
+        case 'eu-west':
+            return \AmazonSDB::REGION_EU_W1;
+        case 'ap-southeast':
+        default:
+            return \AmazonSDB::REGION_APAC_SE1;
         }
     }
     
@@ -132,7 +132,9 @@ abstract class SDBWrapper {
      * @return AmazonSDB
      */
     public static function GetSDBConnection() {
-        if ( is_null(self::$_sdb) ) self::_InitSDBConnection();
+        if ( is_null(self::$_sdb) ) {
+            self::_InitSDBConnection();
+        }
         
         return self::$_sdb;
     }

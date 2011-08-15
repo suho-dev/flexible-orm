@@ -67,7 +67,7 @@ class NextTokenCache {
     public static function GetNearestToken( $query, $limit, $offset ) {
         do {
             $token = self::GetToken( $query, $limit, $offset-- );
-        } while( $offset > 0 && $token === false );
+        } while ( $offset > 0 && $token === false );
         
         return $token ? array( ++$offset, $token ) : array( 0, false );
     }

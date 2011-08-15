@@ -73,7 +73,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      * Iterpret the result of a select operation into a 2-dimensional array
      * of items and their attributes.
      */
-    private function _getSelectResult()  {
+    private function _getSelectResult() {
         $items = $this->body->SelectResult->Item();
 
         if ( $items ) {
@@ -203,7 +203,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
             }
             
             // Continue querying SDB until all items have been fetched or limit is reached
-            while( (is_null($resultsLimit) || (count($this->_items) < $resultsLimit)) && $result->nextToken() ) {
+            while ( (is_null($resultsLimit) || (count($this->_items) < $resultsLimit)) && $result->nextToken() ) {
                 $limitRemaining = is_null($resultsLimit) ? $limit : $this->_limitRemaining($limit, $offset, $currentOffset);
                 
                 $result = SDBStatement::Query(
@@ -215,7 +215,9 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
                 $currentOffset += count($result);
                 NextTokenCache::Store("$query LIMIT $limitRemaining", $limit, $currentOffset, $result->nextToken());
                 
-                if ( ++$count > self::MAX_QUERIES ) break;
+                if ( ++$count > self::MAX_QUERIES ) {
+                    break;
+                }
             }
         }
         

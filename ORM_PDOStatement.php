@@ -97,7 +97,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
         $objects    = new ModelCollection();
         $class      = basename(str_replace('\\', '/', $className));
 
-        while( $object = $this->_getObject($className, $qualifiedColumnNames) ) {
+        while ( $object = $this->_getObject($className, $qualifiedColumnNames) ) {
             $objects[] = $object;
         }
         
@@ -312,7 +312,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
         $output      = '';
         $count       = 1;
         
-        while( $quotedToken !== false ) {
+        while ( $quotedToken !== false ) {
             if ( $count++ % 2 ) {
                 $output .= $quotedToken;
             }

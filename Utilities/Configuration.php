@@ -117,7 +117,9 @@ class Configuration {
      * @return mixed
      */
     public static function Value( $attribute, $group = null ) {
-        if ( is_null(self::$_settings) ) self::$_settings = new Configuration();
+        if ( is_null(self::$_settings) ) {
+            self::$_settings = new Configuration();
+        }
         
         return self::$_settings->_getValue( $attribute, $group );
     }
@@ -138,7 +140,9 @@ class Configuration {
      * @return void
      */
     public static function Load( $ini_file ) {
-        if ( is_null(self::$_settings) ) self::$_settings = new Configuration();
+        if ( is_null(self::$_settings) ) {
+            self::$_settings = new Configuration();
+        }
 
         self::$_settings->_add( parse_ini_file($ini_file, true) );
     }
@@ -241,7 +245,9 @@ class Configuration {
      *      The requested property value
      */
     public static function __callStatic( $group, $arguments ) {
-        if ( is_null(self::$_settings) ) self::$_settings = new Configuration();
+        if ( is_null(self::$_settings) ) {
+            self::$_settings = new Configuration();
+        }
 
         if ( isset($arguments[0]) ) {
             return self::$_settings->_getValue( $arguments[0], $group );

@@ -117,7 +117,7 @@ class PDOFactory implements Interfaces\DataFactory {
         
         try {
             $this->_db = new \PDO( $dsn, $db_user, $db_pswd );
-            $this->_db->setAttribute( \PDO::ATTR_EMULATE_PREPARES, TRUE);
+            $this->_db->setAttribute( \PDO::ATTR_EMULATE_PREPARES, true);
             $this->_db->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->_db->setAttribute( \PDO::ATTR_STATEMENT_CLASS, array(__NAMESPACE__.'\ORM_PDOStatement'));
         } catch( \PDOException $e ) {
@@ -136,7 +136,7 @@ class PDOFactory implements Interfaces\DataFactory {
     private function _setDatabaseType( &$dsn ) {
         list( $this->_databaseType, ) = explode( ':', $dsn, 2 );
         
-        if( $this->_databaseType == 'sqlsrv' ) {
+        if ( $this->_databaseType == 'sqlsrv' ) {
             $dsn = preg_replace( array('/host=/','/dbname=/'), array('Server=', 'Database='), $dsn );
         }
     }
@@ -199,17 +199,17 @@ class PDOFactory implements Interfaces\DataFactory {
     
     private function _convertToCompatibleSQL( $sql ) {
         switch( $this->databaseType() ) {
-            case 'sqlsrv':
-                $compatibleSql = preg_replace( "/LIMIT \d+/", '', $sql );
-                $compatibleSql = str_replace( '`', '', $compatibleSql );
-                break;
-                
-            case 'pgsql':
-                $compatibleSql = str_replace( '`', '', $sql );
-                break;
-            
-            default:
-                $compatibleSql = $sql;
+        case 'sqlsrv':
+            $compatibleSql = preg_replace( "/LIMIT \d+/", '', $sql );
+            $compatibleSql = str_replace( '`', '', $compatibleSql );
+            break;
+
+        case 'pgsql':
+            $compatibleSql = str_replace( '`', '', $sql );
+            break;
+
+        default:
+            $compatibleSql = $sql;
         }
         
         return $compatibleSql;
@@ -341,15 +341,15 @@ class PDOFactory implements Interfaces\DataFactory {
      */
     public function fieldNames( $table ) {
         switch( $this->databaseType() ) {
-            case 'sqlite':
-                return $this->_describeTableSQLite( $table );
-            case 'pgsql':
-                return $this->_describeTablePostgres( $table );
-            case 'sqlsrv':
-                return $this->_describeTableMSSql( $table );
-            case 'mysql':
-            default:
-                return $this->_describeTableMysql( $table );
+        case 'sqlite':
+            return $this->_describeTableSQLite( $table );
+        case 'pgsql':
+            return $this->_describeTablePostgres( $table );
+        case 'sqlsrv':
+            return $this->_describeTableMSSql( $table );
+        case 'mysql':
+        default:
+            return $this->_describeTableMysql( $table );
         }
     }
     

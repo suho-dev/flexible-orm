@@ -227,7 +227,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      */
     public function bindValues( $values ) {
         foreach ($values as $key => $value ) {
-            if ( is_numeric($key) ){
+            if ( is_numeric($key) ) {
                 $this->_bindAnonymousValue( $value );
             } else {
                 $this->bindValue( $key, $value );
@@ -380,7 +380,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $output      = '';
         $count       = 1;
 
-        while( $quotedToken !== false ) {
+        while ( $quotedToken !== false ) {
             if ( $count++ % 2 ) {
                 $output .= $quotedToken;
             }
@@ -405,7 +405,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $offset     = 0;
         $length     = strlen($this->_queryString);
         
-        while( ($i = strpos($this->_queryString, "'", $offset)) !== false && $offset < $length ) {
+        while ( ($i = strpos($this->_queryString, "'", $offset)) !== false && $offset < $length ) {
             if ( $insideQuotes ) {
                 // Currently inside a quoted block
                 if ( substr($this->_queryString, $i+1, 1) != "'" ) {
@@ -453,20 +453,20 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $queryType = $this->queryType();
 
         switch( $queryType ) {
-            case 'INSERT':
-                return $this->_emulateInsert();
-                
-            case 'UPDATE':
-                return $this->_emulateUpdate();
-                
-            case 'DELETE':
-                return $this->_emulateDelete();
-                
-            case 'SELECT':
-                return $this->_executeFetchQuery();
-                
-            default:
-                throw new \ORM\Exceptions\ORMPDOException("Unsupported query type $queryType");
+        case 'INSERT':
+            return $this->_emulateInsert();
+
+        case 'UPDATE':
+            return $this->_emulateUpdate();
+
+        case 'DELETE':
+            return $this->_emulateDelete();
+
+        case 'SELECT':
+            return $this->_executeFetchQuery();
+
+        default:
+            throw new \ORM\Exceptions\ORMPDOException("Unsupported query type $queryType");
         }
     }
     
@@ -559,7 +559,9 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         
         if ( $itemNamePresent > 1 ) {
             $i = array_search(':itemName[]', $values);
-            if ( $i !== false ) $values[$i] = ':itemName()';
+            if ( $i !== false ) {
+                $values[$i] = ':itemName()';
+            }
         }
 
         $attributes = array();
@@ -685,7 +687,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     private function _emulateDelete() {
         $this->_simplifyQuery();
         
-        if ( preg_match( '/DELETE FROM ([a-z_0-9A-Z]+) WHERE itemName\(\) = \'([^\']*)/i', $this->_queryString, $matches ) ){
+        if ( preg_match( '/DELETE FROM ([a-z_0-9A-Z]+) WHERE itemName\(\) = \'([^\']*)/i', $this->_queryString, $matches ) ) {
             // There is only going to be one item to delete
             return self::$_sdb->delete_attributes( $matches[1], $matches[2] )->isOK();
         } else {
@@ -717,7 +719,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $count = 0;
         do {
             $itemName = mt_rand( 1, mt_getrandmax() );
-        } while( count(self::$_sdb->get_attributes($domain, $itemName)) && ++$count < 20 );
+        } while ( count(self::$_sdb->get_attributes($domain, $itemName)) && ++$count < 20 );
 
         return $itemName;
     }
@@ -847,24 +849,26 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * @return array|false
      */
     public function fetch( $fetch_style = self::FETCH_BOTH ) {
-        if ( count($this->_items) === 0 ) return false;
+        if ( count($this->_items) === 0 ) {
+            return false;
+        }
         
         $result = array_shift($this->_items);
 
         switch( $fetch_style) {
-            case self::FETCH_ARRAY:
-                return array_values($result);
+        case self::FETCH_ARRAY:
+            return array_values($result);
 
-            case self::FETCH_ASSOC:
-                return $result;
+        case self::FETCH_ASSOC:
+            return $result;
 
-            case self::FETCH_BOTH:
-                return array_merge(array_values($result), $result);
+        case self::FETCH_BOTH:
+            return array_merge(array_values($result), $result);
 
-            default:
-                throw new \ORM\Exceptions\ORMFetchException(
-                        "Unknown fetch style $fetch_style"
-                );
+        default:
+            throw new \ORM\Exceptions\ORMFetchException(
+                "Unknown fetch style $fetch_style"
+            );
         }
         
     }
@@ -896,7 +900,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         if ( $fetch_style == self::FETCH_ASSOC ) {
             $results = $this->_items;
         } else {
-            while( $results[] = $this->fetch($fetch_style) ) {}
+            while ( $results[] = $this->fetch($fetch_style) ) {}
             array_pop($results);
         }
         
@@ -1012,12 +1016,12 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      */
     public function attributes() {
         switch($this->queryType()) {
-            case 'INSERT':
-                return $this->_getAttributesFromInsertQuery($this->_queryString);
-            case 'UPDATE':
-                return $this->_getAttributesFromUpdateQuery();
-            default:
-                return array();
+        case 'INSERT':
+            return $this->_getAttributesFromInsertQuery($this->_queryString);
+        case 'UPDATE':
+            return $this->_getAttributesFromUpdateQuery();
+        default:
+            return array();
         }
     }
 }
