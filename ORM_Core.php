@@ -28,10 +28,10 @@ abstract class ORM_Core {
      * @endcode
      * 
      * \n\n
-     * To do this, you would define the \c FIELD_ALIASES constant in your class:
+     * To do this, you would define the \c $_fieldAliases variable in your class:
      * @code
      * class MyClass extends ORM_Core {
-     *     const FIELD_ALIASES = array(
+     *     protected static $_fieldAliases = array(
      *          'first_name'        => 'firstName',
      *          'my_first_address'  => 'address',
      *     );
@@ -319,7 +319,7 @@ abstract class ORM_Core {
      *      The property name in the model
      * @return string
      *      The field name in the database for this model (will default to $propertyName
-     *      if no alias is set.
+     *      if no alias is set).
      */
     public static function TranslatePropertyToField( $propertyName ) {
         $fieldName = array_search( $propertyName, static::$_fieldAliases );
