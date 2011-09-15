@@ -4,6 +4,7 @@
  * @author jarrod.swift
  */
 namespace ORM;
+use \PDO;
 
 /**
  * Custom PDOStatement class allowing better integration with ORM_Model
@@ -34,7 +35,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      * @param int $fetch_style
      * @return mixed
      */
-    public function fetch( $fetch_style = \PDO::FETCH_BOTH ) {
+    public function fetch( $fetch_style = PDO::FETCH_BOTH, $cursor_orientation = null, $cursor_offset = null) {
         return parent::fetch( $fetch_style );
     }
 
@@ -347,7 +348,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      *      parameters in the SQL statement being executed. See PDOStatement->execute()
      * @return bool
      */
-    public function execute( array $input = null) {
+    public function execute( $input = null) {
         try{
             return parent::execute($input);
 

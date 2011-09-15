@@ -18,7 +18,7 @@ interface DataStatement {
      * 
      * @see http://www.php.net/manual/en/pdostatement.execute.php
      */
-    public function execute( array $values = null );
+    public function execute( $values = null );
     
     /**
      * Bind a variable to a placeholder
@@ -49,7 +49,7 @@ interface DataStatement {
      * Fetch a row from the database
      * @see http://www.php.net/manual/en/pdostatement.fetch.php
      */
-    public function fetch( $fetch_style );
+    public function fetch( $fetch_style, $cursor_orientation, $cursor_offset );
     
     /**
      * Fetch the results of the query in to an object of this classname

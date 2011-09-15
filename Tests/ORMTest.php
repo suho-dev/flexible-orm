@@ -10,7 +10,7 @@ namespace ORM\Tests;
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../AutoLoader.php';
-require_once __DIR__ . '/../../plugins/aws-sdk-1.3.7/sdk.class.php';
+require_once __DIR__ . '/../../plugins/aws-sdk-1.4.0.1/sdk-1.4.0.1/sdk.class.php';
 
 \ORM\Utilities\Configuration::Load(__DIR__.'/test.ini');
 \ORM\Utilities\Configuration::SetCacheClass('\ORM\Utilities\Cache\APCCache');

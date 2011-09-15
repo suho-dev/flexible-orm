@@ -444,7 +444,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * @return boolean
      *      True on success.
      */
-    public function execute( array $values = null ) {
+    public function execute( $values = null ) {
         if ( !is_null($values) ) {
             $this->bindValues( $values );
         }
@@ -848,7 +848,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      *          the return order.
      * @return array|false
      */
-    public function fetch( $fetch_style = self::FETCH_BOTH ) {
+    public function fetch( $fetch_style = self::FETCH_BOTH, $cursor_orientation = null, $cursor_offset = null ) {
         if ( count($this->_items) === 0 ) {
             return false;
         }
