@@ -117,10 +117,28 @@ abstract class SDBWrapper {
      */
     private static function _GetAWSKeys() {
         $aws        = Configuration::AWS();
-        $key        = $aws->key ?: AWS_KEY;
-        $secret_key = $aws->secret_key ?: AWS_SECRET_KEY;
+        $key        = $aws->key         ?: self::_GetAWSKeyID();
+        $secret_key = $aws->secret_key  ?: self::_GetAWSSecretKey();
         
         return array( $key, $secret_key );
+    }
+    
+    /**
+     * Attempt to determine the AWS key from the constant AWS_KEY
+     * @return string
+     *      The AWS key if defined, otherwise a blank string.
+     */
+    private static function _GetAWSKeyID() {
+        return defined('AWS_KEY') ? AWS_KEY : '';
+    }
+    
+    /**
+     * Attempt to determine the AWS secret key from the constant AWS_SECRET_KEY
+     * @return string
+     *      The secret key if defined, otherwise a blank string
+     */
+    private static function _GetAWSSecretKey() {
+        return defined('AWS_SECRET_KEY') ? AWS_SECRET_KEY : '';
     }
     
     /**
