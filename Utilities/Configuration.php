@@ -255,7 +255,7 @@ class Configuration {
             return self::$_settings->_getGroup( $group );
         }
     }
-
+    
     /**
      * Send the current settings to the Debug class
      */
