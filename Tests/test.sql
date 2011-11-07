@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS `cars` (
   `doors` int(1) NOT NULL,
   `owner_id` int(11) NOT NULL,
   `name` varchar(32) DEFAULT NULL,
+  `type`  ENUM(  'Sedan',  'Coupe' ) NOT NULL DEFAULT  'Sedan',
   `age` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
