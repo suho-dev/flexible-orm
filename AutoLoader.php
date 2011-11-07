@@ -2,44 +2,65 @@
 /**
  * @file
  * @author jarrod.swift
+ * @version 2.0
  */
 namespace ORM;
 
-require 'Utilities/Configuration.php';
-require 'Utilities/ConfigurationGroup.php';
-
 /**
  * Simple autoloading class for ORM
- *
+ * 
  * Rules followed:
  * - If there is no namespace for the class, then it will try to \c require
  *  the file with \c EXTENSION in both lower and uppercase
  * - If it cannot find a file, does nothing (meaning you just add to the autoload
  *  stack if you need a more complex loader)
- * - If the namespace begins with a package name that is recorded in the Configuration
+ * - If the namespace begins with a package name that is known to the class
  *  (see below) then it will attempt to load it from the specified location
  * - Case must either match exactly or be all lowercase
  *
- * Also includes a Zend style loader (loadZend) which searches the include path
+ * Also includes a Zend style loader (\c AUTOLOAD_STYLE_ZEND) which searches the include path
  * for the class, replacing underscores with "/".
  *
+ * <b>Changes</b>
+ * \note    Version 2: You now need to explicitly call register() to use this class automatically
+ * \note    Version 2: To make it more flexible, the AutoLoader no longer automatically uses the Configuration class
+ *          to load package locations.
+ * 
+ * 
+ * \n
  * \n<b>Packages</b>
- *
+ * To autoload packages, supply the Autoloader object with an associative array, array keys are package names
+ * and values are path names.
+ * 
+ * <b>Usage</b>
+ * The following is the recommended method of boot-strapping the autoloader for flexible-orm
+ * use.
+ * 
  * In the application configuration, you can include a "packages" group which
  * identifies where the autoloader should look for classes. For example:
  *
  * @code
- * #INI File
+ * #INI File "my-application.ini"
  * [packages]
- * ORM          = "/path/to/orm"
  * MyNamespace  = "/path/to/my/namespace"
+ * APlugin      = "/path/to/plugins/aplugin"
  * @endcode
  *
- * This INI file defines that if the root namespace of a class is \c ORM, then
- * look in \c /path/to/orm. It will then use further namespaces as folders within
- * this path. For example it would look for <code>ORM\\Mock\\Car</code> in
- * <code>/path/to/orm/Mock/Car.php</code> (or <code>/path/to/orm/mock/car.php</code>
- * if the former does not exist).
+ * So if you asked for MyNamespace\User, it would look in /path/to/my/namespace/User.
+ * 
+ * @code
+ * // -- PHP Implementation
+ * use \ORM;
+ * use \ORM\Utilities\Configuration;
+ * 
+ * require 'flexible-orm/AutoLoader.php';
+ * 
+ * $loader = new AutoLoader();
+ * $loader->register();
+ * 
+ * Configuration::Load('my-application.ini');
+ * $loader->setPackageLocations( Configuration::packages()->toArray() );
+ * @endcode
  *
  * For more information see the \ref autoloader_tut "Autoloader Tutorial".
  */
@@ -48,30 +69,75 @@ class AutoLoader {
      * The extensions to add to the class name for finding class files
      */
     const EXTENSION = '.php';
-
+    
     /**
-     * @var AutoLoader $_autoLoader
-     */
-    private static $_autoLoader;
-
-    /**
-     * AutoLoader is a singleton class
-     *
-     * @see Get()
-     */
-    private function __construct() {}
-
-    /**
-     * Get the AutoLoader instance
      * 
-     * @return AutoLoader
+     * @see register()
      */
-    public static function Get() {
-        if ( is_null(self::$_autoLoader) ) {
-            self::$_autoLoader = new Autoloader();
-        }
+    const AUTOLOAD_STYLE_FORM = 1;
+    
+    /**
+     * 
+     * @see register()
+     */
+    const AUTOLOAD_STYLE_ZEND = 2;
+    
+    /**
+     * 
+     * @see register()
+     */
+    const AUTOLOAD_STYLE_BOTH = 3;
+    
+    /**
+     * Array of namespaces and the directories to find these namespaces in
+     * @var array $_packageLocations
+     */
+    protected $_packageLocations = array();
 
-        return self::$_autoLoader;
+    /**
+     * Set the known packages and create an AutoLoader
+     * 
+     * If no location is set for \c ORM, this will automatically assume the current
+     * directory is the location for the \c ORM package. This can be overriden in
+     * setPackageLocations().
+     * 
+     * @param array $packages 
+     *      [optional] Array where keys are package names and values are locations to find
+     *      the class files for these packages
+     * 
+     * @see setPackageLocations()
+     */
+    public function __construct( array $packages = array() ) {
+        $this->_packageLocations = $packages;
+        
+        if( !array_key_exists(__NAMESPACE__ ,$this->_packageLocations) ) {
+            $this->_packageLocations[__NAMESPACE__] = __DIR__;
+        }
+    }
+    
+    /**
+     * Get the list of known packages and their locations
+     * @return array
+     */
+    public function getPackageLocations() {
+        return $this->_packageLocations;
+    }
+    
+    /**
+     * Set the list of known packages and their locations
+     * 
+     * If no location is set for \c ORM, this will automatically assume the current
+     * directory is the location for the \c ORM package. This can be overriden by including
+     * an array key named ORM.
+     * 
+     * @param array $packages 
+     */
+    public function setPackageLocations( array $packages ) {
+        $this->_packageLocations = $packages;
+        
+        if( !array_key_exists(__NAMESPACE__ ,$this->_packageLocations) ) {
+            $this->_packageLocations[__NAMESPACE__] = __DIR__;
+        }
     }
 
     /**
@@ -127,16 +193,13 @@ class AutoLoader {
     /**
      * Get the path of a package
      *
-     * @todo test this
      * @param string $class
      *      Class name to use as package name locate
      * @return string|false
      *      Returns path or false if unknown package
      */
     public function locatePackage( $class ) {
-        $packages = Utilities\Configuration::packages();
-
-        foreach ( $packages as $package => $path ) {
+        foreach ( $this->_packageLocations as $package => $path ) {
             if ( preg_match("/^\\\?$package\\\(.*)$/", $class, $matches ) ) {
                 return $path.'/'.str_replace('\\', '/', $matches[1]);
             }
@@ -196,21 +259,26 @@ class AutoLoader {
             return strtolower($pathName);
         }
     }
-
+    
     /**
-     * Register the autoloaders
+     * Register this autoloader
+     * 
+     * @param int $loaderType 
+     *      [optional] Which autoloader styles to register. May be either AUTOLOAD_STYLE_FORM,
+     *      AUTOLOAD_STYLE_ZEND or AUTOLOAD_STYLE_BOTH. Default is both.
      */
-    public static function RegisterAutoloaders() {
-        spl_autoload_register(function($class){
-            AutoLoader::Get()->load($class);
-        });
-
-        spl_autoload_register(function($class){
-            AutoLoader::Get()->loadZend($class);
-        });
+    public function register( $loaderType = self::AUTOLOAD_STYLE_BOTH ) {
+        $autoloader = $this;
+        if( $loaderType == self::AUTOLOAD_STYLE_BOTH || $loaderType == self::AUTOLOAD_STYLE_FORM ) {
+            spl_autoload_register(function($class) use($autoloader) {
+                $autoloader->load($class);
+            });
+        }
+        
+        if( $loaderType == self::AUTOLOAD_STYLE_BOTH || $loaderType == self::AUTOLOAD_STYLE_ZEND ) {
+            spl_autoload_register(function($class) use($autoloader) {
+                $autoloader->loadZend($class);
+            });
+        }
     }
 }
-
-AutoLoader::RegisterAutoloaders();
-
-?>

@@ -15,6 +15,11 @@ namespace ORM\Utilities;
  */
 class ConfigurationGroup {
     /**
+     * @var array $_options
+     */
+    private $_options;
+    
+    /**
      * Create a new object based on an array of options (usually loaded from
      * and ini file)
      * 
@@ -22,9 +27,7 @@ class ConfigurationGroup {
      *      Associative array of option names and values
      */
     public function __construct( array $options ) {
-        foreach ( $options as $key => $value ) {
-            $this->$key = $value;
-        }
+        $this->_options = $options;
     }
 
     /**
@@ -36,7 +39,14 @@ class ConfigurationGroup {
      *      Will return null in the even the property does not exist
      */
     public function __get( $name ) {
-        return isset($this->$name) ? $this->$name : null;
+        return isset($this->_options[$name]) ? $this->_options[$name] : null;
+    }
+    
+    /**
+     * Get this group as an array
+     * @return array
+     */
+    public function toArray() {
+        return $this->_options;
     }
 }
-?>

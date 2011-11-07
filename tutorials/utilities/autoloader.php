@@ -18,13 +18,30 @@ namespace ORM;
  * the \e Helpdesk package. The AutoLoader will then use this package to determine
  * where the class will be.
  *
+ * To define a list of packages, you need an array where the array keys are package names
+ * and the values are package locations.
+ * 
+ * <b>Example</b>
+ * @code
+ * $autoloader = new AutoLoader(array(
+ *      'Mynamespace'   => '/path/to/my/namespace',
+ *      'Helpdesk'      => '/MyApps/helpdesk'
+ * ));
+ * 
+ * $autoloader->register();
+ * @endcode
+ * 
+ * \n
+ * \subsection autoloader_packages_config Packages using Configuration
+ * You can simply use the supplied Configuration class to load packages
+ * 
  * To define the location of packages, simply add a \c [packages] group to the
  * INI file and define the package names and locations. For example, the following
  * would define where the ORM and Helpdesk packages are located.
  * @code
  * [packages]
- * ORM      = "/path/to/ORM"
- * Helpdesk = "/MyApps/helpdesk"
+ * MyNamespace  = "/path/to/my/namespace"
+ * Helpdesk     = "/MyApps/helpdesk"
  * @endcode
  *
  * This defines the root folder for all classes within this namespace. If an
@@ -34,6 +51,20 @@ namespace ORM;
  * With the above INI file, a call to class \c Helpdesk\\Monitor would
  * look for the file \c /MyApps/helpdesk/Monitor.php
  *
+ * @code
+ * // -- PHP Implementation
+ * use \ORM;
+ * use \ORM\Utilities\Configuration;
+ * 
+ * require 'flexible-orm/AutoLoader.php';
+ * 
+ * $loader = new AutoLoader();
+ * $loader->register();
+ * 
+ * Configuration::Load('my-application.ini');
+ * $loader->setPackageLocations( Configuration::packages()->toArray() );
+ * @endcode
+ * 
  * \n
  * \subsection autoloader_nesting Nested Namespaces
  * Further namespaces after the root are treated as subfolders. This means that
