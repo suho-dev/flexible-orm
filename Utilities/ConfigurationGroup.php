@@ -47,6 +47,6 @@ class ConfigurationGroup {
      * @return array
      */
     public function toArray() {
-        return $this->_options[$name];
+        return $this->_options;
     }
 }
