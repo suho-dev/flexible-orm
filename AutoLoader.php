@@ -29,7 +29,7 @@ namespace ORM;
  * 
  * \n
  * \n<b>Packages</b>
- * You simply supply the Autoloader object with an associative array, array keys are package names
+ * To autoload packages, supply the Autoloader object with an associative array, array keys are package names
  * and values are path names.
  * 
  * <b>Usage</b>
