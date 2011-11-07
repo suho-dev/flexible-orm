@@ -42,6 +42,17 @@ class AutoLoaderTest extends ORMTest {
             $this->autoloader->locate('ORM\Tests\Mock\Owner')
         );
     }
+    
+    function testResetPackageLocations() {
+        $this->autoloader->setPackageLocations(array(
+            'Helpdesk'  => '/server/projects/helpdesk'
+        ));
+        
+        $this->assertEquals(
+            '/server/projects/helpdesk/models/user.php',
+            $this->autoloader->locate('Helpdesk\Models\User')
+        );
+    }
 
     function testLocateUnknownPackage() {
         // Slashes will work either way in Windows, but must be / for *nix servers

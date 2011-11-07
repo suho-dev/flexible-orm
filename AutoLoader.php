@@ -9,8 +9,6 @@ namespace ORM;
 /**
  * Simple autoloading class for ORM
  * 
- * No longer requires the Configuration class, and no longer automatically registers itself.
- *
  * Rules followed:
  * - If there is no namespace for the class, then it will try to \c require
  *  the file with \c EXTENSION in both lower and uppercase
@@ -23,12 +21,14 @@ namespace ORM;
  * Also includes a Zend style loader (\c AUTOLOAD_STYLE_ZEND) which searches the include path
  * for the class, replacing underscores with "/".
  *
- * \note    You now need to explicitly call register() to use this class automatically
+ * <b>Changes</b>
+ * \note    Version 2: You now need to explicitly call register() to use this class automatically
+ * \note    Version 2: To make it more flexible, the AutoLoader no longer automatically uses the Configuration class
+ *          to load package locations.
  * 
+ * 
+ * \n
  * \n<b>Packages</b>
- * To make it more flexible, the AutoLoader no longer automatically uses the Configuration class
- * to load package locations.
- * 
  * You simply supply the Autoloader object with an associative array, array keys are package names
  * and values are path names.
  * 
