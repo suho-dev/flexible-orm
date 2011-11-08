@@ -54,6 +54,7 @@ namespace ORM;
  * use \ORM\Utilities\Configuration;
  * 
  * require 'flexible-orm/AutoLoader.php';
+ * require 'flexible-orm/Utilities/Configuration.php';
  * 
  * $loader = new AutoLoader();
  * $loader->register();
