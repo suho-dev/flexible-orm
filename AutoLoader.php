@@ -131,7 +131,9 @@ class AutoLoader {
      *       directory is the location for the \c ORM package. This can be overriden by including
      *       an array key named ORM.
      * 
-     * @param array $packages 
+     * @param array $packages
+     *      Array where keys are package names and values are locations to find the class files
+     *      for these packages
      */
     public function setPackageLocations( array $packages ) {
         $this->_packageLocations = $packages;
