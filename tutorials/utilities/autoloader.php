@@ -9,6 +9,8 @@ namespace ORM;
  * - Nested namespaces are treated as subfolders, and are case-sensitive
  * - Classes are stored with the extension '.php'
  * - You can define additional autoloaders using spl_autoload
+ * - The package \c ORM is defined by default as the location of the AutoLoader class
+ *   but this can be overriden by defining it in the packages array
  *
  * \n
  * \subsection autoloader_packages Packages

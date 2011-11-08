@@ -71,19 +71,24 @@ class AutoLoader {
     const EXTENSION = '.php';
     
     /**
-     * 
+     * Load only using the package format of flexible-orm (namespaces are folders)
      * @see register()
      */
     const AUTOLOAD_STYLE_FORM = 1;
     
     /**
+     * Load classes only using the Zend Framework 1 format of underscores are
+     * folders.
+     * 
+     * \note Using this method will mean AutoLoader cannot load other flexible-orm
+     *       classes
      * 
      * @see register()
      */
     const AUTOLOAD_STYLE_ZEND = 2;
     
     /**
-     * 
+     * Use both the Zend Framework and the flexible-orm formats.
      * @see register()
      */
     const AUTOLOAD_STYLE_BOTH = 3;
@@ -108,11 +113,7 @@ class AutoLoader {
      * @see setPackageLocations()
      */
     public function __construct( array $packages = array() ) {
-        $this->_packageLocations = $packages;
-        
-        if( !array_key_exists(__NAMESPACE__ ,$this->_packageLocations) ) {
-            $this->_packageLocations[__NAMESPACE__] = __DIR__;
-        }
+        $this->setPackageLocations($packages);
     }
     
     /**
@@ -126,9 +127,9 @@ class AutoLoader {
     /**
      * Set the list of known packages and their locations
      * 
-     * If no location is set for \c ORM, this will automatically assume the current
-     * directory is the location for the \c ORM package. This can be overriden by including
-     * an array key named ORM.
+     * \note If no location is set for \c ORM, this will automatically assume the current
+     *       directory is the location for the \c ORM package. This can be overriden by including
+     *       an array key named ORM.
      * 
      * @param array $packages 
      */
