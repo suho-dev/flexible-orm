@@ -4,6 +4,7 @@
  * @author Pierre Dumuid <pierre.dumuid@sustainabilityhouse.com.au>
  */
 namespace ORM\Controller;
+use \LogicException;
 
 /**
  * A wrapper for the session variables
@@ -22,9 +23,9 @@ namespace ORM\Controller;
  *
  * @code
  * $session = \ORM\Controller\Session::GetSession(true);
- * $session->set("i", 1, false);
- * $session->set("j", 1, false);
- * $session->set("k", 1);
+ * $session->set("i", 1);
+ * $session->set("j", 2;
+ * $session->set("k", 3);
  * @endcode
  *
  * Where data only needs to be retrieved:
@@ -44,10 +45,10 @@ namespace ORM\Controller;
  * // How to set variables.
  *
  * $j = $session->get("j");
- * $session->loadSessionVariable(true);
+ * $session->lock();
  * $i = $session->get("i");
- * $session->set("i",$i + 1,false);   // Good
- * $session->set("j",$j + 1,false);   // BAD - because "j" may have been modified by another script!
+ * $session->set("i",$i + 1);   // Good
+ * $session->set("j",$j + 1);   // BAD - because "j" may have been modified by another script!
  * $session->saveSessionVariable();
  * @endcode
  *
@@ -76,7 +77,7 @@ class Session {
      *
      * @var bool $_locked
      */
-    private $_locked = false;
+    private $_locked;
 
     /**
      * A boolean to determine if the data has not been saved.
@@ -103,26 +104,39 @@ class Session {
     /**
      * Session is a singleton class
      *
+     * @param boolean $lock
+     *      Whether or not to lock the session to allow updating when initially
+     *      created
      */
-    private function __construct() {}
+    private function __construct( $lock ) {
+        if( $lock ) {
+            $this->lock();
+        } else {
+            $this->loadSessionVariable();
+        }
+    }
 
     /**
      * Get the static Session instance and instantiate if necessary
      *
+     * Will re-instantiate the session object if called with a different lock
+     * option.
+     * 
+     * @param boolean $lock
+     *      [optional] Whether to lock the session to allow updating. Defaults to \c false.
      * @return Session
      */
-    public static function &GetSession($lock = false) {
-        if ( is_null(static::$_staticSession) ) {
+    public static function GetSession($lock = false) {
+        if ( is_null(static::$_staticSession) || ($lock != static::$_staticSession->isLocked()) ) {
             $calledClass = get_called_class();
-            static::$_staticSession = new $calledClass();
-            static::$_staticSession->loadSessionVariable($lock);
+            static::$_staticSession = new $calledClass($lock);
         }
 
         return static::$_staticSession;
     }
 
 
-    /*
+    /**
      * Save all the unsaved variables if the PHP script finished
      * without calling saveSessionVariables().
      */
@@ -133,12 +147,12 @@ class Session {
     }
 
 
-    /*
+    /**
      * Destroy the session.
      */
     public function destroySession() {
         session_name(static::SESSION_NAME);
-        if (!$this->_locked) {
+        if (!$this->isLocked()) {
             session_start();
         }
         session_destroy();
@@ -148,41 +162,44 @@ class Session {
     /**
      * Retrieve variables from global session variable and store it in local cache
      */
-    public function loadSessionVariable($lock = false) {
+    public function loadSessionVariable() {
         session_name(static::SESSION_NAME);
-        if (!$this->_locked) {
-            session_start();
-        }
+        session_start();
+        
         $this->_sessionVariableCache = array_key_exists(static::FIELD_NAME, $_SESSION) ? $_SESSION[static::FIELD_NAME] : array();
-        if (!$lock) {
+        
+        if (!$this->isLocked()) {
             session_write_close();
-            $this->_locked = false;
-        } else {
-            $this->_locked = true;
         }
     }
 
     /**
      * Save variables to session
+     * 
+     * \note Calling this will close the session and unlock the Session object
+     * 
+     * @throws LogicException if called when not in locked mode
      */
     public function saveSessionVariable() {
-        if (!$this->_locked) {
-            throw new \LogicException("Session is not in a locked condition, unable to update session variable.");
+        if (!$this->isLocked()) {
+            throw new LogicException("Session is not in a locked condition, unable to update session variable.");
         }
         $_SESSION[static::FIELD_NAME] = $this->_sessionVariableCache;
-        $this->_unsavedData = false;
+        
         session_write_close();
-        $this->_locked = false;
+        
+        $this->_unsavedData = false;
+        $this->_locked      = false;
     }
 
     /**
      * Retrieve a variable from the local cached variable array.
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function &get($var) {
         if (array_key_exists($var, $this->_sessionVariableCache)) {
-            return  $this->_sessionVariableCache[$var];
+            return $this->_sessionVariableCache[$var];
         } else {
             $variableNotValid = null;
             return $variableNotValid;
@@ -192,25 +209,27 @@ class Session {
     /**
      * Set a variable in the local cached variable array.
      *
-     * @return mixed
+     * @throws LogicException if called when Session is not locked
+     * 
+     * @param string $var
+     *      Name of the session variable
+     * @param mixed $value
+     *      The value to save
      */
-    public function set($var, $value, $save = true) {
-        if (!$this->_locked) {
-            throw new \LogicException("Attempt to set session variable when Session is not in a locked condition.");
+    public function set($var, $value) {
+        if (!$this->locked()) {
+            throw new LogicException("Attempt to set session variable when Session is not in a locked condition.");
         }
-        $this->_sessionVariableCache[$var] = $value;
-        if ($save) {
-            $this->saveSessionVariable();
-        } else {
-            $this->_unsavedData = true;
-        }
+        
+        $this->_sessionVariableCache[$var]  = $value;
+        $this->_unsavedData                 = true;
     }
 
     public function clear($var) {
         unset($this->_sessionVariableCache[$var]);
     }
 
-    /*
+    /**
      * Increments the number of times locking has been requested.  To
      * be used in conjunction with unlockStack which indicates a lock
      * release.
@@ -229,32 +248,56 @@ class Session {
      * monitor which file called each lock.
      */
     public function lockStack() {
-        $this->_lockStackIndex++;
-        if ($this->_lockStackIndex == 1) {
-            $this->loadSessionVariable(true);
+        if (++$this->_lockStackIndex === 1) {
+            $this->lock();
         }
-        return ($this->_lockStackIndex);
+        
+        return $this->_lockStackIndex;
     }
 
-    /*
+    /**
      * Decrements the number of times locking has been requested to perform a lock release.
      *
+     * @throws LogicException if stack is unlocked in the wrong order
      * @see lockStack()
      */
     public function unlockStack($lockStackIndex) {
         if ($this->_lockStackIndex != $lockStackIndex) {
-            throw \Exception("Stack was not unlocked in order they were opened.");
+            throw LogicException("Stack was not unlocked in order they were opened.");
         }
-        $this->_lockStackIndex --;
-        if ($this->_lockStackIndex == 0) {
+        
+        if (--$this->_lockStackIndex == 0) {
             $this->saveSessionVariable();
         }
     }
 
-    /*
+    /**
      * Returns if the session is locked.
      */
     public function isLocked() {
         return $this->_locked;
+    }
+    
+    /**
+     * Lock the session for editing to prevent race conditions
+     * 
+     * \note Will update the session variable to the current locked situation
+     */
+    public function lock() {
+        if( !$this->isLocked() ) {
+            $this->_locked = true;
+            $this->loadSessionVariable();
+        }
+    }
+    
+    /**
+     * Unlock the session to allow other requests to be executed
+     * 
+     * @see saveSessionVariable()
+     */
+    public function unlock() {
+        if( $this->isLocked() ) {
+            $this->saveSessionVariable();
+        }
     }
 }
