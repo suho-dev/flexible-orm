@@ -12,8 +12,8 @@ use \ORM\Controller\BaseController,
     \ORM\Tests\Mock\CarsController,
     \ORM\Controller\SmartyTemplate;
 
-set_include_path(get_include_path() . PATH_SEPARATOR . '/server/projects/'  . PATH_SEPARATOR . __DIR__.'/..');
-require_once 'ORMTest.php';
+require_once '../ORMTest.php';
+require 'Smarty/libs/Smarty.class.php';
 
 /**
  * Description of ControllerTest

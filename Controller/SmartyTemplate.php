@@ -6,13 +6,10 @@
 namespace ORM\Controller;
 use \Smarty;
 
-require 'Smarty/libs/Smarty.class.php';
-
 /**
  * Class wrapper for Smarty to implement the Template interface
  *
- * Requires that the Smarty folder is inside a folder in the include path (ie
- * it calls <code>require 'Smarty/libs/Smarty.class.php'</code>).
+ * Requires that the Smarty (obviously).
  * 
  * @see BaseController
  */

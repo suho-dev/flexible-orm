@@ -6,8 +6,7 @@
 namespace ORM\Tests\Controller;
 use \ORM\Controller\Request;
 
-set_include_path(get_include_path(). PATH_SEPARATOR . __DIR__.'/..');
-require_once 'ORMTest.php';
+require_once '../ORMTest.php';
 
 
 /**
@@ -20,8 +19,8 @@ class RequestTest extends \ORM\Tests\ORMTest {
      */
     protected $object;
     
-    private $get  = array( 'id' => 123, 'name' => 'jarrod' );
-    private $post = array( 'name' => 'steve', 'age' => '1notvalid');
+    private $get  = array( 'id'     => 123,     'name'  => 'jarrod' );
+    private $post = array( 'name'   => 'steve', 'age'   => '1notvalid');
     
     public function setUp() {
         $this->object = new Request( $this->get, $this->post );
