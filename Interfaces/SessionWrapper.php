@@ -13,9 +13,18 @@ namespace ORM\Interfaces;
  * @author jarrod.swift
  */
 interface SessionWrapper extends \ArrayAccess {
+    /**
+     * Set the name and start the session
+     */
     public function start( $sessionName );
 
+    /**
+     * Write and close the session
+     */
     public function writeClose();
 
+    /**
+     * Destroy the currently open session
+     */
     public function destroy();
 }

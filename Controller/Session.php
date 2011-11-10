@@ -115,6 +115,10 @@ class Session {
      * @param boolean $lock
      *      Whether or not to lock the session to allow updating when initially
      *      created
+     * @param SessionWrapper $session
+     *      The session wrapper to use with this object. Useful for mocking
+     * 
+     * @see GetSession()
      */
     private function __construct( $lock, SessionWrapper $session ) {
         $this->_session = $session;
