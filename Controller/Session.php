@@ -5,6 +5,7 @@
  */
 namespace ORM\Controller;
 use \LogicException;
+use ORM\Interfaces\SessionWrapper;
 
 /**
  * A wrapper for the session variables
@@ -102,6 +103,11 @@ class Session {
      * Index for the lock stack
      */
     private $_lockStackIndex = 0;
+    
+    /**
+     * @var SessionWrapper $_session
+     */
+    protected $_session;
 
     /**
      * Session is a singleton class
@@ -110,10 +116,13 @@ class Session {
      *      Whether or not to lock the session to allow updating when initially
      *      created
      */
-    private function __construct( $lock ) {
+    private function __construct( $lock, SessionWrapper $session ) {
+        $this->_session = $session;
+        
         if( $lock ) {
             $this->lock();
         } else {
+            $this->_locked = $lock;
             $this->loadSessionVariable();
         }
     }
@@ -126,12 +135,19 @@ class Session {
      * 
      * @param boolean $lock
      *      [optional] Whether to lock the session to allow updating. Defaults to \c false.
+     * @param boolean $session
+     *      [optional] You can supply different session data here. Helpful for mocking in
+     *      unit testing. Will not generate a new Session object if called twice with 
+     *      different SessionWrappers.
      * @return Session
      */
-    public static function GetSession($lock = false) {
+    public static function GetSession($lock = false, SessionWrapper $session = null) {
         if ( is_null(static::$_staticSession) || ($lock != static::$_staticSession->isLocked()) ) {
+            if( is_null($session) ) {
+                $session = new Session\SessionWrapper($_SESSION);
+            }
             $calledClass = get_called_class();
-            static::$_staticSession = new $calledClass($lock);
+            static::$_staticSession = new $calledClass($lock, $session);
         }
 
         return static::$_staticSession;
@@ -153,11 +169,12 @@ class Session {
      * Destroy the session.
      */
     public function destroySession() {
-        session_name(static::SESSION_NAME);
         if (!$this->isLocked()) {
-            session_start();
+            $this->_session->start(static::SESSION_NAME);
         }
-        session_destroy();
+        
+        $this->_sessionVariableCache = array();
+        $this->_session->destroy();
     }
 
 
@@ -165,13 +182,15 @@ class Session {
      * Retrieve variables from global session variable and store it in local cache
      */
     public function loadSessionVariable() {
-        session_name(static::SESSION_NAME);
-        session_start();
+        $this->_session->start(static::SESSION_NAME);
         
-        $this->_sessionVariableCache = array_key_exists(static::FIELD_NAME, $_SESSION) ? $_SESSION[static::FIELD_NAME] : array();
+        $this->_sessionVariableCache = array();
+        if(isset($this->_session[static::FIELD_NAME])) {
+            $this->_sessionVariableCache = $this->_session[static::FIELD_NAME];
+        }
         
         if (!$this->isLocked()) {
-            session_write_close();
+            $this->_session->writeClose();
         }
     }
 
@@ -186,9 +205,9 @@ class Session {
         if (!$this->isLocked()) {
             throw new LogicException("Session is not in a locked condition, unable to update session variable.");
         }
-        $_SESSION[static::FIELD_NAME] = $this->_sessionVariableCache;
         
-        session_write_close();
+        $this->_session[static::FIELD_NAME] = $this->_sessionVariableCache;
+        $this->_session->writeClose();
         
         $this->_unsavedData = false;
         $this->_locked      = false;
@@ -249,7 +268,7 @@ class Session {
      * @return mixed
      */
     public function set($var, $value) {
-        if (!$this->locked()) {
+        if (!$this->isLocked()) {
             throw new LogicException("Attempt to set session variable when Session is not in a locked condition.");
         }
         
