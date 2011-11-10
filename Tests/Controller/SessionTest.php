@@ -86,4 +86,23 @@ class SessionTest extends ORMTest {
         $session->destroySession();
         $this->assertNull( $session->user );
     }
+    
+    public function testMockSessionWrapper() {
+        $wrapper = new MockSessionWrapper(array('x' => 1, 'y' => 2));
+        
+        $wrapper->start();
+        $this->assertEquals( 1, $wrapper['x'] );
+        
+        $wrapper['z'] = 3;
+        
+        $this->assertEquals( 3, $wrapper['z'] );
+    }
+    
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testMockSessionWrapperIncorrectLocking() {
+        $wrapper = new MockSessionWrapper(array('x' => 1, 'y' => 2));
+        $this->assertEquals( 1, $wrapper['x'] );
+    }
 }
