@@ -87,6 +87,20 @@ class SessionTest extends ORMTest {
         $this->assertNull( $session->user );
     }
     
+    /**
+     * @expectedException LogicException
+     */
+    public function testUnlockTwice() {
+        $session = Session::GetSession( true, $this->sessionWrapper );
+        
+        $session->loginCount++;
+        $this->assertEquals( 11, $session->loginCount );
+        $session->unlock();
+        
+        $this->loginCount++;
+        $session->unlock();  
+    }
+    
     public function testMockSessionWrapper() {
         $wrapper = new MockSessionWrapper(array('x' => 1, 'y' => 2));
         

@@ -376,8 +376,6 @@ class Session {
      * @see saveSessionVariable()
      */
     public function unlock() {
-        if( $this->isLocked() ) {
-            $this->saveSessionVariable();
-        }
+        $this->saveSessionVariable();
     }
 }
