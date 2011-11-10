@@ -15,13 +15,14 @@ namespace ORM\Controller\Session;
  */
 class SessionWrapper extends ArrayObject implements ORM\Interfaces\SessionWrapper {
     /**
-     * Start the session
+     * Start the session and load the session variables
      * 
      * @param string $sessionName 
      */
     public function start( $sessionName = 'PHPSESSION' ) {
         session_name( $sessionName );
         session_start();
+        $this->exchangeArray($_SESSION);
     }
 
     /**

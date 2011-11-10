@@ -148,7 +148,7 @@ class Session {
     public static function GetSession($lock = false, SessionWrapper $session = null) {
         if ( is_null(static::$_staticSession) || ($lock != static::$_staticSession->isLocked()) ) {
             if( is_null($session) ) {
-                $session = new Session\SessionWrapper($_SESSION);
+                $session = new Session\SessionWrapper();
             }
             $calledClass = get_called_class();
             static::$_staticSession = new $calledClass($lock, $session);
