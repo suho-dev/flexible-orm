@@ -57,9 +57,6 @@ use ORM\Interfaces\SessionWrapper;
  * $session->unlock();
  * @endcode
  *
- * @todo This should probably lazy-intialise the session variable, otherwise the
- *       session is started and stopped at least twice if lock() is used.
- *
  */
 class Session {
     /**
@@ -113,7 +110,6 @@ class Session {
      */
     private function __construct( SessionWrapper $session ) {
         $this->_session = $session;
-        $this->_loadSessionVariable();
     }
 
     /**
@@ -144,7 +140,7 @@ class Session {
      */
     public function __destruct() {
         if ($this->isLocked()) {
-            $this->saveSessionVariable();
+            $this->_saveSessionVariable();
         }
     }
 
@@ -167,7 +163,6 @@ class Session {
      */
     private function _loadSessionVariable() {
         $this->_session->start(static::SESSION_NAME);
-        $this->_locked = true;
         
         $this->_sessionVariableCache = array();
         if(isset($this->_session[static::FIELD_NAME])) {
@@ -176,7 +171,6 @@ class Session {
         
         if (!$this->isLocked()) {
             $this->_session->writeClose();
-            $this->_locked = false;
         }
     }
 
@@ -195,7 +189,7 @@ class Session {
         $this->_session[static::FIELD_NAME] = $this->_sessionVariableCache;
         $this->_session->writeClose();
         
-        $this->_locked      = false;
+        $this->_locked = false;
     }
 
     /**
@@ -218,6 +212,10 @@ class Session {
      * @return mixed|null
      */
     public function &get($var) {
+        if( is_null($this->_sessionVariableCache) ) {
+            $this->_loadSessionVariable();
+        }
+        
         if (array_key_exists($var, $this->_sessionVariableCache)) {
             return $this->_sessionVariableCache[$var];
         } else {
@@ -258,8 +256,7 @@ class Session {
             throw new LogicException("Attempt to set session variable when Session is not in a locked condition.");
         }
         
-        $this->_sessionVariableCache[$var]  = $value;
-        $this->_unsavedData                 = true;
+        $this->_sessionVariableCache[$var] = $value;
         
         return $value;
     }
@@ -297,17 +294,17 @@ class Session {
      *      $session = Session::GetSession();
      *      $session->lock();
      *      $session->number = 10;
-     *      echo $session->unlock() ? 'Unlocked' : 'Still locked...';
+     *      echo $session->unlock() ? '[setNumber] Unlocked' : '[setNumber] Still locked...';
      * }
      * 
      * $session = Session::GetSession();
      * $session->lock();
      * $session->name = 'Tom';
      * setNumber();
-     * echo $session->unlock() ? 'Unlocked' : 'Still locked...';
+     * echo $session->unlock() ? '[global] Unlocked' : '[global] Still locked...';
      * 
      * // Results in output
-     * Still locked...Unlocked
+     * [setNumber] Still locked...[global] Unlocked
      * @endcode
      * 
      * @see unlock()
@@ -332,10 +329,6 @@ class Session {
      *      Will be true if all locks have been released
      */
     public function unlock() {
-        if( !$this->isLocked() ) {
-            throw new \LogicException('Tried to unlock a session that was not locked');
-        }
-        
         if (--$this->_lockStackIndex === 0) {
             $this->_unlock();
             return true;
@@ -357,9 +350,12 @@ class Session {
      * \note Will update the session variable to the current locked situation
      */
     private function _lockAndLoad() {
-        if( !$this->isLocked() ) {
-            $this->_loadSessionVariable();
+        if( $this->isLocked() ) {
+            throw new \LogicException('Tried to load a session that was already locked');
         }
+        
+        $this->_locked = true;
+        $this->_loadSessionVariable();
     }
     
     /**
@@ -368,6 +364,19 @@ class Session {
      * @see _saveSessionVariable()
      */
     private function _unlock() {
+        if( !$this->isLocked() ) {
+            throw new \LogicException('Tried to unlock a session that was not locked');
+        }
+        
         $this->_saveSessionVariable();
+        $this->_locked = false;
+    }
+    
+    /**
+     * Clear the current session changes and unset the singleton instance of
+     * Session
+     */
+    public static function Clear() {
+        self::$_staticSession = null;
     }
 }
