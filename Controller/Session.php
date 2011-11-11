@@ -109,6 +109,8 @@ class Session {
     /**
      * Get the static Session instance and instantiate if necessary
      *
+     * @param boolean $lock
+     *      [optional] Whether to lock the session to allow updating. Defaults to \c false.
      * @return Session
      */
     public static function GetSession($lock = false) {
