@@ -45,7 +45,7 @@ use \LogicException;
  *
  * // How (and how not) to set variables.
  * $j = $session->get("j");
- * $session->loadSessionVariable(true);
+ * $session->lock();
  * $i = $session->get("i");
  * $session->set("i", $i + 1);   // Good
  * $session->set("j", $j + 1);   // BAD - because "j" may have been modified by another script!
@@ -118,7 +118,11 @@ class Session {
         if ( is_null(static::$_staticSession) ) {
             $calledClass = get_called_class();
             static::$_staticSession = new $calledClass();
-            static::$_staticSession->loadSessionVariable($lock);
+            if ($lock) {
+                static::$_staticSession->lock();
+            } else  {
+                static::$_staticSession->loadSessionVariable();
+            }
         }
 
         return static::$_staticSession;
@@ -152,7 +156,7 @@ class Session {
     /**
      * Retrieve variables from global session variable and store it in local cache
      */
-    public function loadSessionVariable($lock = false) {
+    public function loadSessionVariable() {
         session_name(static::SESSION_NAME);
         if (!$this->isLocked()) {
             session_start();
@@ -214,7 +218,7 @@ class Session {
      * <b>Usage</b>
      * @code
      * $session = Session::GetSession();
-     * $session->loadSessionVariable(true);
+     * $session->lock();
      *
      * $session->set('user_name', 123);
      * $session->saveSessionVariable();
@@ -264,7 +268,7 @@ class Session {
      */
     public function lockStack() {
         if (++$this->_lockStackIndex === 1) {
-            $this->loadSessionVariable(true);
+            $this->lock();
         }
         
         return $this->_lockStackIndex;
@@ -292,4 +296,17 @@ class Session {
     public function isLocked() {
         return $this->_locked;
     }
+    
+    /**
+     * Lock the session for editing to prevent race conditions
+     * 
+     * \note Will update the session variable to the current locked situation
+     */
+    public function lock() {
+        if( !$this->isLocked() ) {
+            $this->_locked = true;
+            $this->loadSessionVariable();
+        }
+    }
+    
 }
