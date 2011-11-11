@@ -238,6 +238,7 @@ class Session {
         } else {
             $this->_unsavedData = true;
         }
+        return $value;
     }
 
     public function clear($var) {
