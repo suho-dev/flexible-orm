@@ -28,6 +28,10 @@ class SessionTest extends ORMTest {
         ));
     }
     
+    public function tearDown() {
+        Session::Clear();
+    }
+    
     public function testGetSession() {
         $session = Session::GetSession( $this->sessionWrapper );
         

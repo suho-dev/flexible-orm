@@ -21,6 +21,10 @@ class MockSessionWrapper implements SessionWrapper {
         $this->_session = $sessionVariables;
     }
     
+    public function started() {
+        return $this->sessionStarted;
+    }
+    
     public function start( $sessionName = 'PHPMOCKSESSION') {
         if( $this->sessionStarted ) {
             throw new \RuntimeException("Attempt to start a session that had already been started");

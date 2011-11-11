@@ -27,4 +27,11 @@ interface SessionWrapper extends \ArrayAccess {
      * Destroy the currently open session
      */
     public function destroy();
+    
+    /**
+     * Has the session  been started?
+     * 
+     * @return boolean
+     */
+    public function started();        
 }
