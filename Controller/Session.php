@@ -206,8 +206,23 @@ class Session {
     /**
      * Set a variable in the local cached variable array.
      *
+     * <b>Usage</b>
+     * @code
+     * $session = Session::GetSession();
+     * $session->loadSessionVariable(true);
+     *
+     * $session->set('user_name', 123);
+     *
+     * @endcode
+     * 
      * @throws LogicException if called when Session is not locked
      * 
+     * @param string $var
+     *      Name of the session variable
+     * @param mixed $value
+     *      The value to save
+     * @param boolean $save
+     *      [optional, default=true] If we should save the value and un-lock the session.
      * @return mixed
      */
     public function set($var, $value, $save = true) {
