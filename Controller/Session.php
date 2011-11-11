@@ -123,7 +123,7 @@ class Session {
     }
 
 
-    /*
+    /**
      * Save all the unsaved variables if the PHP script finished
      * without calling saveSessionVariables().
      */
@@ -134,7 +134,7 @@ class Session {
     }
 
 
-    /*
+    /**
      * Destroy the session.
      */
     public function destroySession() {
@@ -215,7 +215,7 @@ class Session {
         unset($this->_sessionVariableCache[$var]);
     }
 
-    /*
+    /**
      * Increments the number of times locking has been requested.  To
      * be used in conjunction with unlockStack which indicates a lock
      * release.
@@ -241,7 +241,7 @@ class Session {
         return ($this->_lockStackIndex);
     }
 
-    /*
+    /**
      * Decrements the number of times locking has been requested to perform a lock release.
      *
      * @throws LogicException if stack is unlocked in the wrong order
@@ -257,7 +257,7 @@ class Session {
         }
     }
 
-    /*
+    /**
      * Returns if the session is locked.
      */
     public function isLocked() {
