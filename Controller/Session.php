@@ -373,8 +373,7 @@ class Session {
     }
     
     /**
-     * Clear the current session changes and unset the singleton instance of
-     * Session
+     * Save any changes (if locked) and unset the singleton instance of Session
      */
     public static function Clear() {
         self::$_staticSession = null;
