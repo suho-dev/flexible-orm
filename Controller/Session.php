@@ -176,9 +176,11 @@ class Session {
             throw new LogicException("Session is not in a locked condition, unable to update session variable.");
         }
         $_SESSION[static::FIELD_NAME] = $this->_sessionVariableCache;
-        $this->_unsavedData = false;
+        
         session_write_close();
-        $this->_locked = false;
+        
+        $this->_unsavedData = false;
+        $this->_locked      = false;
     }
 
     /**
