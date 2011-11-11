@@ -23,9 +23,10 @@ use \LogicException;
  *
  * @code
  * $session = \ORM\Controller\Session::GetSession(true);
- * $session->set("i", 1, false);
- * $session->set("j", 1, false);
- * $session->set("k", 1);
+ * $session->set("i", 1);
+ * $session->set("j", 2);
+ * $session->set("k", 3);
+ * $session->saveSessionVariable();
  * @endcode
  *
  * Where data only needs to be retrieved:
@@ -46,8 +47,8 @@ use \LogicException;
  * $j = $session->get("j");
  * $session->loadSessionVariable(true);
  * $i = $session->get("i");
- * $session->set("i",$i + 1,false);   // Good
- * $session->set("j",$j + 1,false);   // BAD - because "j" may have been modified by another script!
+ * $session->set("i", $i + 1);   // Good
+ * $session->set("j", $j + 1);   // BAD - because "j" may have been modified by another script!
  * $session->saveSessionVariable();
  * @endcode
  *
@@ -216,7 +217,7 @@ class Session {
      * $session->loadSessionVariable(true);
      *
      * $session->set('user_name', 123);
-     *
+     * $session->saveSessionVariable();
      * @endcode
      * 
      * @throws LogicException if called when Session is not locked
@@ -225,20 +226,17 @@ class Session {
      *      Name of the session variable
      * @param mixed $value
      *      The value to save
-     * @param boolean $save
-     *      [optional, default=true] If we should save the value and un-lock the session.
      * @return mixed
      */
-    public function set($var, $value, $save = true) {
+    public function set($var, $value) {
         if (!$this->isLocked()) {
             throw new LogicException("Attempt to set session variable when Session is not in a locked condition.");
         }
+
         $this->_sessionVariableCache[$var] = $value;
-        if ($save) {
-            $this->saveSessionVariable();
-        } else {
-            $this->_unsavedData = true;
-        }
+
+        $this->_unsavedData = true;
+
         return $value;
     }
 
