@@ -23,7 +23,8 @@ use ORM\Interfaces\SessionWrapper;
  * Where an update is performed:
  *
  * @code
- * $session = \ORM\Controller\Session::GetSession(true);
+ * $session = Session::GetSession();
+ * $session->lock();
  * $session->set("i", 1);
  * $session->set("j", 2);
  * $session->set("k", 3);
@@ -33,7 +34,7 @@ use ORM\Interfaces\SessionWrapper;
  * Where data only needs to be retrieved:
  *
  * @code
- * $session = \ORM\Controller\Session::GetSession();
+ * $session = Session::GetSession();
  * $i = $session->get("i");
  * echo "The value of i is $i";
  * @endcode
@@ -42,7 +43,7 @@ use ORM\Interfaces\SessionWrapper;
  *
  * @code
  * // Construction results in loading with a default of non-blocking behaviour
- * $session = \ORM\Controller\Session::GetSession();
+ * $session = Session::GetSession();
  *
  * // How (and how not) to set variables.
  * $j = $session->j;
@@ -56,9 +57,8 @@ use ORM\Interfaces\SessionWrapper;
  * $session->unlock();
  * @endcode
  *
- * @todo Add a variable to mark the session as blocking or not.
- * @todo Consider implementing variables in an extension of \ArrayObject.
- * @todo Consider marking items within the \ArrayObject as read-only unless opened in a non-blocking fashion.
+ * @todo This should probably lazy-intialise the session variable, otherwise the
+ *       session is started and stopped at least twice if lock() is used.
  *
  */
 class Session {
@@ -82,13 +82,6 @@ class Session {
      * @var bool $_locked
      */
     private $_locked = false;
-
-    /**
-     * A boolean to determine if the data has not been saved.
-     *
-     * @var bool $_unsavedData
-     */
-    private $_unsavedData = false;
 
     /**
      * Constant the defines the session name
@@ -150,7 +143,7 @@ class Session {
      * without calling saveSessionVariables().
      */
     public function __destruct() {
-        if ($this->_unsavedData) {
+        if ($this->isLocked()) {
             $this->saveSessionVariable();
         }
     }
@@ -174,6 +167,7 @@ class Session {
      */
     private function _loadSessionVariable() {
         $this->_session->start(static::SESSION_NAME);
+        $this->_locked = true;
         
         $this->_sessionVariableCache = array();
         if(isset($this->_session[static::FIELD_NAME])) {
@@ -182,6 +176,7 @@ class Session {
         
         if (!$this->isLocked()) {
             $this->_session->writeClose();
+            $this->_locked = false;
         }
     }
 
@@ -200,7 +195,6 @@ class Session {
         $this->_session[static::FIELD_NAME] = $this->_sessionVariableCache;
         $this->_session->writeClose();
         
-        $this->_unsavedData = false;
         $this->_locked      = false;
     }
 
@@ -295,7 +289,7 @@ class Session {
 
     public function lock() {
         if (++$this->_lockStackIndex === 1) {
-            $this->_lock();
+            $this->_lockAndLoad();
         }
         
         return $this->_lockStackIndex;
@@ -319,9 +313,8 @@ class Session {
      * 
      * \note Will update the session variable to the current locked situation
      */
-    private function _lock() {
+    private function _lockAndLoad() {
         if( !$this->isLocked() ) {
-            $this->_locked = true;
             $this->_loadSessionVariable();
         }
     }
