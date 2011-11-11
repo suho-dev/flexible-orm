@@ -287,6 +287,34 @@ class Session {
         return $this->set($var, $value);
     }
 
+    /**
+     * Lock the session for editing
+     * 
+     * Supports nesting, i.e. the following will work:
+     * 
+     * @code
+     * function setNumber() {
+     *      $session = Session::GetSession();
+     *      $session->lock();
+     *      $session->number = 10;
+     *      echo $session->unlock() ? 'Unlocked' : 'Still locked...';
+     * }
+     * 
+     * $session = Session::GetSession();
+     * $session->lock();
+     * $session->name = 'Tom';
+     * setNumber();
+     * echo $session->unlock() ? 'Unlocked' : 'Still locked...';
+     * 
+     * // Results in output
+     * Still locked...Unlocked
+     * @endcode
+     * 
+     * @see unlock()
+     * @return int
+     *      The number of locks currently held (i.e. the number of times that unlock()
+     *      has to be called to unlock the session.
+     */
     public function lock() {
         if (++$this->_lockStackIndex === 1) {
             $this->_lockAndLoad();
@@ -295,10 +323,25 @@ class Session {
         return $this->_lockStackIndex;
     }
 
+    /**
+     * Unlock the retrieved Session lock
+     * 
+     * @see lock()
+     * @throws LogicException if not locked
+     * @returns boolean
+     *      Will be true if all locks have been released
+     */
     public function unlock() {
+        if( !$this->isLocked() ) {
+            throw new \LogicException('Tried to unlock a session that was not locked');
+        }
+        
         if (--$this->_lockStackIndex === 0) {
             $this->_unlock();
+            return true;
         }
+        
+        return false;
     }
 
     /**
@@ -322,7 +365,7 @@ class Session {
     /**
      * Unlock the session to allow other requests to be executed
      * 
-     * @see saveSessionVariable()
+     * @see _saveSessionVariable()
      */
     private function _unlock() {
         $this->_saveSessionVariable();
