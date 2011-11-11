@@ -81,7 +81,7 @@ class Session {
      *
      * @var bool $_locked
      */
-    private $_locked;
+    private $_locked = false;
 
     /**
      * A boolean to determine if the data has not been saved.
@@ -113,46 +113,32 @@ class Session {
     /**
      * Session is a singleton class
      *
-     * @param boolean $lock
-     *      Whether or not to lock the session to allow updating when initially
-     *      created
      * @param SessionWrapper $session
      *      The session wrapper to use with this object. Useful for mocking
      * 
      * @see GetSession()
      */
-    private function __construct( $lock, SessionWrapper $session ) {
+    private function __construct( SessionWrapper $session ) {
         $this->_session = $session;
-        
-        if( $lock ) {
-            $this->lock();
-        } else {
-            $this->_locked = $lock;
-            $this->loadSessionVariable();
-        }
+        $this->_loadSessionVariable();
     }
 
     /**
      * Get the static Session instance and instantiate if necessary
      *
-     * Will re-instantiate the session object if called with a different lock
-     * option.
-     * 
-     * @param boolean $lock
-     *      [optional] Whether to lock the session to allow updating. Defaults to \c false.
      * @param boolean $session
      *      [optional] You can supply different session data here. Helpful for mocking in
      *      unit testing. Will not generate a new Session object if called twice with 
      *      different SessionWrappers.
      * @return Session
      */
-    public static function GetSession($lock = false, SessionWrapper $session = null) {
-        if ( is_null(static::$_staticSession) || ($lock != static::$_staticSession->isLocked()) ) {
+    public static function GetSession(SessionWrapper $session = null) {
+        if ( is_null(static::$_staticSession) ) {
             if( is_null($session) ) {
                 $session = new Session\SessionWrapper();
             }
             $calledClass = get_called_class();
-            static::$_staticSession = new $calledClass($lock, $session);
+            static::$_staticSession = new $calledClass($session);
         }
 
         return static::$_staticSession;
@@ -186,7 +172,7 @@ class Session {
     /**
      * Retrieve variables from global session variable and store it in local cache
      */
-    public function loadSessionVariable() {
+    private function _loadSessionVariable() {
         $this->_session->start(static::SESSION_NAME);
         
         $this->_sessionVariableCache = array();
@@ -206,7 +192,7 @@ class Session {
      * 
      * @throws LogicException if called when not in locked mode
      */
-    public function saveSessionVariable() {
+    private function _saveSessionVariable() {
         if (!$this->isLocked()) {
             throw new LogicException("Session is not in a locked condition, unable to update session variable.");
         }
@@ -307,49 +293,17 @@ class Session {
         return $this->set($var, $value);
     }
 
-    public function clear($var) {
-        unset($this->_sessionVariableCache[$var]);
-    }
-
-    /**
-     * Increments the number of times locking has been requested.  To
-     * be used in conjunction with unlockStack which indicates a lock
-     * release.
-     *
-     * Locking is performed on when the lockStack index reaches 1, and unlocked
-     * when it reaches 0 again. An error is thrown if a unlock is attempted
-     *
-     * This solves an issue of nested lockings as follows: (where $s is the global session object)
-     *
-     * function one() {$lockStackIndex = $s->lockStack(); two(); ... $s->unlockStack($lockStackIndex); }
-     * function two() {$lockStackIndex = $s->lockStack();        ... $s->unlockStack($lockStackIndex); }
-     *
-     * @return int
-     *
-     * @todo - not sure if we should though.. use debug_backtrace to
-     * monitor which file called each lock.
-     */
-    public function lockStack() {
+    public function lock() {
         if (++$this->_lockStackIndex === 1) {
-            $this->lock();
+            $this->_lock();
         }
         
         return $this->_lockStackIndex;
     }
 
-    /**
-     * Decrements the number of times locking has been requested to perform a lock release.
-     *
-     * @throws LogicException if stack is unlocked in the wrong order
-     * @see lockStack()
-     */
-    public function unlockStack($lockStackIndex) {
-        if ($this->_lockStackIndex != $lockStackIndex) {
-            throw new LogicException("Stack was not unlocked in order they were opened.");
-        }
-        
-        if (--$this->_lockStackIndex == 0) {
-            $this->unlock();
+    public function unlock() {
+        if (--$this->_lockStackIndex === 0) {
+            $this->_unlock();
         }
     }
 
@@ -365,10 +319,10 @@ class Session {
      * 
      * \note Will update the session variable to the current locked situation
      */
-    public function lock() {
+    private function _lock() {
         if( !$this->isLocked() ) {
             $this->_locked = true;
-            $this->loadSessionVariable();
+            $this->_loadSessionVariable();
         }
     }
     
@@ -377,7 +331,7 @@ class Session {
      * 
      * @see saveSessionVariable()
      */
-    public function unlock() {
-        $this->saveSessionVariable();
+    private function _unlock() {
+        $this->_saveSessionVariable();
     }
 }
