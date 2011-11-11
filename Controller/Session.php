@@ -44,11 +44,14 @@ use \LogicException;
  * $session = \ORM\Controller\Session::GetSession();
  *
  * // How (and how not) to set variables.
- * $j = $session->get("j");
+ * $j = $session->j;
+ * 
  * $session->lock();
- * $i = $session->get("i");
- * $session->set("i", $i + 1);   // Good
- * $session->set("j", $j + 1);   // BAD - because "j" may have been modified by another script!
+ * 
+ * $i = $session->i;
+ * $session->i = $i + 1;   // Good
+ * $session->j = $j + 1;   // BAD - because "j" may have been modified by another script!
+ * 
  * $session->unlock();
  * @endcode
  *
@@ -193,11 +196,17 @@ class Session {
     /**
      * Retrieve a variable from the local cached variable array.
      *
+     * Alternatively, you can use magic properties to access the session variable
+     * 
      * <b>Usage</b>
      * @code
      * $session = Session::GetSession();
      * 
+     * // Either
      * $session->get('user_name');
+     * 
+     * // OR
+     * $session->user_name;
      * 
      * @endcode
      * 
@@ -215,13 +224,19 @@ class Session {
     /**
      * Set a variable in the local cached variable array.
      *
+     * Alternatively, you can use magic properties to set the session variables
+     * 
      * <b>Usage</b>
      * @code
      * $session = Session::GetSession();
      * $session->lock();
      *
+     * // Either
      * $session->set('user_name', 123);
      *
+     * // OR
+     * $session->user_name = 123;
+     * 
      * $session->unlock();
      * @endcode
      * 
@@ -243,6 +258,29 @@ class Session {
         $this->_unsavedData = true;
 
         return $value;
+    }
+    
+    /**
+     * Get a variable from the session
+     * 
+     * @see get()
+     * @param string $var
+     *      Variable name
+     * @return mixed|null
+     */
+    public function __get( $var ) {
+        return $this->get( $var );
+    }
+    
+    /**
+     * Set a variable from the session using magic properties
+     * @see set()
+     * @param string $var
+     * @param mixed $value
+     * @return mixed 
+     */
+    public function __set( $var, $value ) {
+        return $this->set($var, $value);
     }
 
     public function clear($var) {
