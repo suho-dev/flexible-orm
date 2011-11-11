@@ -185,7 +185,7 @@ class Session {
      */
     public function &get($var) {
         if (array_key_exists($var, $this->_sessionVariableCache)) {
-            return  $this->_sessionVariableCache[$var];
+            return $this->_sessionVariableCache[$var];
         } else {
             $variableNotValid = null;
             return $variableNotValid;
@@ -238,7 +238,8 @@ class Session {
         if ($this->_lockStackIndex == 1) {
             $this->loadSessionVariable(true);
         }
-        return ($this->_lockStackIndex);
+        
+        return $this->_lockStackIndex;
     }
 
     /**
