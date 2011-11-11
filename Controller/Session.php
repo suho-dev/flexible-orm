@@ -184,6 +184,14 @@ class Session {
     /**
      * Retrieve a variable from the local cached variable array.
      *
+     * <b>Usage</b>
+     * @code
+     * $session = Session::GetSession();
+     * 
+     * $session->get('user_name');
+     * 
+     * @endcode
+     * 
      * @return mixed|null
      */
     public function &get($var) {
