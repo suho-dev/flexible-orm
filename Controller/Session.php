@@ -25,8 +25,9 @@ use ORM\Interfaces\SessionWrapper;
  * @code
  * $session = \ORM\Controller\Session::GetSession(true);
  * $session->set("i", 1);
- * $session->set("j", 2;
+ * $session->set("j", 2);
  * $session->set("k", 3);
+ * $session->unlock();
  * @endcode
  *
  * Where data only needs to be retrieved:
@@ -256,11 +257,12 @@ class Session {
      * $session->lock();
      * 
      * // Either
-     * $session->get('user_name');
+     * $session->set('user_name', 123);
      * 
      * // OR
-     * $session->user_name;
+     * $session->user_name = 123;
      * 
+     * $session->unlock();
      * @endcode
      * 
      * @throws LogicException if called when Session is not locked
