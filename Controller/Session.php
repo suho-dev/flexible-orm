@@ -180,7 +180,7 @@ class Session {
     /**
      * Retrieve a variable from the local cached variable array.
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function &get($var) {
         if (array_key_exists($var, $this->_sessionVariableCache)) {
