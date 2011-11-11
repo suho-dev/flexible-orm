@@ -349,7 +349,7 @@ class Session {
         }
         
         if (--$this->_lockStackIndex == 0) {
-            $this->saveSessionVariable();
+            $this->unlock();
         }
     }
 
