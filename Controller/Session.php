@@ -42,8 +42,7 @@ use \LogicException;
  * // Construction results in loading with a default of non-blocking behaviour
  * $session = \ORM\Controller\Session::GetSession();
  *
- * // How to set variables.
- *
+ * // How (and how not) to set variables.
  * $j = $session->get("j");
  * $session->loadSessionVariable(true);
  * $i = $session->get("i");
