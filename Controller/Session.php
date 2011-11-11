@@ -167,6 +167,8 @@ class Session {
     /**
      * Save variables to session
      * 
+     * \note Calling this will close the session and unlock the Session object
+     * 
      * @throws LogicException if called when not in locked mode
      */
     public function saveSessionVariable() {
