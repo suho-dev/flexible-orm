@@ -345,7 +345,7 @@ class Session {
      */
     public function unlockStack($lockStackIndex) {
         if ($this->_lockStackIndex != $lockStackIndex) {
-            throw LogicException("Stack was not unlocked in order they were opened.");
+            throw new LogicException("Stack was not unlocked in order they were opened.");
         }
         
         if (--$this->_lockStackIndex == 0) {
