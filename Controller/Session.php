@@ -4,6 +4,7 @@
  * @author Pierre Dumuid <pierre.dumuid@sustainabilityhouse.com.au>
  */
 namespace ORM\Controller;
+use \LogicException;
 
 /**
  * A wrapper for the session variables
@@ -164,10 +165,12 @@ class Session {
 
     /**
      * Save variables to session
+     * 
+     * @throws LogicException if called when not in locked mode
      */
     public function saveSessionVariable() {
         if (!$this->_locked) {
-            throw new \LogicException("Session is not in a locked condition, unable to update session variable.");
+            throw new LogicException("Session is not in a locked condition, unable to update session variable.");
         }
         $_SESSION[static::FIELD_NAME] = $this->_sessionVariableCache;
         $this->_unsavedData = false;
@@ -192,11 +195,13 @@ class Session {
     /**
      * Set a variable in the local cached variable array.
      *
+     * @throws LogicException if called when Session is not locked
+     * 
      * @return mixed
      */
     public function set($var, $value, $save = true) {
         if (!$this->_locked) {
-            throw new \LogicException("Attempt to set session variable when Session is not in a locked condition.");
+            throw new LogicException("Attempt to set session variable when Session is not in a locked condition.");
         }
         $this->_sessionVariableCache[$var] = $value;
         if ($save) {
@@ -239,11 +244,12 @@ class Session {
     /*
      * Decrements the number of times locking has been requested to perform a lock release.
      *
+     * @throws LogicException if stack is unlocked in the wrong order
      * @see lockStack()
      */
     public function unlockStack($lockStackIndex) {
         if ($this->_lockStackIndex != $lockStackIndex) {
-            throw \Exception("Stack was not unlocked in order they were opened.");
+            throw LogicException("Stack was not unlocked in order they were opened.");
         }
         $this->_lockStackIndex --;
         if ($this->_lockStackIndex == 0) {
