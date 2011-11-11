@@ -80,7 +80,7 @@ class Session {
      *
      * @var bool $_locked
      */
-    private $_locked = false;
+    private $_locked;
 
     /**
      * A boolean to determine if the data has not been saved.
@@ -107,25 +107,33 @@ class Session {
     /**
      * Session is a singleton class
      *
+     * @param boolean $lock
+     *      Whether or not to lock the session to allow updating when initially
+     *      created
      */
-    private function __construct() {}
+    private function __construct( $lock ) {
+        if( $lock ) {
+            $this->lock();
+        } else {
+            $this->_locked = $lock;
+            $this->loadSessionVariable();
+        }
+    }
 
     /**
      * Get the static Session instance and instantiate if necessary
      *
+     * Will re-instantiate the session object if called with a different lock
+     * option.
+     * 
      * @param boolean $lock
      *      [optional] Whether to lock the session to allow updating. Defaults to \c false.
      * @return Session
      */
     public static function GetSession($lock = false) {
-        if ( is_null(static::$_staticSession) ) {
+        if ( is_null(static::$_staticSession) || ($lock != static::$_staticSession->isLocked()) ) {
             $calledClass = get_called_class();
-            static::$_staticSession = new $calledClass();
-            if ($lock) {
-                static::$_staticSession->lock();
-            } else  {
-                static::$_staticSession->loadSessionVariable();
-            }
+            static::$_staticSession = new $calledClass($lock);
         }
 
         return static::$_staticSession;
@@ -161,16 +169,12 @@ class Session {
      */
     public function loadSessionVariable() {
         session_name(static::SESSION_NAME);
-        if (!$this->isLocked()) {
-            session_start();
-        }
+        session_start();
+        
         $this->_sessionVariableCache = array_key_exists(static::FIELD_NAME, $_SESSION) ? $_SESSION[static::FIELD_NAME] : array();
         
-        if (!$lock) {
+        if (!$this->isLocked()) {
             session_write_close();
-            $this->_locked = false;
-        } else {
-            $this->_locked = true;
         }
     }
 
@@ -230,10 +234,10 @@ class Session {
      * @code
      * $session = Session::GetSession();
      * $session->lock();
-     *
+     * 
      * // Either
      * $session->set('user_name', 123);
-     *
+     * 
      * // OR
      * $session->user_name = 123;
      * 
@@ -252,11 +256,10 @@ class Session {
         if (!$this->isLocked()) {
             throw new LogicException("Attempt to set session variable when Session is not in a locked condition.");
         }
-
-        $this->_sessionVariableCache[$var] = $value;
-
-        $this->_unsavedData = true;
-
+        
+        $this->_sessionVariableCache[$var]  = $value;
+        $this->_unsavedData                 = true;
+        
         return $value;
     }
     
