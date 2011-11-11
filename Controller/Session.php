@@ -143,6 +143,7 @@ class Session {
         if (!$this->isLocked()) {
             session_start();
         }
+        $this->_sessionVariableCache = array();
         session_destroy();
     }
 
