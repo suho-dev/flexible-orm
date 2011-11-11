@@ -26,7 +26,7 @@ use \LogicException;
  * $session->set("i", 1);
  * $session->set("j", 2);
  * $session->set("k", 3);
- * $session->saveSessionVariable();
+ * $session->unlock();
  * @endcode
  *
  * Where data only needs to be retrieved:
@@ -49,7 +49,7 @@ use \LogicException;
  * $i = $session->get("i");
  * $session->set("i", $i + 1);   // Good
  * $session->set("j", $j + 1);   // BAD - because "j" may have been modified by another script!
- * $session->saveSessionVariable();
+ * $session->unlock();
  * @endcode
  *
  * @todo Add a variable to mark the session as blocking or not.
@@ -221,7 +221,8 @@ class Session {
      * $session->lock();
      *
      * $session->set('user_name', 123);
-     * $session->saveSessionVariable();
+     *
+     * $session->unlock();
      * @endcode
      * 
      * @throws LogicException if called when Session is not locked
@@ -286,7 +287,7 @@ class Session {
         }
         
         if (--$this->_lockStackIndex == 0) {
-            $this->saveSessionVariable();
+            $this->unlock();
         }
     }
 
@@ -309,4 +310,12 @@ class Session {
         }
     }
     
+    /**
+     * Unlock the session to allow other requests to be executed
+     * 
+     * @see saveSessionVariable()
+     */
+    public function unlock() {
+        $this->saveSessionVariable();
+    }
 }
