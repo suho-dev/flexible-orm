@@ -262,8 +262,7 @@ class Session {
      * monitor which file called each lock.
      */
     public function lockStack() {
-        $this->_lockStackIndex++;
-        if ($this->_lockStackIndex == 1) {
+        if (++$this->_lockStackIndex === 1) {
             $this->loadSessionVariable(true);
         }
         
@@ -280,8 +279,8 @@ class Session {
         if ($this->_lockStackIndex != $lockStackIndex) {
             throw LogicException("Stack was not unlocked in order they were opened.");
         }
-        $this->_lockStackIndex --;
-        if ($this->_lockStackIndex == 0) {
+        
+        if (--$this->_lockStackIndex == 0) {
             $this->saveSessionVariable();
         }
     }
