@@ -140,7 +140,7 @@ class Session {
      */
     public function destroySession() {
         session_name(static::SESSION_NAME);
-        if (!$this->_locked) {
+        if (!$this->isLocked()) {
             session_start();
         }
         session_destroy();
@@ -152,10 +152,11 @@ class Session {
      */
     public function loadSessionVariable($lock = false) {
         session_name(static::SESSION_NAME);
-        if (!$this->_locked) {
+        if (!$this->isLocked()) {
             session_start();
         }
         $this->_sessionVariableCache = array_key_exists(static::FIELD_NAME, $_SESSION) ? $_SESSION[static::FIELD_NAME] : array();
+        
         if (!$lock) {
             session_write_close();
             $this->_locked = false;
@@ -172,7 +173,7 @@ class Session {
      * @throws LogicException if called when not in locked mode
      */
     public function saveSessionVariable() {
-        if (!$this->_locked) {
+        if (!$this->isLocked()) {
             throw new LogicException("Session is not in a locked condition, unable to update session variable.");
         }
         $_SESSION[static::FIELD_NAME] = $this->_sessionVariableCache;
@@ -228,7 +229,7 @@ class Session {
      * @return mixed
      */
     public function set($var, $value, $save = true) {
-        if (!$this->_locked) {
+        if (!$this->isLocked()) {
             throw new LogicException("Attempt to set session variable when Session is not in a locked condition.");
         }
         $this->_sessionVariableCache[$var] = $value;
