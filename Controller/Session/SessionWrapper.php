@@ -4,6 +4,7 @@
  * @author jarrod.swift
  */
 namespace ORM\Controller\Session;
+use \ArrayObject;
 
 /**
  * A wrapper for the in-built session handling
@@ -13,7 +14,7 @@ namespace ORM\Controller\Session;
  *
  * @author jarrod.swift
  */
-class SessionWrapper extends ArrayObject implements ORM\Interfaces\SessionWrapper {
+class SessionWrapper extends ArrayObject implements \ORM\Interfaces\SessionWrapper {
     /**
      * Start the session and load the session variables
      * 
