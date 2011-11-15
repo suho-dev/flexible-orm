@@ -84,7 +84,7 @@ class Session {
     private $_locked = false;
 
     /**
-     * Constant the defines the session name
+     * Constant that defines the session name
      * 
      * \note When subclassing this constant, it will cause errors if you 
      *       attempt to use multiple names for the session!
@@ -92,7 +92,7 @@ class Session {
     const SESSION_NAME = 'ORM_DEFAULT';
 
     /**
-     * Constant the defines the field of the $_SESSION variable to store the ORM values in.
+     * Constant that defines the field name of the $_SESSION variable to store the ORM values in.
      */
     const FIELD_NAME = 'ORM';
 
