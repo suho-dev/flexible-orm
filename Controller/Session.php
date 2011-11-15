@@ -140,6 +140,7 @@ class Session {
      */
     public function __destruct() {
         if ($this->isLocked()) {
+            trigger_error("Session was not unlocked", E_USER_NOTICE);
             $this->_saveSessionVariable();
         }
     }
@@ -325,10 +326,18 @@ class Session {
      * 
      * @see lock()
      * @throws LogicException if not locked
+     * @throws RuntimeException if not unlocked in order and $lockStackIndex is
+     *         provided
+     * @param int $lockStackIndex
+     *      [optional] Enforce lock order integrity by providing the lock index
      * @returns boolean
      *      Will be true if all locks have been released
      */
-    public function unlock() {
+    public function unlock( $lockStackIndex = null ) {
+        if( !is_null($lockStackIndex) && $lockStackIndex !== $this->_lockStackIndex ) {
+            throw new \RuntimeException("Incorrect lock stack index - supplied $lockStackIndex, should be $this->_lockStackIndex");
+        }
+        
         if (--$this->_lockStackIndex === 0) {
             $this->_unlock();
             return true;
