@@ -181,4 +181,12 @@ class SessionTest extends ORMTest {
         
         $clonedSession = clone $session;
     }
+    
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testGetSessionDifferentWrapper() {
+        $session = Session::GetSession( $this->sessionWrapper );
+        $session = Session::GetSession( new MockSessionWrapper() );
+    }
 }

@@ -85,6 +85,9 @@ class Session {
 
     /**
      * Constant the defines the session name
+     * 
+     * \note When subclassing this constant, it will cause errors if you 
+     *       attempt to use multiple names for the session!
      */
     const SESSION_NAME = 'ORM_DEFAULT';
 
@@ -118,10 +121,11 @@ class Session {
     /**
      * Get the static Session instance and instantiate if necessary
      *
+     * @throws BadMethodCallException if a different SessionWrapper is supplied
+     *         after the first call to GetSession()
      * @param boolean $session
      *      [optional] You can supply different session data here. Helpful for mocking in
-     *      unit testing. Will not generate a new Session object if called twice with 
-     *      different SessionWrappers.
+     *      unit testing.
      * @return Session
      */
     public static function GetSession(SessionWrapper $session = null) {
@@ -131,6 +135,8 @@ class Session {
             }
             $calledClass = get_called_class();
             static::$_staticSession = new $calledClass($session);
+        } elseif( !is_null($session) && $session !== static::$_staticSession->_session ) {
+            throw new \BadMethodCallException("Attempted to get session with different SessionWrapper");
         }
 
         return static::$_staticSession;
@@ -154,7 +160,7 @@ class Session {
      */
     public function destroySession() {
         if (!$this->isLocked()) {
-            $this->_session->start(static::SESSION_NAME);
+            $this->_session->start(self::SESSION_NAME);
         }
         
         $this->_sessionVariableCache = array();
@@ -166,11 +172,11 @@ class Session {
      * Retrieve variables from global session variable and store it in local cache
      */
     private function _loadSessionVariable() {
-        $this->_session->start(static::SESSION_NAME);
+        $this->_session->start(self::SESSION_NAME);
         
         $this->_sessionVariableCache = array();
-        if(isset($this->_session[static::FIELD_NAME])) {
-            $this->_sessionVariableCache = $this->_session[static::FIELD_NAME];
+        if(isset($this->_session[self::FIELD_NAME])) {
+            $this->_sessionVariableCache = $this->_session[self::FIELD_NAME];
         }
         
         if (!$this->isLocked()) {
@@ -190,7 +196,7 @@ class Session {
             throw new LogicException("Session is not in a locked condition, unable to update session variable.");
         }
         
-        $this->_session[static::FIELD_NAME] = $this->_sessionVariableCache;
+        $this->_session[self::FIELD_NAME] = $this->_sessionVariableCache;
         $this->_session->writeClose();
         
         $this->_locked = false;
@@ -387,6 +393,9 @@ class Session {
         $this->_locked = false;
     }
     
+    /**
+     * Don't allow cloning of this singleton, that could cause major problems
+     */
     public function __clone() {
         throw new BadMethodCallException("You cannot clone the Session object");
     }
