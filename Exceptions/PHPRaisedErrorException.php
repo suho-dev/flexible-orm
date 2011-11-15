@@ -11,4 +11,5 @@ namespace ORM\Exceptions;
  * @see ErrorHandler
  */
 class PHPRaisedErrorException extends \RuntimeException {
+    
 }

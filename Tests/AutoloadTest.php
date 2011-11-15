@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for Configuration class
+ * Tests for AutoLoad class
  * @file
  * @author jarrod.swift
  */
