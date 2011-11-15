@@ -11,5 +11,11 @@ namespace ORM\Exceptions;
  * @see ErrorHandler
  */
 class PHPRaisedErrorException extends \RuntimeException {
+    public function setFile( $file ) {
+        $this->file = $file;
+    }
     
+    public function setLine( $line ) {
+        $this->line = $line;
+    }
 }

@@ -78,5 +78,16 @@ class ErrorHandlerTest extends ORMTest {
         error_reporting(E_ALL);
         $this->assertTrue( $this->errorHandler->displayErrorOfType(E_NOTICE), "Failed to display E_NOTICE");
     }
+    
+    public function testExceptionQuality() {
+        error_reporting(E_ALL);
+        try {
+            $this->errorHandler->handleError(E_NOTICE, "Test error", __FILE__, $line = __LINE__ );
+            $this->assertTrue( false );
+        } catch(\ORM\Exceptions\PHPNoticeException $e ) {
+            $this->assertEquals( $line, $e->getLine() );
+            $this->assertEquals( __FILE__, $e->getFile() );
+        }
+    }
 
 }

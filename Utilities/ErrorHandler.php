@@ -71,28 +71,43 @@ class ErrorHandler {
      */
     public function handleError( $errorType, $errorMessage, $file, $line, array $context = array()) {
         if( $this->displayErrorOfType($errorType) ) {
-            switch ($errorType) {
-                case E_USER_DEPRECATED:
-                case E_USER_NOTICE:
-                case E_STRICT:
-                case E_NOTICE:
-                case E_DEPRECATED:
-                    throw new Exceptions\PHPNoticeException($errorMessage);
-                    
-                case E_COMPILE_WARNING:
-                case E_CORE_WARNING:
-                case E_USER_WARNING:
-                case E_WARNING:
-                    throw new Exceptions\PHPWarningException($errorMessage);
-                    
-                case E_COMPILE_ERROR:
-                case E_CORE_ERROR:
-                case E_ERROR:
-                case E_USER_ERROR:
-                case E_RECOVERABLE_ERROR:
-                default:
-                    throw new Exceptions\PHPErrorException($errorMessage);
-            }
+            $exception = $this->_getException($errorType, $errorMessage);
+            $exception->setFile($file);
+            $exception->setLine($line);
+            
+            throw $exception;
+        }
+    }
+    
+    /**
+     * Get the correct exception object for the specified error type
+     *
+     * @param int $errorType
+     * @param string $errorMessage
+     * @return Exceptions\PHPRaisedErrorException
+     */
+    private function _getException( $errorType, $errorMessage ) {
+        switch ($errorType) {
+            case E_USER_DEPRECATED:
+            case E_USER_NOTICE:
+            case E_STRICT:
+            case E_NOTICE:
+            case E_DEPRECATED:
+                return new Exceptions\PHPNoticeException($errorMessage);
+
+            case E_COMPILE_WARNING:
+            case E_CORE_WARNING:
+            case E_USER_WARNING:
+            case E_WARNING:
+                return new Exceptions\PHPWarningException($errorMessage);
+
+            case E_COMPILE_ERROR:
+            case E_CORE_ERROR:
+            case E_ERROR:
+            case E_USER_ERROR:
+            case E_RECOVERABLE_ERROR:
+            default:
+                return new Exceptions\PHPErrorException($errorMessage);
         }
     }
     
