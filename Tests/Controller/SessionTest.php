@@ -130,4 +130,29 @@ class SessionTest extends ORMTest {
         $wrapper = new MockSessionWrapper(array('x' => 1, 'y' => 2));
         $this->assertEquals( 1, $wrapper['x'] );
     }
+    
+    public function testUnlockWithStackIndex() {
+        $session = Session::GetSession( $this->sessionWrapper );
+        
+        $i = $session->lock();
+        
+        $this->assertTrue( $session->unlock($i) ); 
+        
+        $i = $session->lock();
+        $j = $session->lock();
+        
+        $this->assertFalse( $session->unlock($j) ); 
+        $this->assertTrue( $session->unlock($i) ); 
+    }
+    
+    /**
+     * @expectedException \ORM\Exceptions\IncorrectSessionLockIndexException
+     */
+    public function testUnlockWithIncorrectStackIndex() {
+        $session = Session::GetSession( $this->sessionWrapper );
+        
+        $i = $session->lock();
+        $j = $session->lock();
+        $session->unlock($i);
+    }
 }
