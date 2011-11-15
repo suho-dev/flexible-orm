@@ -14,11 +14,17 @@ use ORM\Exceptions;
 class ErrorHandler {
     /**
      * Register this object as the error handler
+     * 
+     * @param boolean $passThroughErrors
+     *      [optional] Set to true to allow errors processed by this class to then  
+     *      be propogated up to the default handler also.
      */
-    public function registerErrorHandler() {
+    public function registerErrorHandler( $passThroughErrors = false ) {
         $me = $this;
-        set_error_handler(function($errorType, $errorMessage, $file, $line, $context) use($me) {
+        set_error_handler(function($errorType, $errorMessage, $file, $line, $context) use($me, $passThroughErrors) {
             $me->handleError($errorType, $errorMessage, $file, $line, $context);
+            
+            return !$passThroughErrors;
         });
     }
     

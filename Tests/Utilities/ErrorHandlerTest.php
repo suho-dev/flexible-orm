@@ -33,17 +33,15 @@ class ErrorHandlerTest extends ORMTest {
      * This method is called after a test is executed.
      */
     protected function tearDown() {
-        
+        restore_error_handler();
     }
 
     /**
-     * @todo Implement testRegisterErrorHandler().
+     * @expectedException \ORM\Exceptions\PHPWarningException
      */
     public function testRegisterErrorHandler() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->errorHandler->registerErrorHandler();
+        trigger_error('Gah, I had an error!', E_USER_WARNING);
     }
 
     /**
