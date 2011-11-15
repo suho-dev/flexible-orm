@@ -326,7 +326,7 @@ class Session {
      * Unlock the retrieved Session lock
      * 
      * @see lock()
-     * @throws LogicException if not locked
+     * @throws LogicException if session was not locked
      * @throws IncorrectSessionLockIndexException if an incorrect $lockStackIndex is provided
      * @param int $lockStackIndex
      *      [optional] Enforce lock order integrity by providing the lock index
@@ -357,10 +357,12 @@ class Session {
      * Lock the session for editing to prevent race conditions
      * 
      * \note Will update the session variable to the current locked situation
+     * 
+     * @throws LogicException if session was already locked
      */
     private function _lockAndLoad() {
         if( $this->isLocked() ) {
-            throw new \LogicException('Tried to load a session that was already locked');
+            throw new LogicException('Tried to lock a session that was already locked');
         }
         
         $this->_locked = true;
@@ -371,10 +373,12 @@ class Session {
      * Unlock the session to allow other requests to be executed
      * 
      * @see _saveSessionVariable()
+     * 
+     * @throws LogicException if session was not locked
      */
     private function _unlock() {
         if( !$this->isLocked() ) {
-            throw new \LogicException('Tried to unlock a session that was not locked');
+            throw new LogicException('Tried to unlock a session that was not locked');
         }
         
         $this->_saveSessionVariable();
