@@ -172,4 +172,13 @@ class SessionTest extends ORMTest {
         unset( $session );
         Session::Clear();
     }
+    
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testClone() {
+        $session = Session::GetSession( $this->sessionWrapper );
+        
+        $clonedSession = clone $session;
+    }
 }

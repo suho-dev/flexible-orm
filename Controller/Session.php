@@ -6,6 +6,7 @@
  */
 namespace ORM\Controller;
 use \LogicException;
+use \BadMethodCallException;
 use ORM\Interfaces\SessionWrapper;
 use ORM\Exceptions\IncorrectSessionLockIndexException;
 
@@ -384,5 +385,9 @@ class Session {
         
         $this->_saveSessionVariable();
         $this->_locked = false;
+    }
+    
+    public function __clone() {
+        throw new BadMethodCallException("You cannot clone the Session object");
     }
 }
