@@ -4,9 +4,9 @@
  * @author jarrod.swift
  */
 namespace ORM\Tests\Controller;
-use ORM\Controller\Session;
 use ORM\Tests\ORMTest;
 use ORM\Tests\Mock\MockSessionWrapper;
+use ORM\Tests\Mock\SessionMock as Session;
 
 require_once '../ORMTest.php';
 
@@ -45,6 +45,7 @@ class SessionTest extends ORMTest {
     public function testLockAndUnlock() {
         $session = Session::GetSession( $this->sessionWrapper );
         
+        $session->name;
         $this->assertFalse( $session->isLocked() );
         $session->lock();
         $this->assertTrue( $session->isLocked() );

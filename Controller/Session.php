@@ -2,6 +2,7 @@
 /**
  * @file
  * @author Pierre Dumuid <pierre.dumuid@sustainabilityhouse.com.au>
+ * @author Jarrod Swift <jarrod.swift@sustainabilityhouse.com.au>
  */
 namespace ORM\Controller;
 use \LogicException;
@@ -99,7 +100,7 @@ class Session {
     /**
      * @var SessionWrapper $_session
      */
-    protected $_session;
+    private $_session;
 
     /**
      * Session is a singleton class
@@ -383,14 +384,5 @@ class Session {
         
         $this->_saveSessionVariable();
         $this->_locked = false;
-    }
-    
-    /**
-     * Remove the current Session instance
-     * 
-     * Helpful for testing
-     */
-    public static function Clear() {
-        self::$_staticSession = null;
     }
 }
