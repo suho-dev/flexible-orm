@@ -145,14 +145,30 @@ class SessionTest extends ORMTest {
         $this->assertTrue( $session->unlock($i) ); 
     }
     
-    /**
-     * @expectedException \ORM\Exceptions\IncorrectSessionLockIndexException
-     */
     public function testUnlockWithIncorrectStackIndex() {
         $session = Session::GetSession( $this->sessionWrapper );
         
         $i = $session->lock();
         $j = $session->lock();
-        $session->unlock($i);
+        
+        try {
+            $session->unlock($i);
+            $this->assertTrue( false );
+        } catch( \ORM\Exceptions\IncorrectSessionLockIndexException $e ) {
+            $this->assertTrue( true );
+        }
+        
+        while( !$session->unlock() ) {};
+    }
+    
+    /**
+     * @expectedException PHPUnit_Framework_Error_Notice
+     */
+    public function testFailToUnlock() {
+        $session = Session::GetSession( $this->sessionWrapper );
+        
+        $i = $session->lock();
+        unset( $session );
+        Session::Clear();
     }
 }
