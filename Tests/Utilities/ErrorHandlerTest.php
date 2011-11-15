@@ -16,15 +16,16 @@ require_once dirname(__FILE__) . '/../ORMTest.php';
 class ErrorHandlerTest extends ORMTest {
 
     /**
-     * @var ErrorHandler
+     * @var ErrorHandler $errorHandler
      */
-    protected $object;
+    protected $errorHandler;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
     protected function setUp() {
+        $this->errorHandler = new ErrorHandler();
     }
 
     /**
@@ -56,29 +57,28 @@ class ErrorHandlerTest extends ORMTest {
     }
 
     /**
-     * @todo Implement testHandleError().
+     * @expectedException \ORM\Exceptions\PHPNoticeException
      */
-    public function testHandleError() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+    public function testHandleErrorNotice() {
+        $this->errorHandler->handleError(E_NOTICE, "Test error", __FILE__, __LINE__ );
+    }
+    
+    /**
+     * @expectedException \ORM\Exceptions\PHPWarningException
+     */
+    public function testHandleErrorWarning() {
+        $this->errorHandler->handleError(E_WARNING, "Test error", __FILE__, __LINE__ );
     }
 
-    /**
-     * @todo Implement testDisplayErrorOfType().
-     */
     public function testDisplayErrorOfType() {
-        $errorHandler = new ErrorHandler();
-        
         error_reporting(E_ALL ^ E_NOTICE);
         
-        $this->assertTrue( $errorHandler->displayErrorOfType(E_ERROR), "Failed to display E_ERROR");
-        $this->assertTrue( $errorHandler->displayErrorOfType(E_USER_WARNING), "Failed to display E_USER_WARNING");
-        $this->assertFalse( $errorHandler->displayErrorOfType(E_NOTICE), "Incorrectly displayed E_NOTICE");
+        $this->assertTrue( $this->errorHandler->displayErrorOfType(E_ERROR), "Failed to display E_ERROR");
+        $this->assertTrue( $this->errorHandler->displayErrorOfType(E_USER_WARNING), "Failed to display E_USER_WARNING");
+        $this->assertFalse( $this->errorHandler->displayErrorOfType(E_NOTICE), "Incorrectly displayed E_NOTICE");
         
         error_reporting(E_ALL);
-        $this->assertTrue( $errorHandler->displayErrorOfType(E_NOTICE), "Failed to display E_NOTICE");
+        $this->assertTrue( $this->errorHandler->displayErrorOfType(E_NOTICE), "Failed to display E_NOTICE");
     }
 
 }
