@@ -9,7 +9,7 @@ use \Smarty;
 /**
  * Class wrapper for Smarty to implement the Template interface
  *
- * Requires that the Smarty (obviously).
+ * Requires that the Smarty class has been loaded, or will be auto-loaded (obviously).
  * 
  * @see BaseController
  */
