@@ -166,6 +166,13 @@ class Session {
         $this->_sessionVariableCache = array();
         $this->_session->destroy();
     }
+    
+    /**
+     * Regenerate the session ID and destroy the old session
+     */
+    public function regenerateSessionId() {
+        $this->_session->regenerateId();
+    }
 
 
     /**

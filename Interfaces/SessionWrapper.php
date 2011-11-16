@@ -29,6 +29,11 @@ interface SessionWrapper extends \ArrayAccess {
     public function destroy();
     
     /**
+     * Regenerate session ID and destroy old session
+     */
+    public function regenerateId();
+    
+    /**
      * Has the session  been started?
      * 
      * @return boolean

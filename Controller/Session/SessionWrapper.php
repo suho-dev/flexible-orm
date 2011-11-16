@@ -52,4 +52,8 @@ class SessionWrapper extends ArrayObject implements \ORM\Interfaces\SessionWrapp
     public function started() {
         return $this->_sessionStarted;
     }
+    
+    public function regenerateId() {
+        session_regenerate_id(true);
+    }
 }

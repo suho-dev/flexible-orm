@@ -68,4 +68,8 @@ class MockSessionWrapper implements SessionWrapper {
             throw new \RuntimeException("Attempt to access a session that has not been started");
         }
     }
+    
+    public function regenerateId() {
+        
+    }
 }
