@@ -1,5 +1,9 @@
 <?php
 /**
+ * Tests for the Session class
+ * 
+ * This test needs to be run with the --stderr switch for PHPUnit
+ * 
  * @file
  * @author jarrod.swift
  */
@@ -7,6 +11,10 @@ namespace ORM\Tests\Controller;
 use ORM\Tests\ORMTest;
 use ORM\Tests\Mock\MockSessionWrapper;
 use ORM\Tests\Mock\SessionMock as Session;
+
+
+session_start('ORM_DEFAULT');
+session_write_close();
 
 require_once '../ORMTest.php';
 
@@ -188,5 +196,17 @@ class SessionTest extends ORMTest {
     public function testGetSessionDifferentWrapper() {
         $session = Session::GetSession( $this->sessionWrapper );
         $session = Session::GetSession( new MockSessionWrapper() );
+    }
+    
+    public function testWithActualSession() {
+        Session::Clear();
+        $session = Session::GetSession();
+        $this->assertNull($session->name);
+        
+        $session->lock();
+        $session->name = 'jarrod';
+        $this->assertTrue( $session->unlock() );
+        
+        $this->assertEquals( 'jarrod', $session->name );
     }
 }
