@@ -130,12 +130,12 @@ class Session {
      */
     public static function GetSession(SessionWrapper $session = null) {
         if ( is_null(static::$_staticSession) ) {
-            if( is_null($session) ) {
+            if ( is_null($session) ) {
                 $session = new Session\SessionWrapper();
             }
             $calledClass = get_called_class();
             static::$_staticSession = new $calledClass($session);
-        } elseif( !is_null($session) && $session !== static::$_staticSession->_session ) {
+        } elseif ( !is_null($session) && $session !== static::$_staticSession->_session ) {
             throw new \BadMethodCallException("Attempted to get session with different SessionWrapper");
         }
 
@@ -175,7 +175,7 @@ class Session {
         $this->_session->start(self::SESSION_NAME);
         
         $this->_sessionVariableCache = array();
-        if(isset($this->_session[self::FIELD_NAME])) {
+        if (isset($this->_session[self::FIELD_NAME])) {
             $this->_sessionVariableCache = $this->_session[self::FIELD_NAME];
         }
         
@@ -222,7 +222,7 @@ class Session {
      * @return mixed|null
      */
     public function &get($var) {
-        if( is_null($this->_sessionVariableCache) ) {
+        if ( is_null($this->_sessionVariableCache) ) {
             $this->_loadSessionVariable();
         }
         
@@ -280,7 +280,7 @@ class Session {
      * @return mixed|null
      */
     public function __get( $var ) {
-        return $this->get( $var );
+        return $this->get($var);
     }
     
     /**
@@ -334,7 +334,6 @@ class Session {
      * Unlock the retrieved Session lock
      * 
      * @see lock()
-     * @throws LogicException if session was not locked
      * @throws IncorrectSessionLockIndexException if an incorrect $lockStackIndex is provided
      * @param int $lockStackIndex
      *      [optional] Enforce lock order integrity by providing the lock index
@@ -342,7 +341,7 @@ class Session {
      *      Will be true if all locks have been released
      */
     public function unlock( $lockStackIndex = null ) {
-        if( !is_null($lockStackIndex) && $lockStackIndex !== $this->_lockStackIndex ) {
+        if ( !is_null($lockStackIndex) && $lockStackIndex !== $this->_lockStackIndex ) {
             throw new IncorrectSessionLockIndexException("Incorrect lock stack index - supplied $lockStackIndex, should be $this->_lockStackIndex");
         }
         
@@ -369,7 +368,7 @@ class Session {
      * @throws LogicException if session was already locked
      */
     private function _lockAndLoad() {
-        if( $this->isLocked() ) {
+        if ( $this->isLocked() ) {
             throw new LogicException('Tried to lock a session that was already locked');
         }
         
@@ -385,7 +384,7 @@ class Session {
      * @throws LogicException if session was not locked
      */
     private function _unlock() {
-        if( !$this->isLocked() ) {
+        if ( !$this->isLocked() ) {
             throw new LogicException('Tried to unlock a session that was not locked');
         }
         
@@ -394,7 +393,9 @@ class Session {
     }
     
     /**
-     * Don't allow cloning of this singleton, that could cause major problems
+     * Don't allow cloning of this singleton, that could cause major problems.
+     *
+     * @throws BadMethodCallException whenever an attempt to clone is made.
      */
     public function __clone() {
         throw new BadMethodCallException("You cannot clone the Session object");
