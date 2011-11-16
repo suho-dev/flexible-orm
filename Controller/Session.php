@@ -136,7 +136,7 @@ class Session {
             $calledClass = get_called_class();
             static::$_staticSession = new $calledClass($session);
         } elseif ( !is_null($session) && $session !== static::$_staticSession->_session ) {
-            throw new \BadMethodCallException("Attempted to get session with different SessionWrapper");
+            throw new BadMethodCallException("Attempted to get session with different SessionWrapper");
         }
 
         return static::$_staticSession;
