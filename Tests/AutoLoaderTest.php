@@ -4,7 +4,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests;
+namespace ORM;
 use ORM\AutoLoader;
 use ORM\Utilities\Configuration;
 
@@ -18,7 +18,7 @@ require_once dirname(__FILE__) . '/ORMTest.php';
  *       for my environment)
  * 
  */
-class AutoLoaderTest extends ORMTest {
+class AutoLoaderTest extends Tests\ORMTest {
     /**
      * @var AutoLoader $autoloader
      */
