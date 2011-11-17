@@ -17,7 +17,6 @@ require_once dirname(__FILE__) . '/ORMTest.php';
  * @todo Rewrite this class so it works in all environments (currently only works
  *       for my environment)
  * 
- * @todo add test for autoloader::addIncludePath()
  */
 class AutoLoaderTest extends ORMTest {
     /**
@@ -31,7 +30,7 @@ class AutoLoaderTest extends ORMTest {
     
     function testLocate() {
         $this->assertEquals(
-            '/server/projects/flexible-orm/Utilities/Configuration.php',
+            realpath(__DIR__.'/../Utilities/Configuration.php'),
             $this->autoloader->locate( 'ORM\Utilities\Configuration')
         );
 
@@ -41,7 +40,7 @@ class AutoLoaderTest extends ORMTest {
         );
 
         $this->assertEquals(
-            '/server/projects/flexible-orm/Tests/Mock/Owner.php',
+            realpath(__DIR__.'/Mock/Owner.php'),
             $this->autoloader->locate('ORM\Tests\Mock\Owner')
         );
     }
@@ -58,7 +57,7 @@ class AutoLoaderTest extends ORMTest {
     }
 
     function testLocateUnknownPackage() {
-        // Slashes will work either way in Windows, but must be / for *nix servers
+        // This test reuires Zendframework to be in the PEAR path
         $this->assertEquals(
             'C:\server\xampp\php\pear/Zend/Pdf/FileParser/Font.php',
             $this->autoloader->locate('Zend\Pdf\FileParser\Font')
@@ -70,5 +69,11 @@ class AutoLoaderTest extends ORMTest {
             '/server/projects/controller.1.1/',
             $this->autoloader->locatePackage('\Controller\\')
         );
+    }
+    
+    function testAddIncludePath() {
+        $this->autoloader->addIncludePath('/my/test/path');
+        
+        $this->assertTrue( preg_match( ':/my/test/path:', get_include_path() ) > 0);
     }
 }
