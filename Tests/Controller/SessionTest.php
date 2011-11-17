@@ -209,4 +209,11 @@ class SessionTest extends ORMTest {
         
         $this->assertEquals( 'jarrod', $session->name );
     }
+    
+    /**
+     * @todo implement test for regenerateSessionId
+     */
+    public function testRegenerateSessionId() {
+        $this->markTestIncomplete();
+    }
 }
