@@ -57,14 +57,15 @@ class AutoLoaderTest extends ORMTest {
     }
 
     function testLocateUnknownPackage() {
-        // This test reuires Zendframework to be in the PEAR path
+        // This test reuires PHPUnit to be in the PEAR path
         $this->assertEquals(
-            'C:\server\xampp\php\pear/Zend/Pdf/FileParser/Font.php',
-            $this->autoloader->locate('Zend\Pdf\FileParser\Font')
+            '/usr/lib/php/pear/PHPUnit/Framework/Assert.php',
+            $this->autoloader->locate('PHPUnit\Framework\Assert.php')
         );
     }
 
     function testLocatePackage() {
+//        die(get_include_path());
         $this->assertEquals(
             '/server/projects/controller.1.1/',
             $this->autoloader->locatePackage('\Controller\\')
