@@ -5,6 +5,8 @@
  * @version 2.0
  */
 namespace ORM;
+use ORM\Exceptions\IncludePathDoesNotExistException;
+use ORM\Exceptions\IncludePathIsNotADirectoryException;
 
 /**
  * Simple autoloading class for ORM
@@ -231,7 +233,7 @@ class AutoLoader {
      * @return string|false
      */
     private function _locateInIncludePath( $class ) {
-        $paths      = explode( PATH_SEPARATOR, get_include_path() );
+        $paths      = $this->_getIncludePaths();
         $classPath  = str_replace('\\', '/', $class );
 
         foreach ( $paths as $path ) {
@@ -290,13 +292,39 @@ class AutoLoader {
      * 
      * Essentially a shortcut to <code>set_include_path( get_include_path().PATH_SEPARATOR.$path );</code>
      * 
+     * If the same path already exists, it will not be added again. If specifying an absolute
+     * path (as opposed to a relative one), the path must exist.
+     * 
+     * @throws IncludePathDoesNotExistException if an absolute path is given that does not exist.
+     * @throws IncludePathIsNotADirectoryException if an absolute path is given to a file that is
+     *         not a directory.
+     * 
      * @param string $path
      * @return string
      *      The new PHP include path 
      */
     public function addIncludePath( $path ) {
-        set_include_path( get_include_path().PATH_SEPARATOR.$path );
+        if( !in_array($path, $this->_getIncludePaths() ) ) {
+            if( ($path[0] == '/' || $path[0] == '\\') ) {
+                // Absolute path provided
+                if( !file_exists($path) ) {
+                    throw new IncludePathDoesNotExistException( "'$path' cannot be found" );
+                } elseif( !is_dir($path) ) {
+                    throw new IncludePathIsNotADirectoryException( "'$path' is not a directory" );
+                }
+            }
+            
+            set_include_path( get_include_path().PATH_SEPARATOR.$path );
+        }
         
         return get_include_path();
+    }
+    
+    /**
+     * Get all the include paths as an array
+     * @return array
+     */
+    private function _getIncludePaths() {
+        return explode( PATH_SEPARATOR, get_include_path() );
     }
 }

@@ -14,9 +14,6 @@ require_once dirname(__FILE__) . '/ORMTest.php';
 /**
  * Test class for Configuration.
  * 
- * @todo Rewrite this class so it works in all environments (currently only works
- *       for my environment)
- * 
  */
 class AutoLoaderTest extends Tests\ORMTest {
     /**
@@ -56,16 +53,18 @@ class AutoLoaderTest extends Tests\ORMTest {
         );
     }
 
+    /**
+     * @todo Need to make this test not require PHPUnit to be in one specific place
+     */
     function testLocateUnknownPackage() {
         // This test reuires PHPUnit to be in the PEAR path
         $this->assertEquals(
             '/usr/lib/php/pear/PHPUnit/Framework/Assert.php',
-            $this->autoloader->locate('PHPUnit\Framework\Assert.php')
+            $this->autoloader->locate('PHPUnit\Framework\Assert')
         );
     }
 
     function testLocatePackage() {
-//        die(get_include_path());
         $this->assertEquals(
             '/server/projects/controller.1.1/',
             $this->autoloader->locatePackage('\Controller\\')
@@ -73,8 +72,50 @@ class AutoLoaderTest extends Tests\ORMTest {
     }
     
     function testAddIncludePath() {
-        $this->autoloader->addIncludePath('/my/test/path');
+        $includePathToAdd = realpath(__DIR__.'/../');
+        $this->autoloader->addIncludePath($includePathToAdd);
         
-        $this->assertTrue( preg_match( ':/my/test/path:', get_include_path() ) > 0);
+        $this->assertTrue( in_array($includePathToAdd, $this->_getIncludePaths() ) );
+        
+        $includePathToAdd2 = '../somewhere/relative';
+        $this->autoloader->addIncludePath($includePathToAdd2);
+        
+        $this->assertTrue( in_array($includePathToAdd, $this->_getIncludePaths()), "First path was removed: ".  get_include_path());
+        $this->assertTrue( in_array($includePathToAdd2, $this->_getIncludePaths()), "Unable to find path: ".  get_include_path());
     }
+    
+    /**
+     * Get an array of included paths
+     */
+    private function _getIncludePaths() {
+        return explode( PATH_SEPARATOR, get_include_path() );
+    }
+    
+    /**
+     * Ensure that adding the path twice does not result in the inlcude_path
+     * having the same path in it twice.
+     * 
+     * 
+     */
+    function testAddIncludePathTwice() {
+        $includePathToAdd = __DIR__;
+        $path = $this->autoloader->addIncludePath($includePathToAdd);
+        
+        $this->assertEquals( $path, $this->autoloader->addIncludePath($includePathToAdd) );
+    }
+    
+    /**
+     * @expectedException \ORM\Exceptions\IncludePathDoesNotExistException
+     */
+    function testAddIncludePathInvalid() {
+        $this->autoloader->addIncludePath('/would/be/suprisingin/if/this/existed');
+    }
+    
+    /**
+     * @expectedException \ORM\Exceptions\IncludePathIsNotADirectoryException
+     */
+    function testAddIncludePathFile() {
+        $this->autoloader->addIncludePath( __FILE__ );
+    }
+    
 }
