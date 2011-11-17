@@ -284,4 +284,19 @@ class AutoLoader {
             });
         }
     }
+    
+    /**
+     * Add a path to the PHP include path
+     * 
+     * Essentially a shortcut to <code>set_include_path( get_include_path().PATH_SEPERATOR.$path );</code>
+     * 
+     * @param string $path
+     * @return string
+     *      The new PHP include path 
+     */
+    public function addIncludePath( $path ) {
+        set_include_path( get_include_path().PATH_SEPERATOR.$path );
+        
+        return get_include_path();
+    }
 }
