@@ -13,8 +13,11 @@ require_once dirname(__FILE__) . '/ORMTest.php';
 
 /**
  * Test class for Configuration.
+ * 
  * @todo Rewrite this class so it works in all environments (currently only works
  *       for my environment)
+ * 
+ * @todo add test for autoloader::addIncludePath()
  */
 class AutoLoaderTest extends ORMTest {
     /**
