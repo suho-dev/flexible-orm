@@ -1,11 +1,11 @@
 <?php
-namespace ORM\Tests;
+namespace ORM;
 use \ORM\Tests\Mock, \ORM\PDOFactory;
 
 require_once 'ORMTest.php';
 
 
-class PDOFactoryTest extends ORMTest {
+class PDOFactoryTest extends Tests\ORMTest {
     public function testGet() {
         $cars = PDOFactory::Get('SELECT * FROM cars');
         $this->assertEquals( 'ORM\ORM_PDOStatement', get_class($cars), 'PDO Factory did not return a ORM_PDOStatement object' );

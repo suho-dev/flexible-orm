@@ -5,7 +5,7 @@
  * @author jarrod.swift
  * @todo Fix the autoloader
  */
-namespace ORM\Tests;
+namespace ORM;
 use \ORM\Tests\Mock, \ORM\PDOFactory, \ORM\DEBUG;
 
 require_once 'ORMTest.php';
@@ -15,7 +15,7 @@ PDOFactory::Get("TRUNCATE TABLE `cars`")->execute();
 /**
  * Test class for ORM_Model
  */
-class ORM_ModelTest extends ORMTest {
+class ORM_ModelTest extends Test\ORMTest {
     public function setUp() {
         PDOFactory::Get("INSERT INTO `cars` (`id`, `brand`, `colour`, `doors`, `owner_id`, `name`, `age`, `type`) VALUES
             (1, 'Alfa Romeo', 'red', 4, 1, '156Ti', 4, 'Sedan'),

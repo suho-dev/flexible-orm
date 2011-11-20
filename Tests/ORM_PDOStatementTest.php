@@ -1,11 +1,11 @@
 <?php
-namespace ORM\Tests;
+namespace ORM;
 use \ORM\Tests\Mock, \ORM\PDOFactory;
 
 require_once 'ORMTest.php';
 
 
-class ORM_PDOTest extends ORMTest {
+class ORM_PDOStatementTest extends ORMTest {
     private $_owner;
     
     protected function setUp() {
