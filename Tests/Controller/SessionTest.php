@@ -209,7 +209,29 @@ class SessionTest extends ORMTest {
         
         $this->assertEquals( 'jarrod', $session->name );
     }
-    
+
+    public function testWithActualSessionLockAndUnlockTwice() {
+        Session::Clear();
+        $session = Session::GetSession();
+        $this->assertNull($session->name);
+
+        // The set-up
+        $session->lock();
+        $session->name = 'jarrod';
+        $this->assertTrue( $session->unlock() );
+
+        // Ensure it variable is correct after first unlock
+        $this->assertEquals( 'jarrod', $session->name );
+
+        // Ensure it variable is correct after subsequent lock
+        $session->lock();
+        $this->assertEquals( 'jarrod', $session->name );
+
+        // Ensure it variable is correct after subsequent un-lock
+        $this->assertTrue( $session->unlock() );
+        $this->assertEquals( 'jarrod', $session->name );
+    }
+
     /**
      * @todo implement test for regenerateSessionId
      */
