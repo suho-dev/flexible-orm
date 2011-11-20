@@ -34,6 +34,7 @@ class SessionWrapper extends ArrayObject implements \ORM\Interfaces\SessionWrapp
      */
     public function writeClose() {
         $this->_sessionStarted = false;
+        $_SESSION = $this->getArrayCopy();
         session_write_close();
     }
 

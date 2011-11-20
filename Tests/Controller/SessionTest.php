@@ -7,7 +7,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests\Controller;
+namespace ORM\Controller;
 use ORM\Tests\ORMTest;
 use ORM\Tests\Mock\MockSessionWrapper;
 use ORM\Tests\Mock\SessionMock as Session;
@@ -21,7 +21,7 @@ require_once '../ORMTest.php';
 /**
  * Test the Session class using the MockSessionWrapper
  */
-class SessionTest extends ORMTest {
+class SessionTest extends \ORM\Tests\ORMTest {
     /**
      * @var MockSessionWrapper $sessionWrapper
      */
@@ -68,6 +68,21 @@ class SessionTest extends ORMTest {
         $this->assertTrue( $session->isLocked() );
         $session->unlock();
         $this->assertFalse( $session->isLocked() );
+    }
+    
+    public function testLockAndUnlockData() {
+        $session = Session::GetSession( $this->sessionWrapper );
+        
+        
+        $session->lock();
+        $session->name = 'Jarrod';
+        $this->assertEquals( 'Jarrod', $session->name );
+        $session->unlock();
+        $this->assertEquals( 'Jarrod', $session->name );
+        $session->lock();
+        $this->assertEquals( 'Jarrod', $session->name );
+        
+        $session->unlock();
     }
     
     public function testGet() {
@@ -213,23 +228,23 @@ class SessionTest extends ORMTest {
     public function testWithActualSessionLockAndUnlockTwice() {
         Session::Clear();
         $session = Session::GetSession();
-        $this->assertNull($session->name);
+        $number = rand();
 
         // The set-up
         $session->lock();
-        $session->name = 'jarrod';
+        $session->number = $number;
         $this->assertTrue( $session->unlock() );
 
         // Ensure it variable is correct after first unlock
-        $this->assertEquals( 'jarrod', $session->name );
+        $this->assertEquals( $number, $session->number, "number incorrect after first unlock" );
 
         // Ensure it variable is correct after subsequent lock
         $session->lock();
-        $this->assertEquals( 'jarrod', $session->name );
+        $this->assertEquals( $number, $session->number, "number incorrect after re-locking"  );
 
         // Ensure it variable is correct after subsequent un-lock
         $this->assertTrue( $session->unlock() );
-        $this->assertEquals( 'jarrod', $session->name );
+        $this->assertEquals( $number, $session->number, "number incorrect after second unlock"  );
     }
 
     /**
