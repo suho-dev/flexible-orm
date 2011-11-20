@@ -6,7 +6,7 @@
 /**
  * Tests specific to the Controller package
  */
-namespace ORM\Tests\Controller;
+namespace ORM\Controller;
 use \ORM\Controller\BaseController, 
     \ORM\Controller\Request, 
     \ORM\Tests\Mock\CarsController,
@@ -17,9 +17,11 @@ require 'Smarty/libs/Smarty.class.php';
 
 /**
  * Description of ControllerTest
+ * 
+ * @todo Make including Smarty more flexible
  *
  */
-class ControllerTest extends \ORM\Tests\ORMTest {
+class BaseControllerTest extends Tests\ORMTest {
     /**
      * @var CarsController $controller
      */

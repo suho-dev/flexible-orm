@@ -3,8 +3,8 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests\Controller;
-use \ORM\Controller\Request;
+namespace ORM\Controller;
+use ORM\Controller\Request;
 
 require_once '../ORMTest.php';
 
