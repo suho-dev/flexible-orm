@@ -1,11 +1,11 @@
 <?php
-namespace ORM\Tests;
+namespace ORM\SDB;
 use \ORM\Tests\Mock, \ORM\SDB\ORMModelSDB;
 
-require_once 'ORMTest.php';
+require_once '../ORMTest.php';
 
 
-class ORMModelSDBTest extends ORMTest {
+class ORMModelSDBTest extends \ORM\Tests\ORMTest {
     /**
      * @var AmazonSDB $object
      */
@@ -316,4 +316,3 @@ class ORMModelSDBTest extends ORMTest {
         $cars->save();
     }
 }
-?>

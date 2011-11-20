@@ -2,7 +2,7 @@
 /**
  * Tests specific to AmazonSDB packages (SDB)
  */
-namespace ORM\Tests\SDB;
+namespace ORM\SDB;
 use \ORM\Tests\Mock, \ORM\SDB\SDBStatement;
 
 set_include_path(get_include_path(). PATH_SEPARATOR . __DIR__.'/..');

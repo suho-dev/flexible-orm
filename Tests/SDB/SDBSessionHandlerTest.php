@@ -3,15 +3,14 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests;
-use \ORM\SDB;
-require_once 'ORMTest.php';
+namespace ORM\SDB;
+require_once '../ORMTest.php';
 
 /**
  * Description of SDBSessionHandlerTest
  *
  */
-class SDBSessionHandlerTest extends ORMTest{
+class SDBSessionHandlerTest extends \ORM\Tests\ORMTest {
     public $session_id;
     private $_savedData = array(
         'some' => array('saved', 'data')
