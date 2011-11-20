@@ -1,5 +1,5 @@
 <?php
-namespace ORM\Tests\Utilities;
+namespace ORM\Utilities;
 use ORM\Utilities\ErrorHandler;
 
 require_once '../ORMTest.php';

@@ -4,22 +4,23 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests;
+namespace ORM\Utilities;
 use \ORM\Utilities\Configuration;
 
-require_once dirname(__FILE__) . '/ORMTest.php';
+require_once '../ORMTest.php';
+
 /**
  * Test class for Configuration.
  * 
  */
-class ConfigurationTest extends ORMTest {
+class ConfigurationTest extends \ORM\Tests\ORMTest {
 
     /**
      * Clear and reload the Configuration details before each test
      */
     protected function setUp() {
         Configuration::Clear();
-        Configuration::Load('test.ini');
+        Configuration::Load('../test.ini');
     }
 
     public function testValueNull() {
