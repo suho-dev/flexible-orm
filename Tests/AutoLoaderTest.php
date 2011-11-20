@@ -57,7 +57,7 @@ class AutoLoaderTest extends Tests\ORMTest {
      * @todo Need to make this test not require PHPUnit to be in one specific place
      */
     function testLocateUnknownPackage() {
-        // This test reuires PHPUnit to be in the PEAR path
+        // This test requires PHPUnit to be in the PEAR path
         $this->assertEquals(
             '/usr/lib/php/pear/PHPUnit/Framework/Assert.php',
             $this->autoloader->locate('PHPUnit\Framework\Assert')
