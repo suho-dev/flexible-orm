@@ -344,7 +344,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
             return static::CountFindAllBy( self::_LowercaseFirst($matches[1]), $arguments[0], $operator );
         }
         
-        throw new Exceptions\ORMException("Method $name does not exist");
+        throw new Exceptions\ORMInvalidStaticMethodException("Method $name does not exist");
     }
 
     /**

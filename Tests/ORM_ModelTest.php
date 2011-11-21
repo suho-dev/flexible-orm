@@ -5,7 +5,7 @@
  * @author jarrod.swift
  * @todo Fix the autoloader
  */
-namespace ORM\Tests;
+namespace ORM;
 use \ORM\Tests\Mock, \ORM\PDOFactory, \ORM\DEBUG;
 
 require_once 'ORMTest.php';
@@ -15,7 +15,7 @@ PDOFactory::Get("TRUNCATE TABLE `cars`")->execute();
 /**
  * Test class for ORM_Model
  */
-class ORM_ModelTest extends ORMTest {
+class ORM_ModelTest extends Tests\ORMTest {
     public function setUp() {
         PDOFactory::Get("INSERT INTO `cars` (`id`, `brand`, `colour`, `doors`, `owner_id`, `name`, `age`, `type`) VALUES
             (1, 'Alfa Romeo', 'red', 4, 1, '156Ti', 4, 'Sedan'),
@@ -433,6 +433,35 @@ class ORM_ModelTest extends ORMTest {
         $this->assertEquals( 1400, $elephant->weight );
 
     }
+    
+    public function testUpdateInvalid() {
+        $elephant = new Mock\Elephant();
+        $elephant->name     = "Tim";
+        $elephant->weight   = 1000;
+
+        $this->assertTrue( $elephant->save(), 'Unable to save elephant: ', $elephant->errorMessagesString() );
+
+        $elephant = Mock\Elephant::Find( 'Tim' );
+        $elephant->weight = -100;
+
+        $this->assertFalse( $elephant->save() );
+
+        $elephant = Mock\Elephant::Find( 'Tim' );
+        $this->assertEquals( 1000, $elephant->weight, "Invalid data was saved" );
+    }
+    
+    public function testUpdateNoChanges() {
+        $elephant = new Mock\Elephant();
+        $elephant->name     = "Tim";
+        $elephant->weight   = 1000;
+
+        $this->assertTrue( $elephant->save(), 'Unable to save elephant: ', $elephant->errorMessagesString() );
+
+        $elephant = Mock\Elephant::Find( 'Tim' );
+        $elephant->weight = $elephant->weight;
+
+        $this->assertTrue( $elephant->save() );
+    }
 
     public function testDelete() {
         $ford = new Mock\Car(array(
@@ -656,5 +685,17 @@ class ORM_ModelTest extends ORMTest {
         foreach ( $cars as $car ) {
             $this->assertEquals( $car->brand, $car->testValue() );
         }
+    }
+    
+    /**
+     * @expectedException \ORM\Exceptions\ORMInvalidStaticMethodException
+     */
+    public function testInvalidStaticMethod() {
+        $car = Mock\Car::Blurt();
+    }
+    
+    public function testToString() {
+        $car = Mock\Car::Find();
+        $this->assertEquals( 'ORM\Tests\Mock\Car ['.$car->id().']', (string)$car );
     }
 }
