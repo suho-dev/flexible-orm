@@ -23,6 +23,7 @@ class RequestTest extends \ORM\Tests\ORMTest {
     private $post = array( 'name'   => 'steve', 'age'   => '1notvalid');
     
     public function setUp() {
+        ini_set('request_order', 'GP');
         $this->object = new Request( $this->get, $this->post );
     }
     
@@ -77,4 +78,12 @@ class RequestTest extends \ORM\Tests\ORMTest {
             $this->get['id'], $this->object->get->id(25)
         );
     }
+    
+    /**
+     * @expectedException LogicException
+     */
+    public function testSet() {
+        $this->object->x = 100;
+    }
+    
 }

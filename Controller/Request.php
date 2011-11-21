@@ -174,9 +174,11 @@ class Request {
      * 
      * Order is defined by the ini settings \c request_order (or \c variables_order
      * if not available).
+     * 
+     * @see requestOrder()
      */
     private function _initRequest() {
-        $order = ini_get('request_order') ?: ini_get('variables_order');
+        $order = $this->requestOrder();
         
         for ( $i=0; $i < strlen($order); $i++ ) {
             switch( $order[$i] ) {
@@ -193,6 +195,16 @@ class Request {
         }
         
         $this->_request = new Variables( $this->_requestArray );
+    }
+    
+    /**
+     * Get the request order specified in the PHP settings
+     * 
+     * @see _initRequest()
+     * @return string
+     */
+    public function requestOrder() {
+        return ini_get('request_order') ?: ini_get('variables_order');
     }
     
     /**
