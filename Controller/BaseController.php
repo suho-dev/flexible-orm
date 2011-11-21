@@ -5,6 +5,7 @@
  */
 namespace ORM\Controller;
 use \ORM\Interfaces\Template;
+use \ORM\Exceptions\InvalidActionException;
 
 /**
  * Simple controller class for implementing a MVC stack
@@ -149,7 +150,7 @@ abstract class BaseController {
      * \n\n
      * 
      * @see Template
-     * @throws \ORM\Exceptions\InvalidActionException if a non-existant or
+     * @throws InvalidActionException if a non-existant or
      *      non-public method has been requested as the action.
      * @param string $action 
      *      [optional] Force an action name to run (overrides the value of \c $_actionName)
@@ -160,7 +161,7 @@ abstract class BaseController {
         $this->actionName = is_null($action) ? $this->_actionName : $action;
                
         if ( !is_callable(array($this, $this->actionName))) {
-            throw new \ORM\Exceptions\InvalidActionException("Unknown action, '$this->actionName' for the class, '".get_class($this)."'.");
+            throw new InvalidActionException("Unknown action, '$this->actionName' for the class, '".get_class($this)."'.");
         }
         
         $this->beforeAction();
