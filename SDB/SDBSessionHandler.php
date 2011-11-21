@@ -18,7 +18,7 @@ namespace ORM\SDB;
  * @endcode
  *
  */
-class SDBSessionHandler {
+class SDBSessionHandler implements ORM\Interfaces\SessionHandler {
     /**
      * @var SDBSessionHandler $_sessionHandler
      */

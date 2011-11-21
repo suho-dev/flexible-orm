@@ -1,1 +1,0 @@
-<h1>Layout</h1>{$action_content}

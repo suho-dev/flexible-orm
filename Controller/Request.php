@@ -5,6 +5,7 @@
  */
 namespace ORM\Controller;
 use ORM\Controller\Request\Variables;
+use \LogicException;
 
 /**
  * Represents the request parameters
@@ -166,7 +167,7 @@ class Request {
      * @param mixed $value 
      */
     public function __set( $name, $value ) {
-        throw new \LogicException("Unable to change value of request parameters. Tried to change $name");
+        throw new LogicException("Unable to change value of request parameters. Tried to change $name");
     }
     
     /**

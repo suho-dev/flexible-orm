@@ -1,1 +1,0 @@
-<p>test index with no layout</p>
