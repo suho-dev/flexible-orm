@@ -167,13 +167,18 @@ class AutoLoader {
      * where underscores are folder names
      *
      * @param string $class
+     * @return boolean
+     *      True if succesfully found
      */
     public function loadZend( $class ) {
         $pathName = str_replace( array('_', '\\'), '/', $class );
 
         if ( $this->_locateInIncludePath($pathName) ) {
             require "$pathName.php";
+            return true;
         }
+        
+        return false;
     }
 
     /**

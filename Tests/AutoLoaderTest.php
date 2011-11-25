@@ -53,13 +53,11 @@ class AutoLoaderTest extends Tests\ORMTest {
         );
     }
 
-    /**
-     * @todo Need to make this test not require PHPUnit to be in one specific place
-     */
     function testLocateUnknownPackage() {
-        // This test requires PHPUnit to be in the PEAR path
-        $this->assertEquals(
-            '/usr/lib/php/pear/PHPUnit/Framework/Assert.php',
+        // This test requires PHPUnit to be in the include path
+        
+        $this->assertStringEndsWith( 
+            '/PHPUnit/Framework/Assert.php', 
             $this->autoloader->locate('PHPUnit\Framework\Assert')
         );
     }
@@ -117,5 +115,33 @@ class AutoLoaderTest extends Tests\ORMTest {
     function testAddIncludePathFile() {
         $this->autoloader->addIncludePath( __FILE__ );
     }
+ 
+    function testGetPackageLocations() {
+        $packageLocations = $this->autoloader->getPackageLocations();
+        $this->assertTrue( array_key_exists('Controller', $packageLocations) );
+        $this->assertTrue( array_key_exists('Treehouse', $packageLocations) );
+        $this->assertEquals( '/server/projects/treehouse', $packageLocations['Treehouse']);
+    }
     
+    /**
+     * Hard to test more than it has added to the autoloader stack
+     */
+    function testRegister() {
+        $originalStack = spl_autoload_functions();
+        $originalStackSize = count( $originalStack );
+        
+        $this->autoloader->register( AutoLoader::AUTOLOAD_STYLE_BOTH );
+        
+        $this->assertEquals( $originalStackSize+2, count(spl_autoload_functions()) );
+    }
+    
+    function testLoadZend() {
+        $this->assertTrue( 
+                $this->autoloader->loadZend('Mock_Zend_TestClass'),
+                'loadZend unable to locate Mock_Zend_TestClass'
+        );
+        
+        $testObject = new \Mock_Zend_TestClass;
+        $this->assertTrue( $testObject->loaded );
+    }
 }
