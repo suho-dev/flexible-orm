@@ -137,11 +137,18 @@ class AutoLoaderTest extends Tests\ORMTest {
     
     function testLoadZend() {
         $this->assertTrue( 
-                $this->autoloader->loadZend('Mock_Zend_TestClass'),
-                'loadZend unable to locate Mock_Zend_TestClass'
+            $this->autoloader->loadZend('Mock_Zend_TestClass'),
+            'loadZend unable to locate Mock_Zend_TestClass'
         );
         
         $testObject = new \Mock_Zend_TestClass;
         $this->assertTrue( $testObject->loaded );
+    }
+    
+    function loadZendNotAvailable() {
+        $this->assertFalse( 
+            $this->autoloader->loadZend('Mock_Zend_AnotherTestClass'),
+            'loadZend was able to locate Mock_Zend_AnotherTestClass, which should not exist'
+        );
     }
 }
