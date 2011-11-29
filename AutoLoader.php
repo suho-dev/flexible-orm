@@ -30,11 +30,11 @@ use ORM\Exceptions\IncludePathIsNotADirectoryException;
  * 
  * 
  * \n
- * \n<b>Packages</b>
+ * \n<b>Packages</b>\n
  * To autoload packages, supply the Autoloader object with an associative array, array keys are package names
  * and values are path names.
  * 
- * <b>Usage</b>
+ * <b>Usage</b>\n
  * The following is the recommended method of boot-strapping the autoloader for flexible-orm
  * use.
  * 

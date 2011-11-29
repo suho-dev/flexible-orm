@@ -12,7 +12,6 @@ use ORM\AutoLoader;
 use PHPUnit_Framework_TestCase;
 
 error_reporting(E_ALL);
-set_include_path(get_include_path() . PATH_SEPARATOR . realpath(__DIR__.'/../../plugins') );
 
 require_once __DIR__ . '/../AutoLoader.php';
 require_once 'AWSSDKforPHP/sdk.class.php';
