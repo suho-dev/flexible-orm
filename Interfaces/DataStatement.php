@@ -63,4 +63,3 @@ interface DataStatement {
      */
     public function fetchAllInto( $className );
 }
-?>

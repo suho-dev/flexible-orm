@@ -4,6 +4,7 @@
  * @author jarrod.swift
  */
 namespace ORM\Interfaces;
+
 /**
  * Interface for SQL prepared statement factory classes
  *
@@ -44,4 +45,16 @@ interface DataFactory {
      *      Field names in a numerically indexed array
      */
     public function fieldNames( $table );
+    
+    /**
+     * Get a description of a field in the table
+     * 
+     * @throws FieldDoesNotExistException if the field requested does not exist
+     * @param string $table
+     *      The table name
+     * @param string $field
+     *      The field name
+     * @return string
+     */
+    public function describeField( $table, $field );
 }

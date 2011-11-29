@@ -5,6 +5,7 @@
  */
 namespace ORM;
 use ORM\Utilities\Configuration;
+use ORM\Exceptions\FieldDoesNotExistException;
 
 /**
  * A singleton database managing class that acts as a factory for prepared
@@ -54,6 +55,12 @@ class PDOFactory implements Interfaces\DataFactory {
      * @var string $_databaseType
      */
     private $_databaseType;
+    
+    /**
+     * Store the datatypes and field names after being looked up
+     * @var array $_knownTables
+     */
+    private $_knownTables = array();
 
     /**
      * Connect to the database when creating the PDOFactory instance
@@ -332,30 +339,67 @@ class PDOFactory implements Interfaces\DataFactory {
     /**
      * Get the names of each field from the database table structure
      * 
-     * @todo Improve this so that it is easier to add to and maintain
-     * 
      * @param string $table
      *      The table name 
      * @return array
      *      Field names in a numerically indexed array
      */
     public function fieldNames( $table ) {
-        switch( $this->databaseType() ) {
-        case 'sqlite':
-            return $this->_describeTableSQLite( $table );
-        case 'pgsql':
-            return $this->_describeTablePostgres( $table );
-        case 'sqlsrv':
-            return $this->_describeTableMSSql( $table );
-        case 'mysql':
-        default:
-            return $this->_describeTableMysql( $table );
+        return array_keys( $this->describeTable($table) );
+    }
+    
+    /**
+     * Get a description of a field in the table
+     * 
+     * @throws FieldDoesNotExistException if the field requested does not exist
+     * @param string $table
+     *      The table name
+     * @param string $field
+     *      The field name
+     * @return string
+     */
+    public function describeField( $table, $field ) {
+        $fields = $this->describeTable($table);
+        
+        if(array_key_exists($field, $fields) ) {
+            return $fields[$field];
+        } else {
+            throw new FieldDoesNotExistException("Field $field does not exist in $table");
         }
     }
     
     /**
-     * Get the column names from a MySQL database
+     * Get a desciption of all the fields and their field types from the given table
      * 
+     * @todo Improve this so that it is easier to add to and maintain
+     * 
+     * @param string $table
+     *      Table name 
+     * @return array
+     *      Keys will be field names and values will be field descriptions
+     */
+    public function describeTable( $table ) {
+        if( !isset($this->_knownTables[$table]) ) {
+            switch( $this->databaseType() ) {
+            case 'sqlite':
+                return $this->_describeTableSQLite( $table );
+            case 'pgsql':
+                return $this->_describeTablePostgres( $table );
+            case 'sqlsrv':
+                return $this->_describeTableMSSql( $table );
+            case 'mysql':
+            default:
+                return $this->_describeTableMysql( $table );
+            }
+        }
+        
+        return $this->_knownTables[$table];
+    }
+    
+    /**
+     * Get the column names and datatypes from a MySQL database
+     * 
+     * @todo implement fetching datatypes
      * @param string $table
      *      Table name
      * @return array
@@ -372,9 +416,9 @@ class PDOFactory implements Interfaces\DataFactory {
     }
     
     /**
-     * Get the column names from a Postgres database
+     * Get the column names and datatypes from a Postgres database
      * 
-     * @todo test this
+     * @todo implement fetching datatypes
      * @param string $table
      *      Table name
      * @return array
@@ -391,9 +435,9 @@ class PDOFactory implements Interfaces\DataFactory {
     }
     
     /**
-     * Get the column names from a MS SQL database
+     * Get the column names and datatypes from a MS SQL database
      * 
-     * @todo test this
+     * @todo implement fetching datatypes
      * @param string $table
      *      Table name
      * @return array
@@ -410,8 +454,9 @@ class PDOFactory implements Interfaces\DataFactory {
     }
     
     /**
-     * Get the column names from a SQLite database
+     * Get the column names and datatypes from a SQLite database
      * 
+     * @todo implement fetching datatypes
      * @param string $table
      *      Table name
      * @return array

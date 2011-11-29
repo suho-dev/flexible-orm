@@ -97,6 +97,35 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
 
         parent::__construct( $values );
     }
+    
+    /**
+     * Get a description of the stored data type for a given property.
+     * 
+     * Only makes sense for models backed by database tables. Datatypes will vary
+     * between database implementations.
+     * 
+     * <b>Usage</b>\n
+     * @code
+     * // Trivial example
+     * $someFields = array( 'name', 'age', 'type' );
+     * $cssFields  = array();
+     * 
+     * foreach( $someFields as $field ) {
+     *      $cssFields[$field] = User::PropertyType( $field ) == 'INT' ? 'number' : 'general';
+     * }
+     * @endcode
+     * 
+     * @todo Implement the ORM_Model::PropertyType method
+     * 
+     * @param string $propertyName 
+     * @return string
+     */
+    public static function PropertyType( $propertyName ) {
+        $dfClass = self::DataFactory();
+        $df      = $dfClass::GetFactory( static::DatabaseConfigName() );
+        
+        return $df->describeField( $table, $field );
+    }
 
     /**
      * Find a single object
