@@ -226,16 +226,17 @@ abstract class ORM_Core {
      * @return array
      */
     public function changedFields() {
-        $changed = array();
+        $changed         = array();
         $original_values = count($this->_originalValues) ? $this->_originalValues : array();
-
-        $attributes = $this->values();
+        $attributes      = $this->values();
+        
 
         foreach ( $attributes as $key => $value ) {
-            if ( !isset($original_values[$key]) || $original_values[$key] != $value ) {
+            if ( !array_key_exists( $key, $original_values ) || $original_values[$key] != $value ) {
                 $changed[] = $key;
             }
         }
+        
         return $changed;
     }
 

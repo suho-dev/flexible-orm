@@ -523,19 +523,26 @@ class ORM_ModelTest extends Tests\ORMTest {
      * Test case for a specific problem with field aliasing
      */
     public function testSaveTwice() {
-        $ford = new Mock\Car(array(
+        $values = array(
             'brand'     => 'Ford',
             'colour'    => 'Black',
-            'owner_id'  => 3,
-            'doors'     => 2,
-            'age'       => 100
-        ));
+            'owner_id'  => '3',
+            'doors'     => '2',
+            'age'       => '100'
+        );
+        
+        $ford = new Mock\Car($values);
 
         $this->assertTrue( $ford->save() );
         $id = $ford->id();
         
         $ford->load();
-        $this->assertEquals(array(), $ford->changedFields());
+        $values = $ford->values();
+        
+        $this->assertNull( $ford->originalValue('model') );
+        $this->assertArrayHasKey('model', $values);
+        $this->assertNull( $values['model'] );
+        $this->assertEquals( array(), $ford->changedFields()) ;
         $this->assertTrue( $ford->save() );
         
         $this->assertEquals($id, $ford->id() );
