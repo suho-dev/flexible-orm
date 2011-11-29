@@ -77,5 +77,19 @@ class PDOFactoryTest extends ORMTest {
         
         $this->assertEquals( 'mysql', $factory->databaseType() );
     }
+    
+    /**
+     * @todo implement test for DescribeField (valid)
+     */
+    public function testDescribeField() {
+        $this->markTestIncomplete();
+    }
+    
+    /**
+     * @expectedException \ORM\Exceptions\FieldDoesNotExistException
+     */
+    public function testDescribeUnknownField() {
+        $factory = PDOFactory::GetFactory();
+        $factory->describeField('cars', 'idontexist');
+    }
 }
-?>

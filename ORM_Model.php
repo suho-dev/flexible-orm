@@ -115,8 +115,6 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * }
      * @endcode
      * 
-     * @todo Implement the ORM_Model::PropertyType method
-     * 
      * @param string $propertyName 
      * @return string
      */

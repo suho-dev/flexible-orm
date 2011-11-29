@@ -657,4 +657,11 @@ class ORM_ModelTest extends ORMTest {
             $this->assertEquals( $car->brand, $car->testValue() );
         }
     }
+    
+    /**
+     * @todo implement test for PropertyType
+     */
+    public function TestPropertyType() {
+        $this->markTestIncomplete();
+    }
 }

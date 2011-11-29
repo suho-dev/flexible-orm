@@ -4,6 +4,7 @@
  * @author jarrod.swift
  */
 namespace ORM;
+use \PDO;
 use ORM\Utilities\Configuration;
 use ORM\Exceptions\FieldDoesNotExistException;
 
@@ -128,7 +129,7 @@ class PDOFactory implements Interfaces\DataFactory {
             $this->_db->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->_db->setAttribute( \PDO::ATTR_STATEMENT_CLASS, array(__NAMESPACE__.'\ORM_PDOStatement'));
         } catch( \PDOException $e ) {
-            throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException( $e->getMessage() );
+            throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException( "[$databaseConfig] ".$e->getMessage() );
         }
     }
     
@@ -399,20 +400,22 @@ class PDOFactory implements Interfaces\DataFactory {
     /**
      * Get the column names and datatypes from a MySQL database
      * 
-     * @todo implement fetching datatypes
      * @param string $table
      *      Table name
      * @return array
-     *      Array of field names
+     *      Array of field names => data types
      */
     private function _describeTableMysql( $table ) {
         $query  = $this->statement( "DESCRIBE `$table`" );
         $query->execute();
-        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+        $result = $query->fetchAll( PDO::FETCH_ASSOC );
 
-        return array_map(function($row){
-            return $row['Field'];
-        }, $result );
+        $fields = array();
+        foreach( $result as $fieldPropreties ) {
+            $fields[$fieldPropreties['Field']] = $fieldPropreties['Type'];
+        }
+        
+        return $fields;
     }
     
     /**
@@ -422,12 +425,12 @@ class PDOFactory implements Interfaces\DataFactory {
      * @param string $table
      *      Table name
      * @return array
-     *      Array of field names
+     *      Array of field names => data types
      */
     private function _describeTablePostgres( $table ) {
         $query  = $this->statement( "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'" );
         $query->execute();
-        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+        $result = $query->fetchAll( PDO::FETCH_ASSOC );
 
         return array_map(function($row){
             return $row['column_name'];
@@ -441,12 +444,12 @@ class PDOFactory implements Interfaces\DataFactory {
      * @param string $table
      *      Table name
      * @return array
-     *      Array of field names
+     *      Array of field names => data types
      */
     private function _describeTableMSSql( $table ) {
         $query  = $this->statement( "EXEC sp_columns @table_name= N'$table'" );
         $query->execute();
-        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+        $result = $query->fetchAll( PDO::FETCH_ASSOC );
 
         return array_map(function($row){
             return $row['COLUMN_NAME'];
@@ -460,19 +463,16 @@ class PDOFactory implements Interfaces\DataFactory {
      * @param string $table
      *      Table name
      * @return array
-     *      Array of field names
+     *      Array of field names => data types
      */
     private function _describeTableSQLite( $table ) {
-        //pragma table_info(ABC);
-        
         $query  = $this->statement( "PRAGMA table_info($table)" );
         $query->execute();
-        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+        $result = $query->fetchAll( PDO::FETCH_ASSOC );
 
         return array_map(function($row){
             return $row['name'];
         }, $result );
     }
-    
     
 }
