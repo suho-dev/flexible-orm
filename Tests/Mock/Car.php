@@ -12,6 +12,7 @@ use ORM\ORM_Model;
  */
 class Car extends ORM_Model {
     private $_testValue = 'initial';
+    protected static $_fieldAliases = array('name' => 'model');
     
     /**
      * Define that the model Manufacturer is related to this model through

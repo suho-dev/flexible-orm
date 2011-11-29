@@ -90,7 +90,7 @@ class ORM_ModelTest extends ORMTest {
 
         $this->assertEquals(
             '156Ti',
-            $car->name
+            $car->model
         );
     }
 
@@ -119,7 +119,7 @@ class ORM_ModelTest extends ORMTest {
 
         $this->assertEquals(
             '156Ti',
-            $car->name
+            $car->model
         );
     }
 
@@ -158,7 +158,7 @@ class ORM_ModelTest extends ORMTest {
 
         $this->assertEquals(
             '156Ti',
-            $car->name
+            $car->model
         );
     }
 
@@ -187,7 +187,7 @@ class ORM_ModelTest extends ORMTest {
 
         $this->assertEquals(
             '156Ti',
-            $car->name
+            $car->model
         );
     }
 
@@ -481,13 +481,30 @@ class ORM_ModelTest extends ORMTest {
 
         $ford->save();
 
-        $ford->save();
+//        $ford->save();
 
         // Ensure it has been created for this to make sense as a test
         $this->assertEquals( $ford->id(), Mock\Car::Find($ford->id())->id() );
 
         Mock\Car::Destroy( $ford->id() );
         $this->assertFalse( Mock\Car::Find($ford->id()) );
+    }
+    
+    public function testSaveTwice() {
+        $ford = new Mock\Car(array(
+            'brand'     => 'Ford',
+            'colour'    => 'Black',
+            'owner_id'  => 3,
+            'doors'     => 2,
+            'age'       => 100
+        ));
+
+        $this->assertTrue( $ford->save() );
+        $id = $ford->id();
+        
+        $this->assertTrue( $ford->save() );
+        
+        $this->assertEquals($id, $ford->id() );
     }
 
     /**
@@ -658,10 +675,17 @@ class ORM_ModelTest extends ORMTest {
         }
     }
     
-    /**
-     * @todo implement test for PropertyType
-     */
-    public function TestPropertyType() {
-        $this->markTestIncomplete();
+    public function testPropertyType() {
+        $this->assertEquals(
+                'int(1)',
+                Mock\Car::PropertyType('doors')
+        );
+    }
+    
+    public function testPropertyTypeAlias() {
+        $this->assertEquals(
+                'VARCHAR(32)',
+                Mock\Car::PropertyType('model')
+        );
     }
 }

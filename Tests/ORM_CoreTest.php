@@ -102,12 +102,12 @@ class ORM_CoreTest extends ORMTest {
     
     public function testTranslateFieldToProperty() {
         $this->assertEquals('doors', Mock\Car::TranslateFieldToProperty('doors'));
+        $this->assertEquals('model', Mock\Car::TranslateFieldToProperty('name'));
     }
     
     public function testTranslatePropertyToField() {
         $this->assertEquals('doors', Mock\Car::TranslatePropertyToField('doors'));
+        $this->assertEquals('name',  Mock\Car::TranslatePropertyToField('model'));
     }
 
 }
-
-?>

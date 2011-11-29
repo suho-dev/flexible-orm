@@ -82,7 +82,11 @@ class PDOFactoryTest extends ORMTest {
      * @todo implement test for DescribeField (valid)
      */
     public function testDescribeField() {
-        $this->markTestIncomplete();
+        $factory = PDOFactory::GetFactory();
+        $this->assertEquals(
+                'int(1)',
+                $factory->describeField('cars', 'doors')
+        );
     }
     
     /**

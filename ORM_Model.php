@@ -4,8 +4,9 @@
  * @author jarrod.swift
  */
 namespace ORM;
-
 use ORM\Exceptions;
+use ORM\Exceptions\FieldDoesNotExistException;
+
 
 /**
  * Base class for ordinary ORM classes
@@ -115,6 +116,8 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * }
      * @endcode
      * 
+     * @throws FieldDoesNotExistException if the field requested does not exist in
+     *         this model
      * @param string $propertyName 
      * @return string
      */
@@ -122,7 +125,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $dfClass = self::DataFactory();
         $df      = $dfClass::GetFactory( static::DatabaseConfigName() );
         
-        return $df->describeField( $table, $field );
+        return $df->describeField( static::TableName(), static::FieldAlias($propertyName) );
     }
 
     /**
@@ -808,6 +811,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     /**
      * Get an array listing all the fields stored in the database for this object
      *
+     * @todo Sort this out and test it properly
      * @return array
      *      An array of field names representing each database field
      */
