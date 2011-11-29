@@ -701,10 +701,12 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $changedFields = $this->changedFields();
 
         if ( count($changedFields) ) {
-            $table  = static::TableName();
-            $key    = static::PrimaryKeyName();
-            $set    = array_map(function($field) {
-                return "`$field` = :$field";
+            $table      = static::TableName();
+            $key        = static::PrimaryKeyName();
+            $className  = get_called_class();
+            
+            $set        = array_map(function($field) use($className) {
+                return '`'.$className::TranslatePropertyToField($field)."` = :$field";
             }, $changedFields );
             
             $sql = "UPDATE `$table` SET ".implode( ', ', $set );

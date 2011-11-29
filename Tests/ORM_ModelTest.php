@@ -519,25 +519,45 @@ class ORM_ModelTest extends Tests\ORMTest {
         $this->assertFalse( Mock\Car::Find($ford->id()) );
     }
     
+    /**
+     * Test case for a specific problem with field aliasing
+     */
     public function testSaveTwice() {
         $ford = new Mock\Car(array(
             'brand'     => 'Ford',
             'colour'    => 'Black',
             'owner_id'  => 3,
             'doors'     => 2,
-            'age'       => 100,
-            'model'     => 'xj'
+            'age'       => 100
         ));
 
         $this->assertTrue( $ford->save() );
         $id = $ford->id();
-        $ford->load();
-//        print_r($ford);die();
-        $this->assertEquals( $ford->model, $ford->originalValue('model') );
         
+        $ford->load();
+        $this->assertEquals(array(), $ford->changedFields());
         $this->assertTrue( $ford->save() );
         
         $this->assertEquals($id, $ford->id() );
+    }
+    
+    public function testSaveRecordWithAlias() {
+        $car = Mock\Car::Find(1);
+        $car->model = "156gta";
+        
+        $this->assertEquals(array('model'), $car->changedFields());
+        $this->assertTrue($car->save());
+        
+        $storedCar = Mock\Car::Find(1);
+        
+        $this->assertEquals( $car->model, $storedCar->model );
+    }
+    
+    /**
+     * @todo implement test Car::FindByModel();
+     */
+    public function testFindUsingAlias() {
+        $this->markTestIncomplete();
     }
 
     /**

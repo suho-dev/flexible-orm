@@ -347,6 +347,9 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      *
      * @throws ORMPDOException for any other exceptions
      *
+     * @todo improve exceptions thrown here. Currently FindByInvalidFieldException
+     *       is thrown for any query error with incorrect columns!
+     * 
      * @param array $input
      *      [optional] An array of values with as many elements as there are bound
      *      parameters in the SQL statement being executed. See PDOStatement->execute()
@@ -358,7 +361,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
 
         } catch( \PDOException $e ) {
             if ( strpos( $e->getMessage(), 'Column not found') !== false ) {
-                throw new ORMFindByInvalidFieldException( $e->getMessage() );
+                throw new ORMFindByInvalidFieldException( $e->getMessage()." (from $this)" );
             } else {
                 throw new ORMPDOException( $e->getMessage() );
             }
