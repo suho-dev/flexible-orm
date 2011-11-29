@@ -525,11 +525,15 @@ class ORM_ModelTest extends Tests\ORMTest {
             'colour'    => 'Black',
             'owner_id'  => 3,
             'doors'     => 2,
-            'age'       => 100
+            'age'       => 100,
+            'model'     => 'xj'
         ));
 
         $this->assertTrue( $ford->save() );
         $id = $ford->id();
+        $ford->load();
+//        print_r($ford);die();
+        $this->assertEquals( $ford->model, $ford->originalValue('model') );
         
         $this->assertTrue( $ford->save() );
         
@@ -714,5 +718,19 @@ class ORM_ModelTest extends Tests\ORMTest {
     public function testToString() {
         $car = Mock\Car::Find();
         $this->assertEquals( 'ORM\Tests\Mock\Car ['.$car->id().']', (string)$car );
+    }
+    
+    public function testPropertyType() {
+        $this->assertEquals(
+            'int(1)',
+            Mock\Car::PropertyType('doors')
+        );
+    }
+    
+    public function testPropertyTypeAlias() {
+        $this->assertEquals(
+            'varchar(32)',
+            Mock\Car::PropertyType('model')
+        );
     }
 }

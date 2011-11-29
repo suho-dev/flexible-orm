@@ -42,6 +42,7 @@ abstract class ORM_Core {
      *       supplying a 'where' option to a Find function. The recommendation
      *       when using SQL is to call the FieldAlias() function.
      * 
+     * @todo There should be a check for circular alias references
      * @var array $_fieldAliases
      */
     protected static $_fieldAliases = array();
@@ -317,7 +318,7 @@ abstract class ORM_Core {
      */
     public static function TranslatePropertyToField( $propertyName ) {
         $fieldName = array_search( $propertyName, static::$_fieldAliases );
-        return $fieldName === false ? $propertyName : static::$_fieldAliases[$fieldName];
+        return $fieldName === false ? $propertyName : $fieldName;
     }
     
     /**
