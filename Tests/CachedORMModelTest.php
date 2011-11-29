@@ -5,7 +5,7 @@
  * @author jarrod.swift
  * @todo Fix the autoloader
  */
-namespace ORM\Tests;
+namespace ORM;
 use \ORM\Tests\Mock, \ORM\PDOFactory, \ORM\DEBUG;
 
 require_once 'ORMTest.php';
@@ -18,7 +18,7 @@ PDOFactory::GetFactory()->startProfiling();
  * @note This tests that CachedORMModelTest behaves exactly as ORM_Model and that
  *      it caches objects correctly
  */
-class CachedORMModelTest extends ORMTest {
+class CachedORMModelTest extends Tests\ORMTest {
     protected function tearDown() {
         $freds = Mock\Owner::FindAllByName('Fred');
         $freds->delete();

@@ -4,7 +4,7 @@
  * @author jarrod.swift
  */
 namespace ORM;
-use ORM\Exceptions;
+use ORM\Exceptions\ORMInvalidStaticMethodException;
 use ORM\Exceptions\FieldDoesNotExistException;
 
 
@@ -350,6 +350,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * Car::FindAllByDoors( 3, '>=' );
      * @endcode
      *
+     * @throws RMInvalidStaticMethodException if unknown method called
      * @see FindBy(), FindAllBy(), CountFindAllBy()
      * @param string $name
      * @param array $arguments
@@ -374,7 +375,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
             return static::CountFindAllBy( self::_LowercaseFirst($matches[1]), $arguments[0], $operator );
         }
         
-        throw new Exceptions\ORMException("Method $name does not exist");
+        throw new ORMInvalidStaticMethodException("Method $name does not exist");
     }
 
     /**

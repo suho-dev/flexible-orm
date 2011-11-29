@@ -6,6 +6,7 @@
 namespace ORM;
 use \PDO;
 use ORM\Utilities\Configuration;
+use ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException;
 use ORM\Exceptions\FieldDoesNotExistException;
 
 /**
@@ -98,7 +99,7 @@ class PDOFactory implements Interfaces\DataFactory {
      * $query = PDOFactory::Get("SELECT * FROM rabbits");
      * @endcode
      *
-     * @throws \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException if
+     * @throws ORMPDOInvalidDatabaseConfigurationException if
      *      configuration details are not present or invalid
      * 
      * @param string $databaseConfig
@@ -108,7 +109,7 @@ class PDOFactory implements Interfaces\DataFactory {
      */
     private function __construct( $databaseConfig ) {
         if ( !Configuration::GroupExists($databaseConfig) ) {
-            throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException(
+            throw new ORMPDOInvalidDatabaseConfigurationException(
                 "No database configuration details for $databaseConfig"
             );
         }

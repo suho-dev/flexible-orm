@@ -81,6 +81,7 @@ class Debug {
     /**
      * A class name to use for storing logs
      * 
+     * @throws Exception
      * @param string $storeClass 
      *      A class name. Must implement the Interfaces\\DebugLog
      */

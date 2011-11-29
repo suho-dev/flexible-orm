@@ -130,9 +130,6 @@ abstract class ORM_Core {
      * @return array
      */
     public function errorMessages() {
-        if ( !is_array($this->_errorMessages) ) {
-            $this->_errorMessages = array();
-        }
         return $this->_errorMessages;
     }
 
@@ -200,9 +197,6 @@ abstract class ORM_Core {
      * @see base_model::errorMessage(), base_model::valid()
      */
     public function validationError( $field, $message ) {
-        if ( !is_array($this->_errorMessages) ) {
-            $this->_errorMessages = array();
-        }
         $this->_errorMessages[$field] = $message;
     }
 
