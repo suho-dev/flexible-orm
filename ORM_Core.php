@@ -333,4 +333,12 @@ abstract class ORM_Core {
     public static function FieldAlias( $propertyName ) {
         return static::TranslatePropertyToField( $propertyName );
     }
+    
+    /**
+     * Get the full namespaced class name for this class
+     * @return string
+     */
+    public static function FullClassName() {
+        return get_called_class();
+    }
 }

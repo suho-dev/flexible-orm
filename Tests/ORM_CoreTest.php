@@ -127,4 +127,7 @@ class ORM_CoreTest extends Tests\ORMTest {
         $this->assertEquals('doors', Mock\Car::FieldAlias('doors'));
     }
 
+    public function testClassPath() {
+        $this->assertEquals('ORM\Tests\Mock\Car', Mock\Car::FullClassName() );
+    }
 }

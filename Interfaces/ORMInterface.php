@@ -86,4 +86,10 @@ interface ORMInterface {
      * @return mixed
      */
     function id();
+    
+    /**
+     * Return the full namespaced classname of this class
+     * @return string
+     */
+    static function FullClassName();
 }
