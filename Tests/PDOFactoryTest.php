@@ -1,11 +1,23 @@
 <?php
-namespace ORM\Tests;
+namespace ORM;
 use \ORM\Tests\Mock, \ORM\PDOFactory;
 
 require_once 'ORMTest.php';
 
 
-class PDOFactoryTest extends ORMTest {
+class PDOFactoryTest extends Tests\ORMTest {
+    public function setUp() {
+        PDOFactory::Get("INSERT INTO `cars` (`id`, `brand`, `colour`, `doors`, `owner_id`, `name`, `age`, `type`) VALUES
+            (1, 'Alfa Romeo', 'red', 4, 1, '156Ti', 4, 'Sedan'),
+            (2, 'Volkswagen', 'black', 5, 1, NULL, 0, NULL),
+            (3, 'Volkswagen', 'black', 2, 2, NULL, 0, NULL),
+            (4, 'Toyota', 'White', 4, 2, NULL, 62, NULL)")->execute();
+    }
+    
+    public function tearDown() {
+        PDOFactory::Get("TRUNCATE TABLE `cars`")->execute();
+    }
+    
     public function testGet() {
         $cars = PDOFactory::Get('SELECT * FROM cars');
         $this->assertEquals( 'ORM\ORM_PDOStatement', get_class($cars), 'PDO Factory did not return a ORM_PDOStatement object' );
@@ -49,13 +61,12 @@ class PDOFactoryTest extends ORMTest {
      */
     public function testFindWithInvalidForeignClass() {
         $query = PDOFactory::Get(
-            "SELECT Owner.*, NoClass.* FROM owners AS Owner, noclass AS NoClass WHERE Owner.name = :name"
+            "SELECT Owner.*, NoClass.* FROM owners AS Owner, cars AS NoClass WHERE NoClass.owner_id = Owner.id"
         );
 
-        $query->bindValue(':name', 'Jarrod');
         $query->execute();
         
-        $query->fetchInto('\ORM\Tests\Mock\Owner');
+        $owner = $query->fetchInto('\ORM\Tests\Mock\Owner');
     }
     
     /**
@@ -77,5 +88,23 @@ class PDOFactoryTest extends ORMTest {
         
         $this->assertEquals( 'mysql', $factory->databaseType() );
     }
+    
+    /**
+     * @todo implement test for DescribeField (valid)
+     */
+    public function testDescribeField() {
+        $factory = PDOFactory::GetFactory();
+        $this->assertEquals(
+                'int(1)',
+                $factory->describeField('cars', 'doors')
+        );
+    }
+    
+    /**
+     * @expectedException \ORM\Exceptions\FieldDoesNotExistException
+     */
+    public function testDescribeUnknownField() {
+        $factory = PDOFactory::GetFactory();
+        $factory->describeField('cars', 'idontexist');
+    }
 }
-?>

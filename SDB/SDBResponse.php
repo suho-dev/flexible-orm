@@ -4,6 +4,8 @@
  * @author jarrod.swift
  */
 namespace ORM\SDB;
+use \ORM\Exceptions\ORMPDOException;
+
 /**
  * Represent retrieved items and attributes from AmazonSDB as an array
  *
@@ -258,11 +260,13 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
     
     /**
      * Get items from a query and add them to this query
+     * 
+     * @throws ORMPDOException if SDB response is not OK
      * @param SDBResponse $response 
      */
     private function _setItems( SDBResponse $response ) {
         if ( !$response->isOK() ) {
-            throw new \ORM\Exceptions\ORMPDOException( $response->errorMessage().' - '.$response->getQuery() );
+            throw new ORMPDOException( $response->errorMessage().' - '.$response->getQuery() );
         }
         
         foreach ( $response as $key => $item ) {

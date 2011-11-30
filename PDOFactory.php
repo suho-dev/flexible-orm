@@ -4,7 +4,10 @@
  * @author jarrod.swift
  */
 namespace ORM;
+use \PDO;
 use ORM\Utilities\Configuration;
+use ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException;
+use ORM\Exceptions\FieldDoesNotExistException;
 
 /**
  * A singleton database managing class that acts as a factory for prepared
@@ -54,6 +57,12 @@ class PDOFactory implements Interfaces\DataFactory {
      * @var string $_databaseType
      */
     private $_databaseType;
+    
+    /**
+     * Store the datatypes and field names after being looked up
+     * @var array $_knownTables
+     */
+    private $_knownTables = array();
 
     /**
      * Connect to the database when creating the PDOFactory instance
@@ -90,7 +99,7 @@ class PDOFactory implements Interfaces\DataFactory {
      * $query = PDOFactory::Get("SELECT * FROM rabbits");
      * @endcode
      *
-     * @throws \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException if
+     * @throws ORMPDOInvalidDatabaseConfigurationException if
      *      configuration details are not present or invalid
      * 
      * @param string $databaseConfig
@@ -100,7 +109,7 @@ class PDOFactory implements Interfaces\DataFactory {
      */
     private function __construct( $databaseConfig ) {
         if ( !Configuration::GroupExists($databaseConfig) ) {
-            throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException(
+            throw new ORMPDOInvalidDatabaseConfigurationException(
                 "No database configuration details for $databaseConfig"
             );
         }
@@ -121,7 +130,7 @@ class PDOFactory implements Interfaces\DataFactory {
             $this->_db->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->_db->setAttribute( \PDO::ATTR_STATEMENT_CLASS, array(__NAMESPACE__.'\ORM_PDOStatement'));
         } catch( \PDOException $e ) {
-            throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException( $e->getMessage() );
+            throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException( "[$databaseConfig] ".$e->getMessage() );
         }
     }
     
@@ -332,58 +341,97 @@ class PDOFactory implements Interfaces\DataFactory {
     /**
      * Get the names of each field from the database table structure
      * 
-     * @todo Improve this so that it is easier to add to and maintain
-     * 
      * @param string $table
      *      The table name 
      * @return array
      *      Field names in a numerically indexed array
      */
     public function fieldNames( $table ) {
-        switch( $this->databaseType() ) {
-        case 'sqlite':
-            return $this->_describeTableSQLite( $table );
-        case 'pgsql':
-            return $this->_describeTablePostgres( $table );
-        case 'sqlsrv':
-            return $this->_describeTableMSSql( $table );
-        case 'mysql':
-        default:
-            return $this->_describeTableMysql( $table );
+        return array_keys( $this->describeTable($table) );
+    }
+    
+    /**
+     * Get a description of a field in the table
+     * 
+     * @throws FieldDoesNotExistException if the field requested does not exist
+     * @param string $table
+     *      The table name
+     * @param string $field
+     *      The field name
+     * @return string
+     */
+    public function describeField( $table, $field ) {
+        $fields = $this->describeTable($table);
+        
+        if(array_key_exists($field, $fields) ) {
+            return $fields[$field];
+        } else {
+            throw new FieldDoesNotExistException("Field $field does not exist in $table");
         }
     }
     
     /**
-     * Get the column names from a MySQL database
+     * Get a desciption of all the fields and their field types from the given table
+     * 
+     * @todo Improve this so that it is easier to add to and maintain
+     * 
+     * @param string $table
+     *      Table name 
+     * @return array
+     *      Keys will be field names and values will be field descriptions
+     */
+    public function describeTable( $table ) {
+        if( !isset($this->_knownTables[$table]) ) {
+            switch( $this->databaseType() ) {
+            case 'sqlite':
+                return $this->_describeTableSQLite( $table );
+            case 'pgsql':
+                return $this->_describeTablePostgres( $table );
+            case 'sqlsrv':
+                return $this->_describeTableMSSql( $table );
+            case 'mysql':
+            default:
+                return $this->_describeTableMysql( $table );
+            }
+        }
+        
+        return $this->_knownTables[$table];
+    }
+    
+    /**
+     * Get the column names and datatypes from a MySQL database
      * 
      * @param string $table
      *      Table name
      * @return array
-     *      Array of field names
+     *      Array of field names => data types
      */
     private function _describeTableMysql( $table ) {
         $query  = $this->statement( "DESCRIBE `$table`" );
         $query->execute();
-        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+        $result = $query->fetchAll( PDO::FETCH_ASSOC );
 
-        return array_map(function($row){
-            return $row['Field'];
-        }, $result );
+        $fields = array();
+        foreach( $result as $fieldPropreties ) {
+            $fields[$fieldPropreties['Field']] = $fieldPropreties['Type'];
+        }
+        
+        return $fields;
     }
     
     /**
-     * Get the column names from a Postgres database
+     * Get the column names and datatypes from a Postgres database
      * 
-     * @todo test this
+     * @todo implement fetching datatypes
      * @param string $table
      *      Table name
      * @return array
-     *      Array of field names
+     *      Array of field names => data types
      */
     private function _describeTablePostgres( $table ) {
         $query  = $this->statement( "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'" );
         $query->execute();
-        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+        $result = $query->fetchAll( PDO::FETCH_ASSOC );
 
         return array_map(function($row){
             return $row['column_name'];
@@ -391,18 +439,18 @@ class PDOFactory implements Interfaces\DataFactory {
     }
     
     /**
-     * Get the column names from a MS SQL database
+     * Get the column names and datatypes from a MS SQL database
      * 
-     * @todo test this
+     * @todo implement fetching datatypes
      * @param string $table
      *      Table name
      * @return array
-     *      Array of field names
+     *      Array of field names => data types
      */
     private function _describeTableMSSql( $table ) {
         $query  = $this->statement( "EXEC sp_columns @table_name= N'$table'" );
         $query->execute();
-        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+        $result = $query->fetchAll( PDO::FETCH_ASSOC );
 
         return array_map(function($row){
             return $row['COLUMN_NAME'];
@@ -410,24 +458,22 @@ class PDOFactory implements Interfaces\DataFactory {
     }
     
     /**
-     * Get the column names from a SQLite database
+     * Get the column names and datatypes from a SQLite database
      * 
+     * @todo implement fetching datatypes
      * @param string $table
      *      Table name
      * @return array
-     *      Array of field names
+     *      Array of field names => data types
      */
     private function _describeTableSQLite( $table ) {
-        //pragma table_info(ABC);
-        
         $query  = $this->statement( "PRAGMA table_info($table)" );
         $query->execute();
-        $result = $query->fetchAll( \PDO::FETCH_ASSOC );
+        $result = $query->fetchAll( PDO::FETCH_ASSOC );
 
         return array_map(function($row){
             return $row['name'];
         }, $result );
     }
-    
     
 }

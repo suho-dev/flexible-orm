@@ -5,6 +5,10 @@
  */
 namespace ORM;
 use \PDO;
+use ORM\Exceptions\ORMFetchIntoClassNotFoundException;
+use ORM\Exceptions\ORMFetchIntoRelatedClassNotFoundException;
+use ORM\Exceptions\ORMFindByInvalidFieldException;
+use ORM\Exceptions\ORMPDOException;
 
 /**
  * Custom PDOStatement class allowing better integration with ORM_Model
@@ -140,9 +144,9 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      *
      * @see fetchInto()
      *
-     * @throws Exceptions\ORMFetchIntoClassNotFoundException
+     * @throws ORMFetchIntoClassNotFoundException
      *      If the requested $className cannot be loaded
-     * @throws Exceptions\ORMFetchIntoRelatedClassNotFoundException
+     * @throws ORMFetchIntoRelatedClassNotFoundException
      *      If a class within the query could not be resolved to a class name
      *
      * @param string $className
@@ -155,7 +159,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
      */
     private function _getObject( $className, $qualifiedColumnNames ) {
         if ( !class_exists($className) ) {
-            throw new Exceptions\ORMFetchIntoClassNotFoundException("Unknown class $className requested");
+            throw new ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
         $row = $this->fetch( \PDO::FETCH_NUM );
@@ -184,7 +188,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
                         // Create new object if there isn't one for this $class
                         $fullClassName = "$namespace\\$classDestination";
                         if ( !class_exists($fullClassName) ) {
-                            throw new Exceptions\ORMFetchIntoRelatedClassNotFoundException("Unknown class $fullClassName in '{$this}'");
+                            throw new ORMFetchIntoRelatedClassNotFoundException("Unknown class $fullClassName in '{$this}'");
                         }
 
                         $object->$classDestination = new $fullClassName;
@@ -338,11 +342,14 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
     /**
      * Override the execute function to add some custom error handling
      *
-     * @throws Exceptions\ORMFindByInvalidFieldException if there is an invalid
+     * @throws ORMFindByInvalidFieldException if there is an invalid
      *      field in the SQL
      *
-     * @throws Exceptions\ORMPDOException for any other exceptions
+     * @throws ORMPDOException for any other exceptions
      *
+     * @todo improve exceptions thrown here. Currently FindByInvalidFieldException
+     *       is thrown for any query error with incorrect columns!
+     * 
      * @param array $input
      *      [optional] An array of values with as many elements as there are bound
      *      parameters in the SQL statement being executed. See PDOStatement->execute()
@@ -354,9 +361,9 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
 
         } catch( \PDOException $e ) {
             if ( strpos( $e->getMessage(), 'Column not found') !== false ) {
-                throw new Exceptions\ORMFindByInvalidFieldException( $e->getMessage() );
+                throw new ORMFindByInvalidFieldException( $e->getMessage()." (from $this)" );
             } else {
-                throw new Exceptions\ORMPDOException( $e->getMessage() );
+                throw new ORMPDOException( $e->getMessage() );
             }
         }
 

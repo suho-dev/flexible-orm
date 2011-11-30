@@ -5,6 +5,12 @@
  */
 namespace ORM\SDB;
 use \ORM\Utilities\Configuration;
+use \ORM\Exceptions\ORMPDOException;
+use \ORM\Exceptions\ORMInsertException;
+use \ORM\Exceptions\ORMUpdateException;
+use \ORM\Exceptions\ORMFetchIntoClassNotFoundException;
+use \ORM\Exceptions\ORMFetchIntoException;
+use \ORM\Exceptions\ORMFetchException;
 
 /**
  * Mimick the behaviour of ORM_PDOStatement for AmazonSDB
@@ -437,6 +443,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * @todo throw an exception if all placeholders aren't bound yet
      * @todo Define exception for this action
      * 
+     * @throws ORMPDOException if unknown query type (ie not INSERT, UPDATE, DELETE or SELECT
      * @param array $values
      *      [optional] Array of values to bind. May be a mixture of named placeholders
      *      or numerically indexed anonymous values which will be bound in statement
@@ -466,7 +473,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
             return $this->_executeFetchQuery();
 
         default:
-            throw new \ORM\Exceptions\ORMPDOException("Unsupported query type $queryType");
+            throw new ORMPDOException("Unsupported query type $queryType");
         }
     }
     
@@ -530,7 +537,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $response = self::$_sdb->put_attributes( $domain, $itemName, $attributes );
 
         if ( !$response->isOK() ) {
-            throw new \ORM\Exceptions\ORMInsertException( $response->errorMessage() );
+            throw new ORMInsertException( $response->errorMessage() );
         }
         
         return true; //<! since we got past the exception, response is OK
@@ -653,6 +660,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * SDB does not natively support \c UPDATE, so we emulate it here. Converts
      * the \c UPDATE string into a put_attributes() operation.
      *
+     * @throws ORMUpdateException if update fails
      * @return boolean
      *      True on success
      */
@@ -665,7 +673,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $result     = self::$_sdb->put_attributes( $domain, $itemName, $attributes, true );
 
         if ( !$result->isOK() ) {
-            throw new \ORM\Exceptions\ORMUpdateException( $result->errorMessage() );
+            throw new ORMUpdateException( $result->errorMessage() );
         }
         
         return $result->isOK();
@@ -733,7 +741,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      * \note This function is effected by the ORMModelSDB::EnforceReadConsistency()
      *      setting.
      *
-     * @throws Exceptions\ORMFetchIntoClassNotFoundException
+     * @throws ORMFetchIntoClassNotFoundException if class does not exist
      *
      * @param string $className
      *      Object type to fetch into
@@ -742,7 +750,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      */
     public function fetchInto( $className ) {
         if ( !class_exists($className) ) {
-            throw new Exceptions\ORMFetchIntoClassNotFoundException("Unknown class $className requested");
+            throw new ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
         if ( !$this->_result->isOK() ) {
@@ -768,6 +776,8 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      *
      * All fetch class options must be classes that extend ORM_Model
      *
+     * @throws ORMFetchIntoException if class is not a subclass of ORM_Model
+     * 
      * @param ORMModelSDB $object
      */
     private function _fetchWith( ORMModelSDB &$object ) {
@@ -775,7 +785,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         
         foreach ( $this->_findWith as $fetchClassName ) {
             if ( !is_subclass_of($fetchClassName, '\ORM\ORM_Model') ) {
-                throw new \ORM\Exceptions\ORMFetchIntoException(
+                throw new ORMFetchIntoException(
                     "Find with class '$fetchClassName' does not extend class ORM_Model"
                 );
             }
@@ -834,7 +844,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      *
      * Does not return itemName() properties
      *  
-     * @throws \ORM\Exceptions\ORMFetchException
+     * @throws ORMFetchException
      * @see fetchAll()
      * @param int $fetch_style 
      *      [optional] What type of array to return. Defaults to \c FETCH_BOTH
@@ -866,7 +876,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
             return array_merge(array_values($result), $result);
 
         default:
-            throw new \ORM\Exceptions\ORMFetchException(
+            throw new ORMFetchException(
                 "Unknown fetch style $fetch_style"
             );
         }
@@ -912,8 +922,8 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      *
      * Behaves like ORM_PDOStatement::fetchAllInto().
      *
-     * @throws Exceptions\ORMFetchIntoClassNotFoundException for invalid classname
-     * @throws Exceptions\ORMFetchIntoException for AmazonSDB errors
+     * @throws ORMFetchIntoClassNotFoundException for invalid classname
+     * @throws ORMFetchIntoException for AmazonSDB errors
      *
      * @param string $className
      *      Object type to fetch into
@@ -922,13 +932,13 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      */
     public function fetchAllInto( $className ) {
         if ( !class_exists($className) ) {
-            throw new Exceptions\ORMFetchIntoClassNotFoundException("Unknown class $className requested");
+            throw new ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
         $collection = new \ORM\ModelCollection();
         
         if ( !$this->_result->isOK() ) {
-            throw new \ORM\Exceptions\ORMFetchIntoException(
+            throw new ORMFetchIntoException(
                 $this->_result->errorMessage()
             );
         } elseif ( count($this->_result) ) {

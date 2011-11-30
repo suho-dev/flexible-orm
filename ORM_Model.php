@@ -4,8 +4,9 @@
  * @author jarrod.swift
  */
 namespace ORM;
+use ORM\Exceptions\ORMInvalidStaticMethodException;
+use ORM\Exceptions\FieldDoesNotExistException;
 
-use ORM\Exceptions;
 
 /**
  * Base class for ordinary ORM classes
@@ -96,6 +97,35 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $this->_id  = &$this->{$this->PrimaryKeyName()};
 
         parent::__construct( $values );
+    }
+    
+    /**
+     * Get a description of the stored data type for a given property.
+     * 
+     * Only makes sense for models backed by database tables. Datatypes will vary
+     * between database implementations.
+     * 
+     * <b>Usage</b>\n
+     * @code
+     * // Trivial example
+     * $someFields = array( 'name', 'age', 'type' );
+     * $cssFields  = array();
+     * 
+     * foreach( $someFields as $field ) {
+     *      $cssFields[$field] = User::PropertyType( $field ) == 'INT' ? 'number' : 'general';
+     * }
+     * @endcode
+     * 
+     * @throws FieldDoesNotExistException if the field requested does not exist in
+     *         this model
+     * @param string $propertyName 
+     * @return string
+     */
+    public static function PropertyType( $propertyName ) {
+        $dfClass = self::DataFactory();
+        $df      = $dfClass::GetFactory( static::DatabaseConfigName() );
+        
+        return $df->describeField( static::TableName(), static::FieldAlias($propertyName) );
     }
 
     /**
@@ -320,6 +350,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * Car::FindAllByDoors( 3, '>=' );
      * @endcode
      *
+     * @throws RMInvalidStaticMethodException if unknown method called
      * @see FindBy(), FindAllBy(), CountFindAllBy()
      * @param string $name
      * @param array $arguments
@@ -344,7 +375,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
             return static::CountFindAllBy( self::_LowercaseFirst($matches[1]), $arguments[0], $operator );
         }
         
-        throw new Exceptions\ORMException("Method $name does not exist");
+        throw new ORMInvalidStaticMethodException("Method $name does not exist");
     }
 
     /**
@@ -670,10 +701,12 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $changedFields = $this->changedFields();
 
         if ( count($changedFields) ) {
-            $table  = static::TableName();
-            $key    = static::PrimaryKeyName();
-            $set    = array_map(function($field) {
-                return "`$field` = :$field";
+            $table      = static::TableName();
+            $key        = static::PrimaryKeyName();
+            $className  = get_called_class();
+            
+            $set        = array_map(function($field) use($className) {
+                return '`'.$className::TranslatePropertyToField($field)."` = :$field";
             }, $changedFields );
             
             $sql = "UPDATE `$table` SET ".implode( ', ', $set );
@@ -781,6 +814,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
     /**
      * Get an array listing all the fields stored in the database for this object
      *
+     * @todo Sort this out and test it properly
      * @return array
      *      An array of field names representing each database field
      */

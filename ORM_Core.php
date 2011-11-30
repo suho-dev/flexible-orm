@@ -42,6 +42,7 @@ abstract class ORM_Core {
      *       supplying a 'where' option to a Find function. The recommendation
      *       when using SQL is to call the FieldAlias() function.
      * 
+     * @todo There should be a check for circular alias references
      * @var array $_fieldAliases
      */
     protected static $_fieldAliases = array();
@@ -130,9 +131,6 @@ abstract class ORM_Core {
      * @return array
      */
     public function errorMessages() {
-        if ( !is_array($this->_errorMessages) ) {
-            $this->_errorMessages = array();
-        }
         return $this->_errorMessages;
     }
 
@@ -200,9 +198,6 @@ abstract class ORM_Core {
      * @see base_model::errorMessage(), base_model::valid()
      */
     public function validationError( $field, $message ) {
-        if ( !is_array($this->_errorMessages) ) {
-            $this->_errorMessages = array();
-        }
         $this->_errorMessages[$field] = $message;
     }
 
@@ -231,16 +226,17 @@ abstract class ORM_Core {
      * @return array
      */
     public function changedFields() {
-        $changed = array();
+        $changed         = array();
         $original_values = count($this->_originalValues) ? $this->_originalValues : array();
-
-        $attributes = $this->values();
+        $attributes      = $this->values();
+        
 
         foreach ( $attributes as $key => $value ) {
-            if ( !isset($original_values[$key]) || $original_values[$key] != $value ) {
+            if ( !array_key_exists( $key, $original_values ) || $original_values[$key] != $value ) {
                 $changed[] = $key;
             }
         }
+        
         return $changed;
     }
 
@@ -323,7 +319,7 @@ abstract class ORM_Core {
      */
     public static function TranslatePropertyToField( $propertyName ) {
         $fieldName = array_search( $propertyName, static::$_fieldAliases );
-        return $fieldName === false ? $propertyName : static::$_fieldAliases[$fieldName];
+        return $fieldName === false ? $propertyName : $fieldName;
     }
     
     /**

@@ -5,7 +5,7 @@
  * @author jarrod.swift
  * @todo Fix the autoloader
  */
-namespace ORM\Tests;
+namespace ORM;
 use \ORM\Tests\Mock, \ORM\PDOFactory, \ORM\DEBUG;
 
 require_once 'ORMTest.php';
@@ -15,7 +15,7 @@ PDOFactory::Get("TRUNCATE TABLE `cars`")->execute();
 /**
  * Test class for ORM_Model
  */
-class ORM_ModelTest extends ORMTest {
+class ORM_ModelTest extends Tests\ORMTest {
     public function setUp() {
         PDOFactory::Get("INSERT INTO `cars` (`id`, `brand`, `colour`, `doors`, `owner_id`, `name`, `age`, `type`) VALUES
             (1, 'Alfa Romeo', 'red', 4, 1, '156Ti', 4, 'Sedan'),
@@ -90,7 +90,7 @@ class ORM_ModelTest extends ORMTest {
 
         $this->assertEquals(
             '156Ti',
-            $car->name
+            $car->model
         );
     }
 
@@ -119,7 +119,7 @@ class ORM_ModelTest extends ORMTest {
 
         $this->assertEquals(
             '156Ti',
-            $car->name
+            $car->model
         );
     }
 
@@ -158,7 +158,7 @@ class ORM_ModelTest extends ORMTest {
 
         $this->assertEquals(
             '156Ti',
-            $car->name
+            $car->model
         );
     }
 
@@ -187,7 +187,7 @@ class ORM_ModelTest extends ORMTest {
 
         $this->assertEquals(
             '156Ti',
-            $car->name
+            $car->model
         );
     }
 
@@ -433,6 +433,35 @@ class ORM_ModelTest extends ORMTest {
         $this->assertEquals( 1400, $elephant->weight );
 
     }
+    
+    public function testUpdateInvalid() {
+        $elephant = new Mock\Elephant();
+        $elephant->name     = "Tim";
+        $elephant->weight   = 1000;
+
+        $this->assertTrue( $elephant->save(), 'Unable to save elephant: ', $elephant->errorMessagesString() );
+
+        $elephant = Mock\Elephant::Find( 'Tim' );
+        $elephant->weight = -100;
+
+        $this->assertFalse( $elephant->save() );
+
+        $elephant = Mock\Elephant::Find( 'Tim' );
+        $this->assertEquals( 1000, $elephant->weight, "Invalid data was saved" );
+    }
+    
+    public function testUpdateNoChanges() {
+        $elephant = new Mock\Elephant();
+        $elephant->name     = "Tim";
+        $elephant->weight   = 1000;
+
+        $this->assertTrue( $elephant->save(), 'Unable to save elephant: ', $elephant->errorMessagesString() );
+
+        $elephant = Mock\Elephant::Find( 'Tim' );
+        $elephant->weight = $elephant->weight;
+
+        $this->assertTrue( $elephant->save() );
+    }
 
     public function testDelete() {
         $ford = new Mock\Car(array(
@@ -481,13 +510,61 @@ class ORM_ModelTest extends ORMTest {
 
         $ford->save();
 
-        $ford->save();
+//        $ford->save();
 
         // Ensure it has been created for this to make sense as a test
         $this->assertEquals( $ford->id(), Mock\Car::Find($ford->id())->id() );
 
         Mock\Car::Destroy( $ford->id() );
         $this->assertFalse( Mock\Car::Find($ford->id()) );
+    }
+    
+    /**
+     * Test case for a specific problem with field aliasing
+     */
+    public function testSaveTwice() {
+        $values = array(
+            'brand'     => 'Ford',
+            'colour'    => 'Black',
+            'owner_id'  => '3',
+            'doors'     => '2',
+            'age'       => '100'
+        );
+        
+        $ford = new Mock\Car($values);
+
+        $this->assertTrue( $ford->save() );
+        $id = $ford->id();
+        
+        $ford->load();
+        $values = $ford->values();
+        
+        $this->assertNull( $ford->originalValue('model') );
+        $this->assertArrayHasKey('model', $values);
+        $this->assertNull( $values['model'] );
+        $this->assertEquals( array(), $ford->changedFields()) ;
+        $this->assertTrue( $ford->save() );
+        
+        $this->assertEquals($id, $ford->id() );
+    }
+    
+    public function testSaveRecordWithAlias() {
+        $car = Mock\Car::Find(1);
+        $car->model = "156gta";
+        
+        $this->assertEquals(array('model'), $car->changedFields());
+        $this->assertTrue($car->save());
+        
+        $storedCar = Mock\Car::Find(1);
+        
+        $this->assertEquals( $car->model, $storedCar->model );
+    }
+    
+    /**
+     * @todo implement test Car::FindByModel();
+     */
+    public function testFindUsingAlias() {
+        $this->markTestIncomplete();
     }
 
     /**
@@ -656,5 +733,31 @@ class ORM_ModelTest extends ORMTest {
         foreach ( $cars as $car ) {
             $this->assertEquals( $car->brand, $car->testValue() );
         }
+    }
+    
+    /**
+     * @expectedException \ORM\Exceptions\ORMInvalidStaticMethodException
+     */
+    public function testInvalidStaticMethod() {
+        $car = Mock\Car::Blurt();
+    }
+    
+    public function testToString() {
+        $car = Mock\Car::Find();
+        $this->assertEquals( 'ORM\Tests\Mock\Car ['.$car->id().']', (string)$car );
+    }
+    
+    public function testPropertyType() {
+        $this->assertEquals(
+            'int(1)',
+            Mock\Car::PropertyType('doors')
+        );
+    }
+    
+    public function testPropertyTypeAlias() {
+        $this->assertEquals(
+            'varchar(32)',
+            Mock\Car::PropertyType('model')
+        );
     }
 }
