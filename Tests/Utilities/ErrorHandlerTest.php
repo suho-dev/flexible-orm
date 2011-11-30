@@ -3,8 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests\Utilities;
-use ORM\Utilities\ErrorHandler;
+namespace ORM\Utilities;
 use ORM\Tests\ORMTest;
 
 require_once dirname(__FILE__) . '/../ORMTest.php';
@@ -43,15 +42,24 @@ class ErrorHandlerTest extends ORMTest {
         $this->errorHandler->registerErrorHandler();
         trigger_error('Gah, I had an error!', E_USER_WARNING);
     }
+    
+    public function testRegisterDoesntRaiseTwoExceptions() {
+        $this->errorHandler->register();
+        
+        try{
+            trigger_error('Gah, I had an error!', E_USER_WARNING);
+        } catch( \ORM\Exceptions\PHPWarningException $e) {
+            $this->assertTrue( true );
+        }
+    }
 
     /**
-     * @todo Implement testRegisterShutdownHandler().
+     * @expectedException \ORM\Exceptions\PHPErrorException
      */
-    public function testRegisterShutdownHandler() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+    public function testRegisterShutdownHandlerCompileError() {
+        $this->errorHandler->registerShutdownHandler();
+        
+        $this = 'something';
     }
 
     /**
@@ -89,5 +97,5 @@ class ErrorHandlerTest extends ORMTest {
             $this->assertEquals( __FILE__, $e->getFile() );
         }
     }
-
+    
 }

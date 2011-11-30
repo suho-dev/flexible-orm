@@ -40,8 +40,27 @@ class ErrorHandler {
         });
     }
     
+    /**
+     * Fatal errors can only be caught at shutdown, so a shutdown handler will look
+     * for the occurance of them.
+     */
     public function registerShutdownHandler() {
+        $me          = $this;
+        $fatalErrors = array(
+            E_COMPILE_ERROR,
+            E_CORE_ERROR,
+            E_ERROR,
+            E_USER_ERROR,
+            E_RECOVERABLE_ERROR,
+        );
         
+        register_shutdown_function(function() use( $me, $fatalErrors ){
+            $error = error_get_last();
+            
+            if( !is_null($error) ) {
+                $me->handleError($error['type'], $error['message'], $error['file'], $error['line']);
+            }
+        });
     }
     
     /**
