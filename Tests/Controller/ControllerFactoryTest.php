@@ -20,7 +20,8 @@ class ControllerFactoryTest extends \ORM\Tests\ORMTest {
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        $this->factory = new ControllerFactory('\ORM\Tests\Mock\Controller');
+        $autoloader     = new \ORM\AutoLoader;
+        $this->factory  = new ControllerFactory($autoloader, '\ORM\Tests\Mock\Controller');
     }
 
     /**
@@ -54,8 +55,14 @@ class ControllerFactoryTest extends \ORM\Tests\ORMTest {
      * @expectedException \ORM\Exceptions\ControllerDoesNotExistException
      */
     public function testGetInvalid() {
-        $this->factory->get( 'notacontrollers' );
+        $this->factory->get( 'notacontroller' );
     }
+    
+    public function testGetDifferentName() {
+        $controller = $this->factory->get( 'specialcontroller' );
+        $this->assertInstanceOf('\ORM\Tests\Mock\Controller\Test', $controller);
+    }
+    
     
     /**
      * @expectedException \ORM\Exceptions\ControllerDoesNotExistException

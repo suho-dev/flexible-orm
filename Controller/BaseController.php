@@ -19,6 +19,9 @@ use \ORM\Exceptions\InvalidActionException;
  * these methods allows for controller-wide functionality such as checking
  * for a logged in user.
  * 
+ * @todo link to example using ControllerFactory
+ * 
+ * @see ControllerFactory
  */
 abstract class BaseController {
     /**

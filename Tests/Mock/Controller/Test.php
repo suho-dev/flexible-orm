@@ -8,4 +8,7 @@ use ORM\Controller\BaseController;
  * @author jarrodswift
  */
 class Test extends BaseController {
+    public static function ControllerName() {
+        return 'specialcontroller';
+    }
 }

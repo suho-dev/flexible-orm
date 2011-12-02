@@ -5,10 +5,13 @@
  */
 namespace ORM\Controller;
 use ORM\Exceptions\ControllerDoesNotExistException;
+use ORM\AutoLoader;
 
 /**
  * Description of ControllerFactory
  *
+ * @todo usage example (FrontController)
+ * 
  * @author jarrodswift
  */
 class ControllerFactory {
@@ -17,6 +20,11 @@ class ControllerFactory {
      * @see registerControllers(), get()
      */
     protected $_registeredControllers;
+    
+    /**
+     * @var AutoLoader $_autoloader
+     */
+    protected $_autoloader;
     
     /**
      * Create a new factory, registering a path to find controllers
@@ -29,8 +37,10 @@ class ControllerFactory {
      *      conflicting names. If not provided, it will automatically try to use
      *      the last namespace in the $namespace
      */
-    public function __construct( $namespace = null, $prefix = null ) {
-        $this->_registeredControllers = new ControllerRegistry;
+    public function __construct( AutoLoader $autoloader, $namespace = null, $prefix = null ) {
+        $this->_autoloader            = $autoloader;
+        $this->_registeredControllers = new ControllerRegistry ();
+        $this->_registeredControllers->setAutoLoader( $autoloader );
         
         if( !is_null($namespace) ) {
             $this->registerControllers($namespace, $prefix);
@@ -46,12 +56,15 @@ class ControllerFactory {
      *         to a class
      * 
      * @param string $controllerName 
+     * @param string $prefix
      * @return BaseController
      *      A subclass of BaseController is always returned
      */
-    public function get( $controllerName ) {
-        if(array_key_exists($controllerName, $this->_registeredControllers)) {
-            
+    public function get( $controllerName, $prefix = null ) {
+        $controllerClass = $this->_registeredControllers->getClassName($controllerName, $prefix);
+        
+        if($controllerClass) {
+            return new $controllerClass;
         } else {
             throw new ControllerDoesNotExistException("Unable to load a controller for $controllerName");
         }
