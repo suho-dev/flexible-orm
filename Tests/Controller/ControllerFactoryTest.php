@@ -11,46 +11,75 @@ require_once '../ORMTest.php';
 class ControllerFactoryTest extends \ORM\Tests\ORMTest {
 
     /**
-     * @var ControllerFactory
+     * @var ControllerFactory $factory
      */
-    protected $object;
+    protected $factory;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        $this->object = new ControllerFactory;
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown() {
-        
+        $this->factory = new ControllerFactory('\ORM\Tests\Mock\Controller');
     }
 
     /**
      * @covers {className}::{origMethodName}
-     * @todo Implement testGet().
      */
     public function testGet() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $controller = $this->factory->get( 'Cars' );
+        $this->assertInstanceOf('\ORM\Tests\Mock\Controller\Cars', $controller);
     }
 
     /**
      * @covers {className}::{origMethodName}
-     * @todo Implement testRegisterControllers().
      */
     public function testRegisterControllers() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $registered = $this->factory->registerControllers('\ORM\Tests\Mock\AlternateController');
+        $this->assertEquals( '\ORM\Tests\Mock\AlternateController', $registered['alternatecontroller']);
+        
+    }
+    
+    public function testRegisterControllersWithPrefix() {
+        $registered = $this->factory->registerControllers('\ORM\Tests\Mock\AlternateController', 'alt');
+        $this->assertEquals( '\ORM\Tests\Mock\AlternateController', $registered['alt']);
+    }
+    
+    public function testGetAlternate() {
+        $controller = $this->factory->get( 'owners' );
+        $this->assertInstanceOf('\ORM\Tests\Mock\AlternateController\Owners', $controller);
+    }
+    
+    /**
+     * @expectedException \ORM\Exceptions\ControllerDoesNotExistException
+     */
+    public function testGetInvalid() {
+        $this->factory->get( 'notacontrollers' );
+    }
+    
+    /**
+     * @expectedException \ORM\Exceptions\ControllerDoesNotExistException
+     */
+    public function testGetUnknown() {
+        $this->factory->get( 'unknown' );
+    }
+    
+    public function testGetDuplicateName() {
+        $controller = $this->factory->get( 'alternate/cars' );
+        $this->assertInstanceOf('\ORM\Tests\Mock\AlternateController\Cars', $controller);
+        
+        $controller = $this->factory->get( 'cars' );
+        $this->assertInstanceOf('\ORM\Tests\Mock\Controller\Cars', $controller);
+    }
+    
+    public function testUnregister() {
+        $registered = $this->factory->registerControllers('\ORM\Tests\Mock\AlternateController', 'alt');
+        
+        $registered = $this->factory->unRegisterController('alt');
+        $this->assertFalse( array_key_exists('alternatecontroller', $registered) );
+        
+        $registered = $this->factory->unRegisterController();
+        $this->assertEquals( array(), $registered);
     }
 
 }
