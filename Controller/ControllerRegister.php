@@ -7,7 +7,21 @@ namespace ORM\Controller;
 use ORM\Interfaces\ClassRegister;
 
 /**
- * Description of ControllerRegister
+ * Register of controllers
+ * 
+ * Controllers can be explicitly registered as an alias to a class name (using
+ * registerController()) or automatically registered using a namespace (see registerNamespace()).
+ * 
+ * When using namespaces, it assumes the controller class is immediately under the
+ * namespace (see naming rules below) and is a subclass of BaseController
+ * 
+ * <b>Namespace Rules</b>
+ * An alias is converted to a class name and then searched for in all registered
+ * namespaces.
+ *  - First letter capitalised
+ *  - Converted from underscores to camel case
+ * 
+ * e.g. \c simulations becomes \c Simulations and \c users_jobs becomes \c UsersJobs
  *
  * @see ControllerFactory, BaseController
  */
@@ -81,6 +95,7 @@ class ControllerRegister implements ClassRegister {
      * @return string 
      */
     private function _controllerToClassName( $controllerName ) {
-        return ucfirst($controllerName);
+        $words = ucwords(str_replace('_',' ', $controllerName));
+        return str_replace(' ', '', $words);
     }
 }

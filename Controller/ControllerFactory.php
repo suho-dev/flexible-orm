@@ -9,11 +9,30 @@ use ORM\Interfaces\ClassRegister;
 use ReflectionClass;
 
 /**
- * Description of ControllerFactory
- *
- * @todo usage example (FrontController)
+ * Factory for controllers 
  * 
- * @author jarrodswift
+ * <b>Usage</b>
+ * @code
+ * $register = new ControllerRegister();
+ * $register->registerNamespace( '\MyProject\Controllers' );
+ * 
+ * $factory = new ControllerFactory( $register );
+ * 
+ * // Gets a controller matching the supplied name
+ * $controller = $factory->get( $_GET['controller'] );
+ * @endcode 
+ *
+ * \n<b>Using Contructor Args</b>
+ * It's also possible to pass values to the Controller constructor
+ * @code
+ * $factory = new ControllerFactory( $register );
+ * $controller = $factory->get( 
+ *      $_GET['controller'],
+ *      array( new Request( $_GET, $_POST ), new SmartyTemplate )
+ * );
+ * @endcode
+ * 
+ * 
  * @see ControllerRegister, BaseController
  */
 class ControllerFactory {
@@ -23,7 +42,7 @@ class ControllerFactory {
     private $_register;
     
     /**
-     * Construct anew factory
+     * Construct a new factory
      * 
      * @param ClassRegister $register 
      *      Register of controllers
@@ -37,7 +56,10 @@ class ControllerFactory {
      * 
      * @throw ControllerDoesNotExistException if controller class cannot be located
      *        or the class found does not subclass BaseController
+     * 
      * @param string $controllerName
+     * @param array $constructorArgs
+     *      [optional] Array of values to pass to the Controller's constructor
      * @return BaseController
      *      A controller object (which will be a sublass of BaseController)
      */
@@ -46,12 +68,10 @@ class ControllerFactory {
         
         if( $class === false ) {
             throw new ControllerDoesNotExistException( "Unable to load controller $controllerName" );
-        } elseif( count($constructorArgs)) {
+        } else {
             $reflection = new ReflectionClass( $class );
             return $reflection->newInstanceArgs( $constructorArgs );
-        } else {
-            return new $class;
-        }
+        } 
     }
     
     /**

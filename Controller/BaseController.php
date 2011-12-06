@@ -198,7 +198,7 @@ abstract class BaseController {
      */
     public function performAction( $action = null ) {
         $this->actionName = is_null($action) ? $this->_actionName : $action;
-               
+        
         if ( !is_callable(array($this, $this->actionName))) {
             throw new InvalidActionException("Unknown action, '$this->actionName' for the class, '".get_class($this)."'.");
         }
