@@ -5,7 +5,7 @@
  */
 namespace ORM\Controller;
 use ORM\Exceptions\ControllerDoesNotExistException;
-use ORM\AutoLoader;
+use ORM\Interfaces\ClassRegister;
 
 /**
  * Description of ControllerFactory
@@ -13,104 +13,56 @@ use ORM\AutoLoader;
  * @todo usage example (FrontController)
  * 
  * @author jarrodswift
+ * @see ControllerRegister, BaseController
  */
 class ControllerFactory {
     /**
-     * @var ControllerRegistry $_registeredControllers
-     * @see registerControllers(), get()
+     * @var ClassRegister $_register
      */
-    protected $_registeredControllers;
+    private $_register;
     
     /**
-     * @var AutoLoader $_autoloader
-     */
-    protected $_autoloader;
-    
-    /**
-     * Create a new factory, registering a path to find controllers
+     * Construct anew factory
      * 
-     * @param string $namespace
-     *      [optional] Path to controllers. See registerControllers() for details
-     *      on adding namespaces to the factory.
-     * @param string $prefix
-     *      [optional] If there are duplicate names, a prefix will allow you to resolve 
-     *      conflicting names. If not provided, it will automatically try to use
-     *      the last namespace in the $namespace
+     * @param ClassRegister $register 
+     *      Register of controllers
      */
-    public function __construct( AutoLoader $autoloader, $namespace = null, $prefix = null ) {
-        $this->_autoloader            = $autoloader;
-        $this->_registeredControllers = new ControllerRegistry ();
-        $this->_registeredControllers->setAutoLoader( $autoloader );
-        
-        if( !is_null($namespace) ) {
-            $this->registerControllers($namespace, $prefix);
-        }
+    public function __construct( ClassRegister $register ) {
+        $this->_register = $register;
     }
     
     /**
-     * Get the correct controller object for a given controller name
+     * Get a controller object to match the supplied controller name
      * 
-     * This is the factory method.
-     * 
-     * @throws ControllerDoesNotExistException if unable to resolve $controlleName
-     *         to a class
-     * 
-     * @param string $controllerName 
-     * @param string $prefix
+     * @throw ControllerDoesNotExistException if controller class cannot be located
+     *        or the class found does not subclass BaseController
+     * @param string $controllerName
      * @return BaseController
-     *      A subclass of BaseController is always returned
+     *      A controller object (which will be a sublass of BaseController)
      */
-    public function get( $controllerName, $prefix = null ) {
-        $controllerClass = $this->_registeredControllers->getClassName($controllerName, $prefix);
+    public function get( $controllerName ) {
+        $class = $this->_register->getClassName($controllerName);
         
-        if($controllerClass) {
-            return new $controllerClass;
+        if( $class === false ) {
+            throw new ControllerDoesNotExistException( "Unable to load controller $controllerName" );
         } else {
-            throw new ControllerDoesNotExistException("Unable to load a controller for $controllerName");
+            return new $class;
         }
     }
     
     /**
-     * Register a path for controller files
-     * 
-     * \note Will only register subclasses of BaseController
-     * 
-     * @todo Convert this to using an interface instead of abstract class to determine
-     *       the validity of a controller
-     * 
-     * @param string $namespace 
-     * @param string $prefix
-     *      [optional] If there are duplicate names, a prefix will allow you to resolve 
-     *      conflicting names. If not provided, it will automatically try to use
-     *      the last namespace in the $namespace
-     * @return array
-     *      The array of registered namespaces is returned
+     * Set the register for this factory
+     * @param ClassRegister $register 
      */
-    public function registerControllers( $namespace, $prefix = null ) {
-        $this->_registeredControllers->addNamespace($namespace, $prefix);
-        return $this->_registeredControllers->getArrayCopy();
+    public function setRegister( ClassRegister $register ) {
+        $this->_register = $register;
     }
-    
     
     /**
-     * Unregister some or all of the registered controllers
-     * 
-     * @see registerControllers()
-     * @param string $prefix 
-     *      [optional] Remove all controllers that were registered with this prefix.
-     *      If not provided, remove all registered controllers. If an unknown prefix
-     *      is supplied, no controllers will be deregistered
-     * @return array
-     *      The array of registered namespaces is returned
+     * Get the current controller register
+     * @return ClassRegister
      */
-    public function unRegisterController( $prefix = null ) {
-        if( is_null($prefix) ) {
-            $this->_registeredControllers = new ControllerRegistry;
-        } elseif(array_key_exists($prefix, $this->_registeredControllers)) {
-            unset( $this->_registeredControllers[$prefix] );
-        }
-        
-        return $this->_registeredControllers->getArrayCopy();
+    public function getRegister() {
+        return $this->_register;
     }
-    
 }

@@ -102,13 +102,19 @@ abstract class BaseController {
      * @endcode
      * 
      * @param Request $request
-     *      Request parameters
+     *      [optional] Request parameters
      * @param Template $template
-     *      The templating object (eg SmartyTemplate) to use for output
+     *      [optional] The templating object (eg SmartyTemplate) to use for output
      */
-    public function __construct( Request $request, Template $template ) {
-        $this->setRequest($request);
-        $this->setTemplate($template);
+    public function __construct( Request $request = null, Template $template = null ) {
+        if( !is_null($request) ) {
+            $this->setRequest($request);
+        }
+        
+        if( !is_null($template) ) {
+            $this->setTemplate($template);
+        }
+        
         $this->controllerName   = static::ControllerName();
     }
     
