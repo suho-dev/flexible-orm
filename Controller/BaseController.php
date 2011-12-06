@@ -134,6 +134,20 @@ abstract class BaseController {
     public function setTemplate( Template $template ) {
         $this->_template        = $template;
     }
+
+    /**
+     * @return Request
+     */
+    public function getRequest() {
+        return $this->_request;
+    }
+    
+    /**
+     * @return Template
+     */
+    public function getTemplate() {
+        return $this->_template;
+    }
     
     /**
      * Perform a controller action

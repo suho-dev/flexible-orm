@@ -6,6 +6,7 @@
 namespace ORM\Controller;
 use ORM\Exceptions\ControllerDoesNotExistException;
 use ORM\Interfaces\ClassRegister;
+use ReflectionClass;
 
 /**
  * Description of ControllerFactory
@@ -40,11 +41,14 @@ class ControllerFactory {
      * @return BaseController
      *      A controller object (which will be a sublass of BaseController)
      */
-    public function get( $controllerName ) {
+    public function get( $controllerName, $constructorArgs = array() ) {
         $class = $this->_register->getClassName($controllerName);
         
         if( $class === false ) {
             throw new ControllerDoesNotExistException( "Unable to load controller $controllerName" );
+        } elseif( count($constructorArgs)) {
+            $reflection = new ReflectionClass( $class );
+            return $reflection->newInstanceArgs( $constructorArgs );
         } else {
             return new $class;
         }

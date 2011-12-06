@@ -3,6 +3,7 @@
 namespace ORM\Controller;
 
 require_once '../ORMTest.php';
+require_once 'Smarty/libs/Smarty.class.php';
 
 /**
  * Test class for ControllerFactory.
@@ -33,6 +34,15 @@ class ControllerFactoryTest extends \ORM\Tests\ORMTest {
     public function testGet() {
         $controller = $this->factory->get( 'cars' );
         $this->assertInstanceOf('\ORM\Tests\Mock\Controller\Cars', $controller);
+    }
+    
+    public function testGetWithArgs() {
+        $request = new Request( array('test'=> 'array'), $_GET);
+        $template = new SmartyTemplate();
+        $controller = $this->factory->get( 'cars', array( $request, $template ) );
+        
+        $this->assertEquals( $request, $controller->getRequest() );
+        $this->assertEquals( $template, $controller->getTemplate() );
     }
 
     /**
