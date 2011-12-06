@@ -14,55 +14,33 @@ class ControllerFactoryTest extends \ORM\Tests\ORMTest {
      * @var ControllerFactory $factory
      */
     protected $factory;
+    /**
+     *
+     * @var ControllerRegister $register
+     */
+    protected $register;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        $autoloader     = new \ORM\AutoLoader;
-        $this->factory  = new ControllerFactory($autoloader, '\ORM\Tests\Mock\Controller');
+        $this->register = new ControllerRegister();
+        $this->register->registerNamespace('\ORM\Tests\Mock\Controller');
+        $this->factory  = new ControllerFactory( $this->register );
     }
 
-    /**
-     * @covers {className}::{origMethodName}
-     */
     public function testGet() {
-        $controller = $this->factory->get( 'Cars' );
+        $controller = $this->factory->get( 'cars' );
         $this->assertInstanceOf('\ORM\Tests\Mock\Controller\Cars', $controller);
     }
 
     /**
-     * @covers {className}::{origMethodName}
-     */
-    public function testRegisterControllers() {
-        $registered = $this->factory->registerControllers('\ORM\Tests\Mock\AlternateController');
-        $this->assertEquals( '\ORM\Tests\Mock\AlternateController', $registered['alternatecontroller']);
-        
-    }
-    
-    public function testRegisterControllersWithPrefix() {
-        $registered = $this->factory->registerControllers('\ORM\Tests\Mock\AlternateController', 'alt');
-        $this->assertEquals( '\ORM\Tests\Mock\AlternateController', $registered['alt']);
-    }
-    
-    public function testGetAlternate() {
-        $controller = $this->factory->get( 'owners' );
-        $this->assertInstanceOf('\ORM\Tests\Mock\AlternateController\Owners', $controller);
-    }
-    
-    /**
      * @expectedException \ORM\Exceptions\ControllerDoesNotExistException
      */
     public function testGetInvalid() {
-        $this->factory->get( 'notacontroller' );
+        $this->factory->get( 'test' );
     }
-    
-    public function testGetDifferentName() {
-        $controller = $this->factory->get( 'specialcontroller' );
-        $this->assertInstanceOf('\ORM\Tests\Mock\Controller\Test', $controller);
-    }
-    
     
     /**
      * @expectedException \ORM\Exceptions\ControllerDoesNotExistException
@@ -71,22 +49,16 @@ class ControllerFactoryTest extends \ORM\Tests\ORMTest {
         $this->factory->get( 'unknown' );
     }
     
-    public function testGetDuplicateName() {
-        $controller = $this->factory->get( 'alternate/cars' );
-        $this->assertInstanceOf('\ORM\Tests\Mock\AlternateController\Cars', $controller);
-        
-        $controller = $this->factory->get( 'cars' );
-        $this->assertInstanceOf('\ORM\Tests\Mock\Controller\Cars', $controller);
+    public function testGetRegister() {
+        $this->assertEquals( $this->register, $this->factory->getRegister() );
     }
     
-    public function testUnregister() {
-        $registered = $this->factory->registerControllers('\ORM\Tests\Mock\AlternateController', 'alt');
+    public function testSetRegister() {
+        $register = new ControllerRegister();
+        $register->registerNamespace('\ORM\Tests\Mock\AlternateController');
+        $this->factory->setRegister($register);
         
-        $registered = $this->factory->unRegisterController('alt');
-        $this->assertFalse( array_key_exists('alternatecontroller', $registered) );
-        
-        $registered = $this->factory->unRegisterController();
-        $this->assertEquals( array(), $registered);
+        $controller = $this->factory->get( 'owners' );
+        $this->assertInstanceOf('\ORM\Tests\Mock\AlternateController\Owners', $controller);
     }
-
 }

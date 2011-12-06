@@ -14,7 +14,7 @@ require_once '../ORMTest.php';
 class ConfigurationGroupTest extends \ORM\Tests\ORMTest {
 
     /**
-     * @var ConfigurationGroup
+     * @var ConfigurationGroup $object
      */
     protected $object;
 

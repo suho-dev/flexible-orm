@@ -14,7 +14,7 @@ require_once '../ORMTest.php';
 class NextTokenCacheTest  extends \ORM\Tests\ORMTest {
 
     /**
-     * @var NextTokenCache
+     * @var NextTokenCache $object
      */
     protected $object;
 
