@@ -537,7 +537,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $response = self::$_sdb->put_attributes( $domain, $itemName, $attributes );
 
         if ( !$response->isOK() ) {
-            throw new ORMInsertException( $response->errorMessage() );
+            throw new ORMInsertException( $response->errorMessage(). " Domain = $domain" );
         }
         
         return true; //<! since we got past the exception, response is OK
@@ -555,9 +555,9 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      */
     private function _getAttributesFromInsertQuery( $query ) {
         $query = str_replace('itemName()', 'itemName[]', $query, $itemNamePresent);
-        preg_match_all('/INTO ([a-z_0-9A-Z]+) \(([^)]+)\) VALUES \((.+) \)/i', $query, $matches );
-        $fields = explode( ', ', $matches[2][0] );
-        $values = explode( ', ', $matches[3][0] );
+        preg_match('/INTO ([a-z_0-9A-Z]+) \(([^)]+)\) VALUES \((.+) \)/i', $query, $matches );
+        $fields = explode( ', ', $matches[2] );
+        $values = explode( ', ', $matches[3] );
 
         if ( $itemNamePresent ) {
             $i = array_search('itemName[]', $fields);

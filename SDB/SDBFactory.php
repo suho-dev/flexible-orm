@@ -51,4 +51,16 @@ class SDBFactory implements \ORM\Interfaces\DataFactory {
     public function fieldNames( $table ) {
         return array();
     }
+    
+    /**
+     * Required for DataFactory interface
+     * 
+     * @param string $table
+     * @param string $field
+     * @return string
+     *      Currently always return "string" as the type 
+     */
+    public function describeField( $table, $field ) {
+        return 'string';
+    }
 }
