@@ -15,4 +15,3 @@ class SDBOwner extends \ORM\SDB\ORMModelSDB {
 
     public $name;
 }
-?>

@@ -27,11 +27,16 @@ class SDBFactoryTest  extends \ORM\Tests\ORMTest {
         
         $statement->execute();
         $id = SDBFactory::LastInsertId();
+
+        $this->assertGreaterThan(1, $id);
         
         $query      = 'SELECT * FROM cars WHERE itemName() = "'.$id.'"';
         $statement  = SDBFactory::Get($query);
+        $statement->setConsistentRead( true );
+        $statement->execute();
         $result     = $statement->fetch(SDBStatement::FETCH_ASSOC);
         
+        $this->assertFalse( $result === false, "No results fetched for '$query'" );
         $this->assertEquals( 'red', $result['colour'] );
         $this->assertEquals( 'two', $result['doors'] );
     }

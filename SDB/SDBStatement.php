@@ -574,12 +574,13 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $attributes = array();
         foreach ($values as $i => $value ) {
             $trimmedValue = trim( $value );
+            $trimmedField = trim( $fields[$i] );
             if ( array_key_exists( $trimmedValue, $this->_binds) ) {
-                $attributes[$fields[$i]] = $this->_binds[$trimmedValue];
+                $attributes[$trimmedField] = $this->_binds[$trimmedValue];
             } elseif ( $trimmedValue == '?' ) {
-                $attributes[$fields[$i]] = array_shift($this->_anonymousBinds);
+                $attributes[$trimmedField] = array_shift($this->_anonymousBinds);
             } else {
-                $attributes[$fields[$i]] = substr($trimmedValue, 1, -1);
+                $attributes[$trimmedField] = substr($trimmedValue, 1, -1);
             }
         }
 
@@ -607,13 +608,14 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         foreach ($set as $pair) {
             list( $field, $value ) = explode( ' = ', trim($pair), 2 );
             $trimmedValue = trim( $value );
+            $trimmedField = trim( $field );
             
             if ( array_key_exists($trimmedValue, $this->_binds) ) {
-                $attributes[$field] = $this->_binds[$trimmedValue];
+                $attributes[$trimmedField] = $this->_binds[$trimmedValue];
             } elseif ( $trimmedValue == '?' ) {
-                $attributes[$field] = array_shift($this->_anonymousBinds);
+                $attributes[$trimmedField] = array_shift($this->_anonymousBinds);
             } else {
-                $attributes[$field] = substr($value, 1, -1);
+                $attributes[$trimmedField] = substr($value, 1, -1);
             }
         }
 
