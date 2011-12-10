@@ -293,7 +293,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $chunkedAttributes = array();
         
         foreach ( $attributes as $field => $value ) {
-            if ( strlen($field) && strlen($value) > self::MAX_ATTRIBUTE_SIZE ) {
+            if ( !is_array($value) && strlen($field) && strlen($value) > self::MAX_ATTRIBUTE_SIZE ) {
                 $chunks = str_split( $value, self::MAX_ATTRIBUTE_SIZE );
                 foreach ($chunks as $i => $chunk ) {
                     $chunkedAttributes["{$field}[$i]"] = $chunk;
