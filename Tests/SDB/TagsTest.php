@@ -39,7 +39,11 @@ class TagsTest extends \ORM\Tests\ORMTest {
         
         $this->assertEquals( $name, $source->description );
         $this->assertInstanceOf('\ORM\Tests\Mock\Source', $source);
-        $this->assertEquals($tags, $source->tags );
+        
+        $this->assertEquals( count($tags), count($source->tags), "Tags array wrong length");
+        foreach( $tags as $tag ) {
+            $this->assertContains($tag, $source->tags );
+        }
     }
     
     public function testSaveTags() {
@@ -61,9 +65,33 @@ class TagsTest extends \ORM\Tests\ORMTest {
     }
     
     public function testAlterTags() {
-        $this->markTestIncomplete();
+        $source = Mock\Source::Find();
+        
+        $source->tags[] = 'added tag';
+        $source->save();
+        
+        $savedSource = Mock\Source::Find( $source->id() );
+        $this->assertEquals( count($source->tags), count($savedSource->tags), 'Tag count wrong' );
+        $this->assertContains( 'added tag', $source->tags );
+        
+        foreach( $source->tags as $tag ) {
+            $this->assertContains($tag, $savedSource->tags, "Tag $tag missing from saved source" );
+        }
     }
     
+    public function testRemoveTag() {
+        $source = Mock\Source::Find();
+        array_pop($source->tags);
+        
+        $source->save();
+        
+        $savedSource = Mock\Source::Find( $source->id() );
+        $this->assertEquals( count($source->tags), count($savedSource->tags), 'Tag count wrong' );
+        
+        foreach( $source->tags as $tag ) {
+            $this->assertContains($tag, $savedSource->tags, "Tag $tag missing from saved source" );
+        }
+    }    
     public function __destruct() {
         $this->sdb->delete_domain('sources');
     }
