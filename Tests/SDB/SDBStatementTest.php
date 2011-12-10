@@ -8,6 +8,22 @@ use \ORM\Tests\Mock, \ORM\SDB\SDBStatement;
 set_include_path(get_include_path(). PATH_SEPARATOR . __DIR__.'/..');
 require_once 'ORMTest.php';
 
+$sdb = \ORM\SDB\SDBStatement::GetSDBConnection();
+$sdb->delete_domain( Mock\SDBOwner::TableName() );
+
+Mock\SDBCar::CreateDomain();
+Mock\SDBOwner::CreateDomain();
+        
+$owners = range( 1, 12 );
+foreach( $owners as $owner ) {
+    $owner = new Mock\SDBOwner(array(
+        'name' => 'Jarrod '.$owner
+    ));
+
+    $owner->save();
+}
+
+
 /**
  * Test failures and exceptions for SDBStatement
  *
@@ -15,10 +31,6 @@ require_once 'ORMTest.php';
  */
 class SDBStatementTest extends \ORM\Tests\ORMTest {
     const DOMAIN = 'SDBStatementTest';
-
-    public function setUp() {
-        Mock\SDBCar::CreateDomain();
-    }
 
     public function testInjectionInsert() {
         $query = new SDBStatement("INSERT INTO cars (brand, colour, doors) VALUES ( ?, ?, ? )");
@@ -49,11 +61,11 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
 
     public function testNotAllBound() {
-
+        $this->markTestIncomplete();
     }
 
     public function testBindParam() {
-
+        $this->markTestIncomplete();
     }
     
     public function testBindAnonymous() {
@@ -83,15 +95,15 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
 
     public function testHybridBind() {
-        
+        $this->markTestIncomplete();
     }
 
     public function testTooManyBound() {
-        
+        $this->markTestIncomplete();
     }
 
     public function testDeleteRange() {
-
+        $this->markTestIncomplete();
     }
     
     public function testFetchArray() {
@@ -164,7 +176,7 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
     
     public function testFetchAll() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 10");
+        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 5");
         $query->execute();
         $count      = 0;
         $results    = array();
@@ -173,7 +185,7 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
             $count++;
         }
         
-        $this->assertEquals(10, $count);
+        $this->assertEquals(5, $count);
         
         array_pop($results);
         
@@ -184,4 +196,3 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
 
 }
-?>

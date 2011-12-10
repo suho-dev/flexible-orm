@@ -293,7 +293,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $chunkedAttributes = array();
         
         foreach ( $attributes as $field => $value ) {
-            if ( strlen($field) && strlen($value) > self::MAX_ATTRIBUTE_SIZE ) {
+            if ( !is_array($value) && strlen($field) && strlen($value) > self::MAX_ATTRIBUTE_SIZE ) {
                 $chunks = str_split( $value, self::MAX_ATTRIBUTE_SIZE );
                 foreach ($chunks as $i => $chunk ) {
                     $chunkedAttributes["{$field}[$i]"] = $chunk;
@@ -537,7 +537,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $response = self::$_sdb->put_attributes( $domain, $itemName, $attributes );
 
         if ( !$response->isOK() ) {
-            throw new ORMInsertException( $response->errorMessage() );
+            throw new ORMInsertException( $response->errorMessage(). " Domain = $domain" );
         }
         
         return true; //<! since we got past the exception, response is OK
@@ -555,9 +555,9 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
      */
     private function _getAttributesFromInsertQuery( $query ) {
         $query = str_replace('itemName()', 'itemName[]', $query, $itemNamePresent);
-        preg_match_all('/INTO ([a-z_0-9A-Z]+) \(([^)]+)\) VALUES \((.+) \)/i', $query, $matches );
-        $fields = explode( ', ', $matches[2][0] );
-        $values = explode( ', ', $matches[3][0] );
+        preg_match('/INTO ([a-z_0-9A-Z]+) \(([^)]+)\) VALUES \((.+) \)/i', $query, $matches );
+        $fields = explode( ', ', $matches[2] );
+        $values = explode( ', ', $matches[3] );
 
         if ( $itemNamePresent ) {
             $i = array_search('itemName[]', $fields);
@@ -574,12 +574,13 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         $attributes = array();
         foreach ($values as $i => $value ) {
             $trimmedValue = trim( $value );
+            $trimmedField = trim( $fields[$i] );
             if ( array_key_exists( $trimmedValue, $this->_binds) ) {
-                $attributes[$fields[$i]] = $this->_binds[$trimmedValue];
+                $attributes[$trimmedField] = $this->_binds[$trimmedValue];
             } elseif ( $trimmedValue == '?' ) {
-                $attributes[$fields[$i]] = array_shift($this->_anonymousBinds);
+                $attributes[$trimmedField] = array_shift($this->_anonymousBinds);
             } else {
-                $attributes[$fields[$i]] = substr($trimmedValue, 1, -1);
+                $attributes[$trimmedField] = substr($trimmedValue, 1, -1);
             }
         }
 
@@ -607,13 +608,14 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         foreach ($set as $pair) {
             list( $field, $value ) = explode( ' = ', trim($pair), 2 );
             $trimmedValue = trim( $value );
+            $trimmedField = trim( $field );
             
             if ( array_key_exists($trimmedValue, $this->_binds) ) {
-                $attributes[$field] = $this->_binds[$trimmedValue];
+                $attributes[$trimmedField] = $this->_binds[$trimmedValue];
             } elseif ( $trimmedValue == '?' ) {
-                $attributes[$field] = array_shift($this->_anonymousBinds);
+                $attributes[$trimmedField] = array_shift($this->_anonymousBinds);
             } else {
-                $attributes[$field] = substr($value, 1, -1);
+                $attributes[$trimmedField] = substr($value, 1, -1);
             }
         }
 

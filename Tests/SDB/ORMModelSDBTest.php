@@ -3,7 +3,12 @@ namespace ORM\SDB;
 use \ORM\Tests\Mock, \ORM\SDB\ORMModelSDB;
 
 require_once '../ORMTest.php';
-
+//$sdb = \ORM\SDB\SDBStatement::GetSDBConnection();
+//$domains = $sdb->list_domains();
+//
+//foreach( $domains as $domain ) {
+//    $sdb->delete_domain($domain);
+//}
 
 class ORMModelSDBTest extends \ORM\Tests\ORMTest {
     /**
@@ -20,13 +25,12 @@ class ORMModelSDBTest extends \ORM\Tests\ORMTest {
         );
 
     protected function setUp(){
-        $this->object = new \AmazonSDB();
-        $this->object->set_response_class('\ORM\SDB\SDBResponse');
-        $this->object->set_region(\AmazonSDB::REGION_APAC_SE1);
+        $this->object = \ORM\SDB\SDBStatement::GetSDBConnection();
+        $sdb = \ORM\SDB\SDBStatement::GetSDBConnection();
+        $sdb->create_domain( Mock\File::TableName()) ;
+        $sdb->create_domain( Mock\SDBCar::TableName() );
 
-        Mock\File::CreateDomain();
-        Mock\SDBCar::CreateDomain();
-        $this->object->batch_put_attributes(self::DOMAIN, $this->_testCars);
+        $sdb->batch_put_attributes(self::DOMAIN, $this->_testCars);
 
     }
 

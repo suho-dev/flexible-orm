@@ -100,5 +100,11 @@ class SDBResponseTest extends \ORM\Tests\ORMTest {
         
         $this->assertEquals( $results->errorMessage(), "The specified domain does not exist.");
     }
+    
+    public function testListDomains() {
+        $domains = $this->object->list_domains();
+        
+        $this->assertGreaterThan(1, count($domains) );
+        $this->assertContains('cars', $domains);
+    }
 }
-?>

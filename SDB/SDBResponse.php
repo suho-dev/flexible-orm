@@ -66,6 +66,8 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
             $this->_getAttributesResult();
         } elseif ( isset($this->body->SelectResult) ) {
             $this->_getSelectResult();
+        } elseif( isset($this->body->ListDomainsResult) ) {
+            $this->_getListDomainsResult();
         }
 
         $this->rewind();
@@ -83,6 +85,24 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
                 $this->_items[(string)$item->Name] = $this->_getObject($item->Attribute);
             }
         }
+    }
+    
+    /**
+     * Get result of list domains into an array of domains
+     * 
+     * Result of <code>$sdb->list_domains();</code>
+     * 
+     * @return array
+     */
+    private function _getListDomainsResult() {
+        $domainList = $this->body->DomainName();
+        $domains    = array();
+        
+        foreach( $domainList as $domain ) {
+            $domains[] = (string)$domain;
+        }
+        
+        $this->_items = $domains;
     }
 
     /**
