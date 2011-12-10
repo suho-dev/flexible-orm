@@ -14,6 +14,7 @@ namespace ORM\SDB;
  * joins in SimpleDB
  *  # Requests that return a lot of results or use large offset values may be
  * slow
+ *  # The ability to store arrays as properties
  * 
  * If you are using Amazon Web Services, you might want to consider using the
  * SDBSessionHandler also.
