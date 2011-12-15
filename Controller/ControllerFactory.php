@@ -48,7 +48,7 @@ class ControllerFactory {
      *      Register of controllers
      */
     public function __construct( ClassRegister $register ) {
-        $this->_register = $register;
+        $this->setRegister($register);
     }
     
     /**

@@ -44,6 +44,11 @@ class ControllerRegister implements ClassRegister {
     /**
      * Add a namespace container for controllers
      * 
+     * Namespaces are searched in the order they are added, so if multiple namespaces
+     * have the same controller class name, the first one found will be returned.
+     * 
+     * You can explicitly override this by using registerController()
+     * 
      * @param string $namespace
      * @return array 
      */
@@ -55,6 +60,7 @@ class ControllerRegister implements ClassRegister {
     /**
      * Register a specific class as a controller
      * 
+     * @see registerNamespace()
      * @param string $name
      * @param string $class
      * @return array 
@@ -68,19 +74,20 @@ class ControllerRegister implements ClassRegister {
      * Get the controller for a specified controller name alias
      *  
      * @param string $controllerName
-     * @return string
-     *      A fully qualified class name for the controller
+     * @return string|false
+     *      A fully qualified class name for the controller or false if none found
      */
     public function getClassName( $controllerName ) {
         if( array_key_exists($controllerName, $this->registeredControllers) ) {
             return $this->registeredControllers[$controllerName];
         }
         
-        $class_name = $this->_controllerToClassName($controllerName);
+        $className = $this->_controllerToClassName($controllerName);
         
         foreach( $this->namespaces as $namespace ) {
-            $qualifiedClassName = "$namespace\\$class_name";
+            $qualifiedClassName = "$namespace\\$className";
             if(class_exists($qualifiedClassName) && is_subclass_of($qualifiedClassName, self::CONTROLLER_CLASS)) {
+                $this->registerController($controllerName, $qualifiedClassName);
                 return $qualifiedClassName;
             }
         }
@@ -95,7 +102,7 @@ class ControllerRegister implements ClassRegister {
      * @return string 
      */
     private function _controllerToClassName( $controllerName ) {
-        $words = ucwords(str_replace('_',' ', $controllerName));
+        $words = ucwords(str_replace(array('_', '-'),' ', $controllerName));
         return str_replace(' ', '', $words);
     }
 }
