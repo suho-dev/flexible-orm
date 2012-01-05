@@ -15,15 +15,18 @@ use ORM\Interfaces\ClassRegister;
  * When using namespaces, it assumes the controller class is immediately under the
  * namespace (see naming rules below) and is a subclass of BaseController
  * 
- * <b>Namespace Rules</b>
+ * <b>Namespace Rules</b>\n
  * An alias is converted to a class name and then searched for in all registered
  * namespaces.
  *  - First letter capitalised
- *  - Converted from underscores to camel case
+ *  - Converted from underscores and dashes to camel case
  * 
  * e.g. \c simulations becomes \c Simulations and \c users_jobs becomes \c UsersJobs
  *
  * @see ControllerFactory, BaseController
+ * 
+ * @todo decouple this from BaseController, instead using a controller interface
+ *       requirement.
  */
 class ControllerRegister implements ClassRegister {
     /**
@@ -32,11 +35,13 @@ class ControllerRegister implements ClassRegister {
     const CONTROLLER_CLASS = 'ORM\Controller\BaseController';
     
     /**
+     * Array of namespaces registered
      * @var array $namespaces
      */
     protected $namespaces = array();
 
     /**
+     * Array of explicitly registered controllers
      * @var array $registeredControllers
      */
     protected $registeredControllers = array();
@@ -47,10 +52,13 @@ class ControllerRegister implements ClassRegister {
      * Namespaces are searched in the order they are added, so if multiple namespaces
      * have the same controller class name, the first one found will be returned.
      * 
-     * You can explicitly override this by using registerController()
+     * \note You can explicitly override this by using registerController()
      * 
      * @param string $namespace
+     *      New namespace to be searched for controller classes. Should be fully
+     *      qualified.
      * @return array 
+     *      Returns all registered namespaces in the order they will be searched
      */
     public function registerNamespace( $namespace ) {
         $this->namespaces[] = $namespace;
@@ -60,9 +68,14 @@ class ControllerRegister implements ClassRegister {
     /**
      * Register a specific class as a controller
      * 
+     * \note This will override any matching controller name in a registered
+     *       namespace.
+     * 
      * @see registerNamespace()
      * @param string $name
+     *      The controller name that will be used by getClassName()
      * @param string $class
+     *      The controller class. Currently must be a subclass of CONTROLLER_CLASS
      * @return array 
      */
     public function registerController( $name, $class ) {
@@ -75,11 +88,15 @@ class ControllerRegister implements ClassRegister {
      *  
      * @param string $controllerName
      * @return string|false
-     *      A fully qualified class name for the controller or false if none found
+     *      A fully qualified class name for the controller or \c false if none 
+     *      found. The class will be a subclass of BaseController
      */
     public function getClassName( $controllerName ) {
         if( array_key_exists($controllerName, $this->registeredControllers) ) {
-            return $this->registeredControllers[$controllerName];
+            $className = $this->registeredControllers[$controllerName];
+            if( is_subclass_of($className, self::CONTROLLER_CLASS) ) {
+                return $className;
+            }
         }
         
         $className = $this->_controllerToClassName($controllerName);
