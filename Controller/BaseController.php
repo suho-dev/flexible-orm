@@ -6,6 +6,7 @@
 namespace ORM\Controller;
 use \ORM\Interfaces\Template;
 use \ORM\Interfaces\Controller;
+use \ORM\Interfaces\RequestData;
 use \ORM\Exceptions\InvalidActionException;
 
 /**
@@ -102,12 +103,12 @@ abstract class BaseController implements Controller {
      * echo $controller->performAction();
      * @endcode
      * 
-     * @param Request $request
+     * @param RequestData $request
      *      [optional] Request parameters
      * @param Template $template
      *      [optional] The templating object (eg SmartyTemplate) to use for output
      */
-    public function __construct( Request $request = null, Template $template = null ) {
+    public function __construct( RequestData $request = null, Template $template = null ) {
         if( !is_null($request) ) {
             $this->setRequest($request);
         }
@@ -121,9 +122,9 @@ abstract class BaseController implements Controller {
     
     /**
      * Set the request object for this controller
-     * @param Request $request 
+     * @param RequestData $request 
      */
-    public function setRequest( Request $request ) {
+    public function setRequest( RequestData $request ) {
         $this->_request         = $request;
         $this->_actionName      = $request->get->action ?: static::DEFAULT_ACTION;
     }
@@ -137,7 +138,7 @@ abstract class BaseController implements Controller {
     }
 
     /**
-     * @return Request
+     * @return RequestData
      */
     public function getRequest() {
         return $this->_request;

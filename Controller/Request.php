@@ -6,6 +6,7 @@
 namespace ORM\Controller;
 use ORM\Controller\Request\Variables;
 use \LogicException;
+use ORM\Interfaces\RequestData;
 
 /**
  * Represents the request parameters
@@ -33,7 +34,7 @@ use \LogicException;
  *
  * @see Variables
  */
-class Request {
+class Request implements RequestData {
     /**
      * The get variables assigned to this Request
      * 
