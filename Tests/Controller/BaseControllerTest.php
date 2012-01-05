@@ -21,7 +21,7 @@ require 'Smarty/libs/Smarty.class.php';
  * @todo Make including Smarty more flexible
  *
  */
-class BaseControllerTest extends Tests\ORMTest {
+class BaseControllerTest extends \ORM\Tests\ORMTest {
     /**
      * @var CarsController $controller
      */

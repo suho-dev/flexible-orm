@@ -98,6 +98,12 @@ class ControllerRegister implements ClassRegister {
     /**
      * Convert a controller name to a class base name
      * 
+     * Dashes, spaces and underscores are removed and the class name will be
+     * camel case. E.g.:
+     *  - cars => Cars
+     *  - car-owners => CarOwners
+     *  - car_drivers => CarDrivers
+     * 
      * @param string $controllerName
      * @return string 
      */
