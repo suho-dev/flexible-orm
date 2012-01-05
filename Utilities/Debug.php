@@ -29,10 +29,6 @@ use \ORM\Interfaces\DebugLog;
  * Interfaces\\DebugLog interface and then nominating it \c Debug::SetLogStore( $classname )
  * 
  * @see DebugCorrectLog in tests/Mock
- * 
- *
- * @todo add option to catch all errors (not exceptions)
- * @todo implement backtrace
  */
 class Debug {
     /**
