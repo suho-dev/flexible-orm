@@ -5,6 +5,7 @@
  */
 namespace ORM\Controller;
 use \ORM\Interfaces\Template;
+use \ORM\Interfaces\Controller;
 use \ORM\Exceptions\InvalidActionException;
 
 /**
@@ -23,7 +24,7 @@ use \ORM\Exceptions\InvalidActionException;
  * 
  * @see ControllerFactory
  */
-abstract class BaseController {
+abstract class BaseController implements Controller {
     /**
      * Layout template name
      * 

@@ -5,6 +5,7 @@
  */
 namespace ORM\Controller;
 use ORM\Interfaces\ClassRegister;
+use ORM\Interfaces\Controller;
 
 /**
  * Register of controllers
@@ -13,7 +14,7 @@ use ORM\Interfaces\ClassRegister;
  * registerController()) or automatically registered using a namespace (see registerNamespace()).
  * 
  * When using namespaces, it assumes the controller class is immediately under the
- * namespace (see naming rules below) and is a subclass of BaseController
+ * namespace (see naming rules below) and implements the Controller interface.
  * 
  * <b>Namespace Rules</b>\n
  * An alias is converted to a class name and then searched for in all registered
@@ -25,14 +26,12 @@ use ORM\Interfaces\ClassRegister;
  *
  * @see ControllerFactory, BaseController
  * 
- * @todo decouple this from BaseController, instead using a controller interface
- *       requirement.
  */
 class ControllerRegister implements ClassRegister {
     /**
      * Base class for all controllers
      */
-    const CONTROLLER_CLASS = 'ORM\Controller\BaseController';
+    const CONTROLLER_INTERFACE = 'ORM\Interfaces\Controller';
     
     /**
      * Array of namespaces registered
@@ -75,7 +74,7 @@ class ControllerRegister implements ClassRegister {
      * @param string $name
      *      The controller name that will be used by getClassName()
      * @param string $class
-     *      The controller class. Currently must be a subclass of CONTROLLER_CLASS
+     *      The controller class. Must implement the Controller interface
      * @return array 
      */
     public function registerController( $name, $class ) {
@@ -89,12 +88,12 @@ class ControllerRegister implements ClassRegister {
      * @param string $controllerName
      * @return string|false
      *      A fully qualified class name for the controller or \c false if none 
-     *      found. The class will be a subclass of BaseController
+     *      found. The class will implement the Controller interface.
      */
     public function getClassName( $controllerName ) {
         if( array_key_exists($controllerName, $this->registeredControllers) ) {
             $className = $this->registeredControllers[$controllerName];
-            if( is_subclass_of($className, self::CONTROLLER_CLASS) ) {
+            if( is_subclass_of($className, self::CONTROLLER_INTERFACE) ) {
                 return $className;
             }
         }
@@ -103,7 +102,7 @@ class ControllerRegister implements ClassRegister {
         
         foreach( $this->namespaces as $namespace ) {
             $qualifiedClassName = "$namespace\\$className";
-            if(class_exists($qualifiedClassName) && is_subclass_of($qualifiedClassName, self::CONTROLLER_CLASS)) {
+            if(class_exists($qualifiedClassName) && is_subclass_of($qualifiedClassName, self::CONTROLLER_INTERFACE)) {
                 $this->registerController($controllerName, $qualifiedClassName);
                 return $qualifiedClassName;
             }

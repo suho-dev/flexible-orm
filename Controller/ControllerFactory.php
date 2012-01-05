@@ -55,13 +55,12 @@ class ControllerFactory {
      * Get a controller object to match the supplied controller name
      * 
      * @throw ControllerDoesNotExistException if controller class cannot be located
-     *        or the class found does not subclass BaseController
      * 
      * @param string $controllerName
      * @param array $constructorArgs
      *      [optional] Array of values to pass to the Controller's constructor
      * @return BaseController
-     *      A controller object (which will be a sublass of BaseController)
+     *      A controller object (which implement the Controller interface)
      */
     public function get( $controllerName, $constructorArgs = array() ) {
         $class = $this->_register->getClassName($controllerName);
