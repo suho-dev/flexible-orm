@@ -9,6 +9,8 @@ namespace ORM\Interfaces;
  * Interface that must be implemented by controller classes that you wish to use
  * with ControllerFactory and ControllerRegister.
  * 
+ * @see BaseController
+ * 
  * @author jarrodswift
  */
 interface Controller {

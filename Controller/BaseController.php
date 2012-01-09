@@ -21,7 +21,11 @@ use \ORM\Exceptions\InvalidActionException;
  * these methods allows for controller-wide functionality such as checking
  * for a logged in user.
  * 
- * @todo link to example using ControllerFactory
+ * <b>Controller Factory</b>\n
+ * To make it more simple to bootstrap your application that has multiple controllers
+ * a controller factory and register class is available:
+ * 
+ * \include controller.factory.example.php
  * 
  * @see ControllerFactory
  */
