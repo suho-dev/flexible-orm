@@ -63,6 +63,8 @@ use ORM\Exceptions\IncludePathIsNotADirectoryException;
  * Configuration::Load('my-application.ini');
  * $loader->setPackageLocations( Configuration::packages()->toArray() );
  * @endcode
+ * 
+ * @todo Ability to add additional package locations easily
  *
  * For more information see the \ref autoloader_tut "Autoloader Tutorial".
  */
@@ -217,7 +219,7 @@ class AutoLoader {
 
         return false;
     }
-
+    
     /**
      * Get the root namespace of a class name
      *

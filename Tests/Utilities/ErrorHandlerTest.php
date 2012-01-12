@@ -11,7 +11,7 @@ require_once '../ORMTest.php';
 class ErrorHandlerTest extends \ORM\Tests\ORMTest {
 
     /**
-     * @var ErrorHandler
+     * @var ErrorHandler $object
      */
     protected $object;
 

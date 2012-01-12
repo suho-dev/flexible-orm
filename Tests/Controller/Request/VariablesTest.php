@@ -14,7 +14,7 @@ require_once '../../ORMTest.php';
 class VariablesTest extends \ORM\Tests\ORMTest {
 
     /**
-     * @var Variables
+     * @var Variables $object
      */
     protected $object;
 

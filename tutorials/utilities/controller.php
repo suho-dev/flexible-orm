@@ -9,6 +9,15 @@ use ORM\Interfaces\Template;
 
 /*! @page controller_tutorial Controller Tutorial
  * 
+ * Page Index:
+ * - \ref ctrl_intro "Introduction"
+ * - \ref ctrl_basic "Basic Concepts"
+ *      - \ref ctrl_layout "Layouts"
+ *      - \ref ctrl_example_classes "Example Classes"
+ * - \ref ctrl_factory "Controller Register and Factory"
+ *
+ * \n\n
+ * 
  * \section ctrl_intro Introduction
  * The Controller package allows flexible-orm to be used as an almost complete 
  * Model-View-Controller framework. It provides the Model and Controller parts
@@ -50,7 +59,8 @@ use ORM\Interfaces\Template;
  * 
  * The layout will get all the assigned variables from the action, plus a special
  * variable named \c $action_content which is the output of the template.
- * 
+ *
+ * \subsection ctrl_example_classes Example Classes
  * <b>Basic Controller Class</b>
  * @code
  * class MyController extends BaseController {
@@ -119,4 +129,13 @@ use ORM\Interfaces\Template;
  * // the 'test' method is executed.
  * echo $controller->performAction( 'test' );
  * @endcode
+ * 
+ * 
+ * \section ctrl_factory Controller Register and Factory
+ * 
+ * To make it more simple to bootstrap your application that has multiple controllers
+ * a controller factory and register class is available
+ * 
+ * \include controller.factory.example.php
+ * 
  */

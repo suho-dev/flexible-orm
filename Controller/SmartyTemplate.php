@@ -35,7 +35,7 @@ class SmartyTemplate extends Smarty implements \ORM\Interfaces\Template {
      * @return string
      *      Template output
      */
-    public function fetch( $template ) {
+    public function fetch( $template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false ) {
         return parent::fetch( "$template.{$this->templateExtension}" );
     }
     

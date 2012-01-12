@@ -5,6 +5,8 @@
  */
 namespace ORM\Controller;
 use \ORM\Interfaces\Template;
+use \ORM\Interfaces\Controller;
+use \ORM\Interfaces\RequestData;
 use \ORM\Exceptions\InvalidActionException;
 
 /**
@@ -19,8 +21,15 @@ use \ORM\Exceptions\InvalidActionException;
  * these methods allows for controller-wide functionality such as checking
  * for a logged in user.
  * 
+ * <b>Controller Factory</b>\n
+ * To make it more simple to bootstrap your application that has multiple controllers
+ * a controller factory and register class is available:
+ * 
+ * \include controller.factory.example.php
+ * 
+ * @see ControllerFactory
  */
-abstract class BaseController {
+abstract class BaseController implements Controller {
     /**
      * Layout template name
      * 
@@ -98,16 +107,52 @@ abstract class BaseController {
      * echo $controller->performAction();
      * @endcode
      * 
-     * @param Request $request
-     *      Request parameters
+     * @param RequestData $request
+     *      [optional] Request parameters
      * @param Template $template
-     *      The templating object (eg SmartyTemplate) to use for output
+     *      [optional] The templating object (eg SmartyTemplate) to use for output
      */
-    public function __construct( Request $request, Template $template ) {
+    public function __construct( RequestData $request = null, Template $template = null ) {
+        if( !is_null($request) ) {
+            $this->setRequest($request);
+        }
+        
+        if( !is_null($template) ) {
+            $this->setTemplate($template);
+        }
+        
+        $this->controllerName   = static::ControllerName();
+    }
+    
+    /**
+     * Set the request object for this controller
+     * @param RequestData $request 
+     */
+    public function setRequest( RequestData $request ) {
         $this->_request         = $request;
         $this->_actionName      = $request->get->action ?: static::DEFAULT_ACTION;
+    }
+    
+    /**
+     * Set the template object for this controller
+     * @param Template $template 
+     */
+    public function setTemplate( Template $template ) {
         $this->_template        = $template;
-        $this->controllerName   = static::ControllerName();
+    }
+
+    /**
+     * @return RequestData
+     */
+    public function getRequest() {
+        return $this->_request;
+    }
+    
+    /**
+     * @return Template
+     */
+    public function getTemplate() {
+        return $this->_template;
     }
     
     /**
@@ -159,7 +204,7 @@ abstract class BaseController {
      */
     public function performAction( $action = null ) {
         $this->actionName = is_null($action) ? $this->_actionName : $action;
-               
+        
         if ( !is_callable(array($this, $this->actionName))) {
             throw new InvalidActionException("Unknown action, '$this->actionName' for the class, '".get_class($this)."'.");
         }
