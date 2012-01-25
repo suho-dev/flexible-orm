@@ -386,12 +386,12 @@ class PDOFactory implements Interfaces\DataFactory {
             case 'sqlite':
                 $this->_knownTables[$table] = $this->_describeTableSQLite( $table );
             case 'pgsql':
-                $this->_knownTables[$table] =  $this->_describeTablePostgres( $table );
+                $this->_knownTables[$table] = $this->_describeTablePostgres( $table );
             case 'sqlsrv':
-                $this->_knownTables[$table] =  $this->_describeTableMSSql( $table );
+                $this->_knownTables[$table] = $this->_describeTableMSSql( $table );
             case 'mysql':
             default:
-                $this->_knownTables[$table] =  $this->_describeTableMysql( $table );
+                $this->_knownTables[$table] = $this->_describeTableMysql( $table );
             }
         }
         
