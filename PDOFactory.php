@@ -384,14 +384,14 @@ class PDOFactory implements Interfaces\DataFactory {
         if( !isset($this->_knownTables[$table]) ) {
             switch( $this->databaseType() ) {
             case 'sqlite':
-                return $this->_describeTableSQLite( $table );
+                $this->_knownTables[$table] = $this->_describeTableSQLite( $table );
             case 'pgsql':
-                return $this->_describeTablePostgres( $table );
+                $this->_knownTables[$table] =  $this->_describeTablePostgres( $table );
             case 'sqlsrv':
-                return $this->_describeTableMSSql( $table );
+                $this->_knownTables[$table] =  $this->_describeTableMSSql( $table );
             case 'mysql':
             default:
-                return $this->_describeTableMysql( $table );
+                $this->_knownTables[$table] =  $this->_describeTableMysql( $table );
             }
         }
         
