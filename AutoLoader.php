@@ -122,7 +122,7 @@ class AutoLoader {
     
     /**
      * Get the list of known packages and their locations
-     * @return array
+     * @return string[]
      */
     public function getPackageLocations() {
         return $this->_packageLocations;
@@ -329,7 +329,7 @@ class AutoLoader {
     
     /**
      * Get all the include paths as an array
-     * @return array
+     * @return string[]
      */
     private function _getIncludePaths() {
         return explode( PATH_SEPARATOR, get_include_path() );

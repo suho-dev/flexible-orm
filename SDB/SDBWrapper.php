@@ -8,6 +8,7 @@
  */
 namespace ORM\SDB;
 use \ORM\Utilities\Configuration;
+use \AmazonSDB;
 
 /**
  * Manage connection to and settings for an AmazonSDB connection
@@ -53,9 +54,8 @@ abstract class SDBWrapper {
      * @see _InitSDBSettings() for environment specific SDB configuration
      */
     private static function _InitSDBConnection() {
-        list( $key, $secret ) = self::_GetAWSKeys();
-
-        self::$_sdb = new \AmazonSDB( $key, $secret );
+        self::$_sdb = new AmazonSDB( self::_BuildSDBConstructorOptions() );
+        
         self::$_sdb->set_response_class( __NAMESPACE__.'\SDBResponse');
         self::_InitSDBSettings();
     }
@@ -74,6 +74,22 @@ abstract class SDBWrapper {
         if ( Configuration::AWS()->apc_enabled ) {
             self::$_sdb->set_cache_config('apc');
         }
+    }
+    
+    private static function _BuildSDBConstructorOptions() {
+        list( $key, $secret ) = self::_GetAWSKeys();
+        
+        $options = array();
+        
+        if( $key ) {
+            $options['key']     = $key;
+        }
+        
+        if( $secret ) {
+            $options['secret'] = $secret;
+        }
+        
+        return $options;
     }
     
     /**

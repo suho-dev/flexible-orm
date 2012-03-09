@@ -40,7 +40,7 @@ class Variables extends \ArrayObject {
      *      The value of the specified variable or \c null if it doesn't exist.
      */
     public function __get( $name ) {
-        if ( isset($this[$name]) ) {
+        if ( array_key_exists($name, $this) ) {
             return $this[$name];
         }
         
