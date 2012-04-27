@@ -204,15 +204,5 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     public function testTableEscaping() {
         $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM `123_mustbeescaped` LIMIT 1");
         $this->assertTrue( $query->execute(), 'Query failed' );
-        
-        $result = $query->fetch(SDBStatement::FETCH_ARRAY);
-        $this->assertEquals(
-            array(
-                'testing'   => true,
-                'note'      => 'This domain name should be escaped with backticks',
-            ),
-            $result
-        );
     }
-
 }

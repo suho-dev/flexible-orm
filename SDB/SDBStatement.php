@@ -838,6 +838,9 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
             $this->_queryString .= " LIMIT {$this->_limit}";
         }
         
+        // Escape the "table" (domain) name
+        $this->_queryString = preg_replace('/FROM +([a-z0-9_\-.]+) /i', 'FROM `${1}` ', $this->_queryString );
+        
         return $className;
     }
     
