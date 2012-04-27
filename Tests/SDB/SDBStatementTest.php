@@ -11,6 +11,12 @@ require_once 'ORMTest.php';
 $sdb = \ORM\SDB\SDBStatement::GetSDBConnection();
 $sdb->delete_domain( Mock\SDBOwner::TableName() );
 
+$sdb->create_domain( '123_mustbeescaped' );
+$sdb->put_attributes( 
+    '123_mustbeescaped', 
+    'test', 
+    array('note' => 'This domain name should be escaped with backticks'));
+
 Mock\SDBCar::CreateDomain();
 Mock\SDBOwner::CreateDomain();
         
@@ -193,6 +199,20 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
         $fetchAllResult = $query->fetchAll(SDBStatement::FETCH_ARRAY );
         $this->assertEquals( $results, $fetchAllResult);
         
+    }
+    
+    public function testTableEscaping() {
+        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM `123_mustbeescaped` LIMIT 1");
+        $this->assertTrue( $query->execute(), 'Query failed' );
+        
+        $result = $query->fetch(SDBStatement::FETCH_ARRAY);
+        $this->assertEquals(
+            array(
+                'testing'   => true,
+                'note'      => 'This domain name should be escaped with backticks',
+            ),
+            $result
+        );
     }
 
 }
