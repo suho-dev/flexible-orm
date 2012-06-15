@@ -23,7 +23,7 @@ class SDBResponse extends \CFResponse implements \Iterator, \ArrayAccess, \Count
      * The maximum number of consecutive "nextToken" queries run when getAll() is
      * called.
      */
-    const MAX_QUERIES = 30;
+    const MAX_QUERIES = 1000;
     /**
      * Store the returned results as arrau
      * @var array $_items
