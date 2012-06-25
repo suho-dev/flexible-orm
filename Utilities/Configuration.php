@@ -30,6 +30,11 @@ class Configuration {
     private $_options;
     
     /**
+     * @var array $_loadedIniFiles
+     */
+    private $_loadedIniFiles = array();
+    
+    /**
      * Private constructor
      * @return Configuration
      */
@@ -143,6 +148,8 @@ class Configuration {
         if ( is_null(self::$_settings) ) {
             self::$_settings = new Configuration();
         }
+        
+        self::$_settings->_loadedIniFiles[] = $ini_file;
 
         self::$_settings->_add( parse_ini_file($ini_file, true) );
     }
@@ -255,6 +262,15 @@ class Configuration {
             return self::$_settings->_getGroup( $group );
         }
     }
+    
+    /**
+     * Get array of loaded ini file names
+     * @return array
+     */
+    public function loadedIniFiles() {
+        return $this->_loadedIniFiles;
+    }
+            
     
     /**
      * Send the current settings to the Debug class
