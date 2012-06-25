@@ -29,7 +29,8 @@ class ORMModelSDBTest extends \ORM\Tests\ORMTest {
         $sdb = \ORM\SDB\SDBStatement::GetSDBConnection();
         $sdb->create_domain( Mock\File::TableName()) ;
         $sdb->create_domain( Mock\SDBCar::TableName() );
-
+        $sdb->create_domain( Mock\SDBOwner::TableName() );
+        
         $sdb->batch_put_attributes(self::DOMAIN, $this->_testCars);
 
     }

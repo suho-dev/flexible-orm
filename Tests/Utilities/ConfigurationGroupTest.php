@@ -35,7 +35,7 @@ class ConfigurationGroupTest extends \ORM\Tests\ORMTest {
     }
 
     /**
-     * @covers {className}::{origMethodName}
+     * Covers: {className}::{origMethodName}
      * @todo Implement test__get().
      */
     public function test__get() {
@@ -46,7 +46,7 @@ class ConfigurationGroupTest extends \ORM\Tests\ORMTest {
     }
 
     /**
-     * @covers {className}::{origMethodName}
+     * Covers: {className}::{origMethodName}
      * @todo Implement testToArray().
      */
     public function testToArray() {

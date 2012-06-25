@@ -35,7 +35,7 @@ class NextTokenCacheTest  extends \ORM\Tests\ORMTest {
     }
 
     /**
-     * @covers {className}::{origMethodName}
+     * Covers: {className}::{origMethodName}
      * @todo Implement testStore().
      */
     public function testStore() {
@@ -46,7 +46,7 @@ class NextTokenCacheTest  extends \ORM\Tests\ORMTest {
     }
 
     /**
-     * @covers {className}::{origMethodName}
+     * Covers: {className}::{origMethodName}
      * @todo Implement testGetToken().
      */
     public function testGetToken() {
@@ -57,7 +57,7 @@ class NextTokenCacheTest  extends \ORM\Tests\ORMTest {
     }
 
     /**
-     * @covers {className}::{origMethodName}
+     * Covers: {className}::{origMethodName}
      * @todo Implement testGetNearestToken().
      */
     public function testGetNearestToken() {

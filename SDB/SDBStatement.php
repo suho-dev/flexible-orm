@@ -697,13 +697,13 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
     private function _emulateDelete() {
         $this->_simplifyQuery();
         
-        if ( preg_match( '/DELETE FROM ([a-z_0-9A-Z]+) WHERE itemName\(\) = \'([^\']*)/i', $this->_queryString, $matches ) ) {
+        if ( preg_match( '/DELETE FROM `?([a-z_0-9A-Z]+)`? WHERE itemName\(\) = \'([^\']*)/i', $this->_queryString, $matches ) ) {
             // There is only going to be one item to delete
             return self::$_sdb->delete_attributes( $matches[1], $matches[2] )->isOK();
         } else {
             // May be many returned items, we will find them then delete each one
-            preg_match( '/^DELETE FROM ([a-z_0-9A-Z]+) WHERE (.*)$/', $this->_queryString, $matches );
-            $sql = "SELECT * FROM {$matches[1]} WHERE {$matches[2]} LIMIT 25";
+            preg_match( '/^DELETE FROM `?([a-z_0-9A-Z]+)`? WHERE (.*)$/', $this->_queryString, $matches );
+            $sql = "SELECT itemName() FROM {$matches[1]} WHERE {$matches[2]} LIMIT 25";
 
             $items = self::$_sdb->select( $sql );
             return self::$_sdb->batch_delete_attributes( $matches[1], $items->itemNames() )->isOK();
