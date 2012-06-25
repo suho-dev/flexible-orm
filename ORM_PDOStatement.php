@@ -4,11 +4,12 @@
  * @author jarrod.swift
  */
 namespace ORM;
-use \PDO;
+
 use ORM\Exceptions\ORMFetchIntoClassNotFoundException;
 use ORM\Exceptions\ORMFetchIntoRelatedClassNotFoundException;
 use ORM\Exceptions\ORMFindByInvalidFieldException;
 use ORM\Exceptions\ORMPDOException;
+use PDO;
 
 /**
  * Custom PDOStatement class allowing better integration with ORM_Model
