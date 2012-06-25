@@ -100,7 +100,6 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
     public function fetchAllInto( $className ) {
         $qualifiedColumnNames = $this->_getQualifiedColumnNames();
         $objects    = new ModelCollection();
-        $class      = basename(str_replace('\\', '/', $className));
 
         while ( $object = $this->_getObject($className, $qualifiedColumnNames) ) {
             $objects[] = $object;
