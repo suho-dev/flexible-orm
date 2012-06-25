@@ -10,6 +10,8 @@ use ORM\Exceptions\ORMFetchIntoRelatedClassNotFoundException;
 use ORM\Exceptions\ORMFindByInvalidFieldException;
 use ORM\Exceptions\ORMPDOException;
 use PDO;
+use PDOException;
+use PDOStatement;
 
 /**
  * Custom PDOStatement class allowing better integration with ORM_Model
@@ -24,7 +26,7 @@ use PDO;
  * This class can be return instead of PDOStatement by setting the attribute
  * PDO::ATTR_STATEMENT_CLASS to this class name (as it is in PDOFactory).
  */
-class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement {
+class ORM_PDOStatement extends PDOStatement implements Interfaces\DataStatement {
     /**
      * Constructor for ORM_PDOStatement
      *
@@ -162,7 +164,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
             throw new ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
-        $row = $this->fetch( \PDO::FETCH_NUM );
+        $row = $this->fetch( PDO::FETCH_NUM );
 
         if ( $row ) {
             $classPath  = str_replace( '\\', '/', $className );// This is so basename/dirname work on *nix
@@ -359,7 +361,7 @@ class ORM_PDOStatement extends \PDOStatement implements Interfaces\DataStatement
         try{
             return parent::execute($input);
 
-        } catch( \PDOException $e ) {
+        } catch( PDOException $e ) {
             if ( strpos( $e->getMessage(), 'Column not found') !== false ) {
                 throw new ORMFindByInvalidFieldException( $e->getMessage()." (from $this)" );
             } else {
