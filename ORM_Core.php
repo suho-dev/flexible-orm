@@ -335,6 +335,21 @@ abstract class ORM_Core {
     }
     
     /**
+     * Translate an array of properties to a matching array of field names
+     * 
+     * @see TranslatePropertyToField()
+     * @param array $properties
+     * @return array
+     */
+    public static function TranslatePropertiesToFields( array $properties ) {
+        $className = get_called_class();
+        
+        return array_map(function($property) use($className) {
+            return $className::TranslatePropertyToField( $property );
+        }, $properties);
+    }
+    
+    /**
      * Get the full namespaced class name for this class
      * @return string
      */
