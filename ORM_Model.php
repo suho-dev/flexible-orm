@@ -763,18 +763,19 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
             return false;
         }
 
-        $table  = static::TableName();
-        $fields = $this->_includedFields( $this->DescribeTable() );
-        $df     = static::DataFactory();
+        $table      = static::TableName();
+        $properties = $this->_includedFields( static::DescribeModel() );
+        $fields     = static::TranslatePropertiesToFields($properties);
+        $df         = static::DataFactory();
 
         $sql    = "INSERT INTO `$table` (`".implode('`, `', $fields)."`)";
-        $sql    .= " VALUES ( :".implode(', :', $fields)." )";
-        $query  = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() )->bindObject($this, $fields);
+        $sql    .= " VALUES ( :".implode(', :', $properties)." )";
+        $query  = $df::Get( $sql, static::DatabaseConfigName(), get_called_class() )->bindObject($this, $properties);
 
         $result = $query->execute();
         
         if ( $result ) {
-            if ( is_null($this->_id) ) {
+            if ( !isset($this->_id) ) {
                 $this->_id = $df::LastInsertId( static::DatabaseConfigName(), static::SequenceName() );
             }
 
@@ -806,14 +807,34 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      */
     private function _includedFields( $allFields ) {
         $me = $this;
+        
         return array_filter($allFields, function( $field ) use( $me ){
             return isset($me->$field);
         });
+    }
+    
+    /**
+     * Get an array listing all the object properties that will be stored in the database
+     * 
+     * @see DescribeTable() to get the actual database fields
+     * @todo Test this method
+     * @return array
+     */
+    public static function DescribeModel() {
+        $className   = get_called_class();
+        
+        return array_map( function($fieldName) use ($className) {
+            return $className::TranslateFieldToProperty( $fieldName );
+        }, static::DescribeTable() );
     }
 
     /**
      * Get an array listing all the fields stored in the database for this object
      *
+     * \note These are the actual database field names, not the translated ones
+     * 
+     * @see DescribeModel() to get the model properties instead of database fields
+     * 
      * @todo Sort this out and test it properly
      * @return array
      *      An array of field names representing each database field
