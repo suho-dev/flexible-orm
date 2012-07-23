@@ -172,9 +172,11 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * 
      * \n\n
      * <b>Other</b>\n
-     * There is a hook for all \e get methods named \c afterGet(), to allow actions
+     * There is a hook for all \e get methods named \c afterFind(), to allow actions
      * to be performed when an object is fetched (as opposed to the constructor, 
-     * which is called both when a new object is created or fetched).
+     * which is called both when a new object is created or fetched). This allows you
+     * to get around the restriction where the constructor is called before the object
+     * is populated.
      * 
      * @see FindByOptions(), FindAll()
      * @param mixed $idOrArray
@@ -199,9 +201,11 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * Same syntax as Find() except will return a ModelCollection of all matched
      * items, rather than just the first matching object.
      *
-     * \note There is a hook for all \e get methods named \c afterGet(), to allow actions
+     * \note There is a hook for all \e get methods named \c afterFind(), to allow actions
      *      to be performed when an object is fetched (as opposed to the constructor, 
-     *      which is called both when a new object is created or fetched).
+     *      which is called both when a new object is created or fetched). This allows you
+     * to get around the restriction where the constructor is called before the object
+     * is populated.
      * 
      * @see Find(), FindAllBy()
      * @param array $optionsArray
@@ -225,6 +229,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $items = $query->fetchAllInto( get_called_class() );
         $items->each(function($item){
             $item->afterGet();
+            $item->afterFind();
         });
         
         return $items;
@@ -406,7 +411,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * $car = Car::FindByOwner_id( 4 );
      * @endcode
      * 
-     * \note There is a hook for all \e get methods named \c afterGet(), to allow actions
+     * \note There is a hook for all \e get methods named \c afterFind(), to allow actions
      *      to be performed when an object is fetched (as opposed to the constructor, 
      *      which is called both when a new object is created or fetched).
      *
@@ -437,6 +442,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $item = $query->fetchInto( get_called_class() );
         if ( $item ) {
             $item->afterGet();
+            $item->afterFind();
         }
         
         return $item;
@@ -471,6 +477,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $item = $query->fetchInto( get_called_class() );
         if ( $item ) {
             $item->afterGet();
+            $item->afterFind();
         }
         
         return $item;
@@ -1134,11 +1141,15 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * Override this method to perform an action \e after an object is retrieved
      * from the database (Find(), FindAll(), etc).
      * 
+     * @deprecated since version 0.17
+     * 
      * Called after the constructor and with all the data populated.
      * 
      * <b>Example</b>
      * 
      * \include orm_model.serialised.example.php
+     * 
+     * @see afterFind() is the new name for this hook.
      */
     public function afterGet() {}
     
