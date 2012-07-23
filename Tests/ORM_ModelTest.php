@@ -6,7 +6,9 @@
  * @todo Fix the autoloader
  */
 namespace ORM;
-use \ORM\Tests\Mock, \ORM\PDOFactory, \ORM\DEBUG;
+
+use ORM\PDOFactory;
+use ORM\Tests\Mock;
 
 require_once 'ORMTest.php';
 
@@ -21,7 +23,9 @@ class ORM_ModelTest extends Tests\ORMTest {
             (1, 'Alfa Romeo', 'red', 4, 1, '156Ti', 4, 'Sedan'),
             (2, 'Volkswagen', 'black', 5, 1, NULL, 0, NULL),
             (3, 'Volkswagen', 'black', 2, 2, NULL, 0, NULL),
-            (4, 'Toyota', 'White', 4, 2, NULL, 62, NULL)")->execute();
+            (4, 'Toyota', 'White', 4, 2, NULL, 62, NULL),
+            (5, 'Skoda', 'white', 4, 1, 'Yeti', 0, NULL),
+            (6, 'Skoda', 'black', 4, 1, 'Yeti', 2, NULL)")->execute();
     }
     
     public function tearDown() {
@@ -233,7 +237,7 @@ class ORM_ModelTest extends Tests\ORMTest {
 
         $this->assertEquals( 'ORM\ModelCollection', get_class($cars));
         
-        $this->assertEquals( 4, count($cars) );
+        $this->assertEquals( 6, count($cars) );
 
         $this->assertEquals( 'Germany', $cars[1]->Manufacturer->country );
     }
@@ -311,7 +315,7 @@ class ORM_ModelTest extends Tests\ORMTest {
         );
 
         $this->assertEquals(
-            2,
+            4,
             count( $cars )
         );
 
@@ -337,7 +341,7 @@ class ORM_ModelTest extends Tests\ORMTest {
 
         $this->assertEquals( 'ORM\ModelCollection', get_class($cars));
 
-        $this->assertEquals( 3, count($cars) );
+        $this->assertEquals( 5, count($cars) );
 
         $this->assertEquals( 'Japan', $cars[2]->Manufacturer->country );
         $this->assertEquals( 'Steve', $cars[2]->Owner->name );
@@ -351,7 +355,7 @@ class ORM_ModelTest extends Tests\ORMTest {
         );
 
         $this->assertEquals(
-            4,
+            6,
             count( $cars )
         );
     }
@@ -365,7 +369,7 @@ class ORM_ModelTest extends Tests\ORMTest {
         );
 
         $this->assertEquals(
-            3,
+            5,
             count( $cars )
         );
 
@@ -560,11 +564,16 @@ class ORM_ModelTest extends Tests\ORMTest {
         $this->assertEquals( $car->model, $storedCar->model );
     }
     
-    /**
-     * @todo implement test Car::FindByModel();
-     */
     public function testFindUsingAlias() {
-        $this->markTestIncomplete();
+        $car = Mock\Car::FindByModel('156Ti');
+        
+        $this->assertEquals('Alfa Romeo', $car->brand);
+    }
+    
+    public function testFindAllUsingAlias() {
+        $cars = Mock\Car::FindAllByModel('Yeti');
+        
+        $this->assertEquals(2, count($cars));
     }
 
     /**
@@ -712,13 +721,13 @@ class ORM_ModelTest extends Tests\ORMTest {
     public function testCountFindAll() {
         $carCount = Mock\Car::CountFindAll();
         
-        $this->assertEquals( 4, $carCount );
+        $this->assertEquals( 6, $carCount );
     }
     
     public function testCountFindAllBy() {
         $carCount = Mock\Car::CountFindAllByColour('black');
         
-        $this->assertEquals( 2, $carCount );
+        $this->assertEquals( 3, $carCount );
     }
     
     public function testAfterGet() {
@@ -732,6 +741,14 @@ class ORM_ModelTest extends Tests\ORMTest {
         
         foreach ( $cars as $car ) {
             $this->assertEquals( $car->brand, $car->testValue() );
+        }
+    }
+    
+    public function testAfterFind() {
+        $cars = Mock\Car::FindAll();
+        
+        foreach( $cars as $car ) {
+            $this->assertEquals( $car->id, $car->findValue() );
         }
     }
     

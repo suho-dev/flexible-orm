@@ -1141,4 +1141,16 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * \include orm_model.serialised.example.php
      */
     public function afterGet() {}
+    
+    /**
+     * Override this method to perform an action \e after an object is retrieved
+     * from the database (Find(), FindAll(), etc).
+     * 
+     * Called after the constructor and with all the data populated.
+     * 
+     * <b>Example</b>
+     * 
+     * \include orm_model.serialised.example.php
+     */
+    public function afterFind() {}
 }
