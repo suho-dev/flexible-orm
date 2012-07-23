@@ -31,15 +31,9 @@ class Car extends ORM_Model {
      */
     const FOREIGN_KEY_MANUFACTURER = 'brand';
 
-    /**
-     * Test the afterGet hook (set the test value to the brand)
-     */
-    public function afterGet() {
-        $this->_testValue = $this->brand;
-    }
-    
     public function afterFind() {
         $this->_findValue = $this->id;
+        $this->_testValue = $this->brand;
     }
     
     public function testValue() {
