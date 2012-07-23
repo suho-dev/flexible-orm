@@ -1157,7 +1157,9 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * Override this method to perform an action \e after an object is retrieved
      * from the database (Find(), FindAll(), etc).
      * 
-     * Called after the constructor and with all the data populated.
+     * Called after the constructor and with all the data populated. The main reason
+     * for using this method is because when using a Find function the constructor is
+     * called <i>before</i> the object has any data in it.
      * 
      * <b>Example</b>
      * 
