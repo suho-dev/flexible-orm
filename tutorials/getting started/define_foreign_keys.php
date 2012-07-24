@@ -70,6 +70,8 @@ namespace ORM;
  * echo get_class($car->Manufacturer); // Will echo 'Manufacturer'
  * @endcode
  *
+ * If you want to create a foreign key relationship with more than one of the same records, see \ref advanced_assoc "Advanced Foreign Keys"
+ * 
  * For more information see ORM_Model::Find() and ORM_Model::FindAll().
  *
  * \section intro_step3_nav Getting Started
