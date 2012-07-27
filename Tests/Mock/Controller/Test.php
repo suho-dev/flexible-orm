@@ -1,5 +1,5 @@
 <?php
-namespace ORM\Tests\Mock\Controller;
+namespace FlexibleORMTests\Mock\Controller;
 
 /**
  * Description of Test

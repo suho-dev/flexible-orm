@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests\Mock;
+namespace FlexibleORMTests\Mock;
 
 /**
  * A mock debug log class that uses SDB to store logs

@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests\Mock;
+namespace FlexibleORMTests\Mock;
 
 /**
  * Description of DebugTestLog

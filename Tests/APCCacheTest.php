@@ -4,7 +4,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests;
+namespace FlexibleORMTests;
 use \ORM\Cache, \ORM\Utilities\Cache\APCcache;
 
 require_once dirname(__FILE__) . '/ORMTest.php';

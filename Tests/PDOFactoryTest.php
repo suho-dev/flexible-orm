@@ -1,11 +1,11 @@
 <?php
-namespace ORM;
-use \ORM\Tests\Mock, \ORM\PDOFactory;
+namespace FlexibleORMTests;
+
+use ORM\PDOFactory;
 
 require_once 'ORMTest.php';
 
-
-class PDOFactoryTest extends Tests\ORMTest {
+class PDOFactoryTest extends ORMTest {
     public function setUp() {
         PDOFactory::Get("INSERT INTO `cars` (`id`, `brand`, `colour`, `doors`, `owner_id`, `name`, `age`, `type`) VALUES
             (1, 'Alfa Romeo', 'red', 4, 1, '156Ti', 4, 'Sedan'),
@@ -66,7 +66,7 @@ class PDOFactoryTest extends Tests\ORMTest {
 
         $query->execute();
         
-        $owner = $query->fetchInto('\ORM\Tests\Mock\Owner');
+        $owner = $query->fetchInto('\FlexibleORMTests\Mock\Owner');
     }
     
     /**

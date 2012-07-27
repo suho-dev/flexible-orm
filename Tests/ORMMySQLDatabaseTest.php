@@ -5,7 +5,7 @@
  * @author jarrod.swift
  * @todo Fix the autoloader
  */
-namespace ORM\Tests;
+namespace FlexibleORMTests;
 use \ORM\Tests\Mock\AlternateCarSqlite, \ORM\Utilities\Configuration;
 
 require_once 'ORMTest.php';

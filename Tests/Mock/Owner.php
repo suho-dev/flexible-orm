@@ -3,7 +3,8 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests\Mock;
+namespace FlexibleORMTests\Mock;
+
 use ORM\ORM_Model;
 /**
  * Description of Owner
@@ -12,4 +13,3 @@ use ORM\ORM_Model;
  */
 class Owner extends ORM_Model {
 }
-?>

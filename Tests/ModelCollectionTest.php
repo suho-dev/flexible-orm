@@ -4,8 +4,9 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM;
-use \ORM\Tests\Mock, \ORM\PDOFactory, \ORM\DEBUG;
+namespace FlexibleORMTests;
+
+use ORM\PDOFactory;
 
 require_once 'ORMTest.php';
 
@@ -15,7 +16,7 @@ PDOFactory::Get("TRUNCATE TABLE `cars`")->execute();
 /**
  * Test class for ORM_Model
  */
-class ModelCollectionTest extends Tests\ORMTest {
+class ModelCollectionTest extends ORMTest {
 
     /**
      * @var ModelCollection $object

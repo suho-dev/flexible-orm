@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Tests\Mock;
+namespace FlexibleORMTests\Mock;
 use ORM\Undoable\UndoableModel;
 /**
  * Description of AlternateCar

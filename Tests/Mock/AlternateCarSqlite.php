@@ -6,7 +6,7 @@
 /**
  * Mock object classes for testing
  */
-namespace ORM\Tests\Mock;
+namespace FlexibleORMTests\Mock;
 use ORM\ORM_Model;
 /**
  * Description of AlternateCarSqlite

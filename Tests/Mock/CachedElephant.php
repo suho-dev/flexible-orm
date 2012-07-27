@@ -7,7 +7,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-namespace ORM\Tests\Mock;
+namespace FlexibleORMTests\Mock;
 use ORM\CachedORMModel;
 /**
  * Description of CachedElephant

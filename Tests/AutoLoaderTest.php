@@ -4,18 +4,19 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM;
+namespace FlexibleORMTests;
+
+use Mock_Zend_TestClass;
 use ORM\AutoLoader;
 use ORM\Utilities\Configuration;
 
 require_once dirname(__FILE__) . '/ORMTest.php';
 
-
 /**
  * Test class for Configuration.
  * 
  */
-class AutoLoaderTest extends Tests\ORMTest {
+class AutoLoaderTest extends ORMTest {
     /**
      * @var AutoLoader $autoloader
      */
@@ -27,7 +28,7 @@ class AutoLoaderTest extends Tests\ORMTest {
     
     function testLocate() {
         $this->assertEquals(
-            realpath(__DIR__.'/../Utilities/Configuration.php'),
+            realpath(__DIR__.'/../src/Utilities/Configuration.php'),
             $this->autoloader->locate( 'ORM\Utilities\Configuration')
         );
 
@@ -37,8 +38,8 @@ class AutoLoaderTest extends Tests\ORMTest {
         );
 
         $this->assertEquals(
-            realpath(__DIR__.'/Mock/Owner.php'),
-            $this->autoloader->locate('ORM\Tests\Mock\Owner')
+            './Mock/Owner.php',
+            $this->autoloader->locate('Mock\Owner')
         );
     }
     
@@ -106,7 +107,7 @@ class AutoLoaderTest extends Tests\ORMTest {
      * @expectedException \ORM\Exceptions\IncludePathDoesNotExistException
      */
     function testAddIncludePathInvalid() {
-        $this->autoloader->addIncludePath('/would/be/suprisingin/if/this/existed');
+        $this->autoloader->addIncludePath('/would/be/suprising/if/this/existed');
     }
     
     /**
@@ -127,8 +128,8 @@ class AutoLoaderTest extends Tests\ORMTest {
      * Hard to test more than it has added to the autoloader stack
      */
     function testRegister() {
-        $originalStack = spl_autoload_functions();
-        $originalStackSize = count( $originalStack );
+        $originalStack      = spl_autoload_functions();
+        $originalStackSize  = count( $originalStack );
         
         $this->autoloader->register( AutoLoader::AUTOLOAD_STYLE_BOTH );
         
@@ -141,7 +142,7 @@ class AutoLoaderTest extends Tests\ORMTest {
             'loadZend unable to locate Mock_Zend_TestClass'
         );
         
-        $testObject = new \Mock_Zend_TestClass;
+        $testObject = new Mock_Zend_TestClass;
         $this->assertTrue( $testObject->loaded );
     }
     

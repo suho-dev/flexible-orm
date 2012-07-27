@@ -1,6 +1,5 @@
 <?php
-namespace ORM\Tests;
-use \ORM\Tests\Mock, \ORM\SDB\ORMModelSDB;
+namespace FlexibleORMTests;
 
 require_once 'ORMTest.php';
 
@@ -23,7 +22,7 @@ class ORMSDBTests extends ORMTest {
     public function testLargeAttribute() {
         // Store some data that is way more than the 1K limit of SDB
         $file = new Mock\File();
-        $file->data = file_get_contents('../ORM_Model.php');
+        $file->data = file_get_contents('../src/ORM_Model.php');
         $file->name = 'ORM_Model.php';
 
         $this->assertTrue( $file->save(), "Unable to save File" );
@@ -125,6 +124,4 @@ class ORMSDBTests extends ORMTest {
         $savedCar = Mock\SDBCar::Find( $car->id() );
         $this->assertEquals( 'red', $savedCar->colour );
     }
-    
 }
-?>

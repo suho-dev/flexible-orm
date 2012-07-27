@@ -1,5 +1,5 @@
 <?php
-namespace ORM\Tests\Mock;
+namespace FlexibleORMTests\Mock;
 use ORM\Controller\Session;
 
 /**

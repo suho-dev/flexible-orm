@@ -5,10 +5,10 @@
  * @author jarrod.swift
  * @todo Fix the autoloader
  */
-namespace ORM;
+namespace FlexibleORMTests;
 
+use FlexibleORMTests\Mock;
 use ORM\PDOFactory;
-use ORM\Tests\Mock;
 
 require_once 'ORMTest.php';
 
@@ -17,7 +17,7 @@ PDOFactory::Get("TRUNCATE TABLE `cars`")->execute();
 /**
  * Test class for ORM_Model
  */
-class ORM_ModelTest extends Tests\ORMTest {
+class ORM_ModelTest extends ORMTest {
     public function setUp() {
         PDOFactory::Get("INSERT INTO `cars` (`id`, `brand`, `colour`, `doors`, `owner_id`, `name`, `age`, `type`) VALUES
             (1, 'Alfa Romeo', 'red', 4, 1, '156Ti', 4, 'Sedan'),
@@ -53,7 +53,7 @@ class ORM_ModelTest extends Tests\ORMTest {
         $car = Mock\Car::Find(1);
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Car',
+            'FlexibleORMTests\\Mock\\Car',
             get_class( $car )
         );
 
@@ -75,15 +75,15 @@ class ORM_ModelTest extends Tests\ORMTest {
     public function testFindWithOptions() {
         $car = Mock\Car::Find(array(
             'where' => 'brand LIKE "Alfa Romeo"'
-        ), 'ORM\Tests\Mock\Owner');
+        ), 'FlexibleORMTests\Mock\Owner');
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Car',
+            'FlexibleORMTests\\Mock\\Car',
             get_class( $car )
         );
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Owner',
+            'FlexibleORMTests\\Mock\\Owner',
             get_class( $car->Owner )
         );
 
@@ -99,20 +99,20 @@ class ORM_ModelTest extends Tests\ORMTest {
     }
 
     public function testForeignKey() {
-        $this->assertEquals('owner_id', Mock\Car::ForeignKey('ORM\Tests\Mock\Owner'));
-        $this->assertEquals('brand',    Mock\Car::ForeignKey('ORM\Tests\Mock\Manufacturer'));
+        $this->assertEquals('owner_id', Mock\Car::ForeignKey('FlexibleORMTests\Mock\Owner'));
+        $this->assertEquals('brand',    Mock\Car::ForeignKey('FlexibleORMTests\Mock\Manufacturer'));
     }
 
     public function testFindWith() {
-        $car = Mock\Car::Find( 1, 'ORM\Tests\Mock\Owner');
+        $car = Mock\Car::Find( 1, 'FlexibleORMTests\Mock\Owner');
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Car',
+            'FlexibleORMTests\\Mock\\Car',
             get_class( $car )
         );
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Owner',
+            'FlexibleORMTests\\Mock\\Owner',
             get_class( $car->Owner )
         );
 
@@ -136,7 +136,7 @@ class ORM_ModelTest extends Tests\ORMTest {
         ));
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Car',
+            'FlexibleORMTests\\Mock\\Car',
             get_class( $car )
         );
 
@@ -153,10 +153,10 @@ class ORM_ModelTest extends Tests\ORMTest {
     public function testFindWithForeignOptions() {
         $car = Mock\Car::Find(array(
             'where' => 'Manufacturer.country = "Italy"'
-        ), 'ORM\Tests\Mock\Manufacturer');
+        ), 'FlexibleORMTests\Mock\Manufacturer');
         
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Manufacturer',
+            'FlexibleORMTests\\Mock\\Manufacturer',
             get_class( $car->Manufacturer )
         );
 
@@ -167,20 +167,20 @@ class ORM_ModelTest extends Tests\ORMTest {
     }
 
     public function testFindMultipleForeignKeys() {
-        $car = Mock\Car::Find( 1, array('ORM\Tests\Mock\Owner', 'ORM\Tests\Mock\Manufacturer') );
+        $car = Mock\Car::Find( 1, array('FlexibleORMTests\Mock\Owner', 'FlexibleORMTests\Mock\Manufacturer') );
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Manufacturer',
+            'FlexibleORMTests\\Mock\\Manufacturer',
             get_class( $car->Manufacturer )
         );
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Car',
+            'FlexibleORMTests\\Mock\\Car',
             get_class( $car )
         );
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Owner',
+            'FlexibleORMTests\\Mock\\Owner',
             get_class( $car->Owner )
         );
 
@@ -204,7 +204,7 @@ class ORM_ModelTest extends Tests\ORMTest {
         ));
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Car',
+            'FlexibleORMTests\\Mock\\Car',
             get_class( $car )
         );
 
@@ -222,7 +222,7 @@ class ORM_ModelTest extends Tests\ORMTest {
         $car    = Mock\Car::Find();
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Car',
+            'FlexibleORMTests\\Mock\\Car',
             get_class( $car )
         );
 
@@ -233,7 +233,7 @@ class ORM_ModelTest extends Tests\ORMTest {
     }
 
     public function testFindAllWith() {
-        $cars = Mock\Car::FindAll(array(), 'ORM\Tests\Mock\Manufacturer');
+        $cars = Mock\Car::FindAll(array(), 'FlexibleORMTests\Mock\Manufacturer');
 
         $this->assertEquals( 'ORM\ModelCollection', get_class($cars));
         
@@ -246,7 +246,7 @@ class ORM_ModelTest extends Tests\ORMTest {
         $car = Mock\Car::FindByBrand('Alfa Romeo');
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\Car',
+            'FlexibleORMTests\\Mock\\Car',
             get_class( $car )
         );
 
@@ -271,7 +271,7 @@ class ORM_ModelTest extends Tests\ORMTest {
 
         foreach ( $cars as $car ) {
             $this->assertEquals(
-                'ORM\\Tests\\Mock\\Car',
+                'FlexibleORMTests\\Mock\\Car',
                 get_class( $car )
             );
 
@@ -321,7 +321,7 @@ class ORM_ModelTest extends Tests\ORMTest {
 
         foreach ( $cars as $car ) {
             $this->assertEquals(
-                'ORM\\Tests\\Mock\\Car',
+                'FlexibleORMTests\\Mock\\Car',
                 get_class( $car )
             );
 
@@ -337,7 +337,7 @@ class ORM_ModelTest extends Tests\ORMTest {
     }
 
     public function testFindAllByForeign() {
-        $cars = Mock\Car::FindAllByDoors(5, '<', array('ORM\Tests\Mock\Owner', 'ORM\Tests\Mock\Manufacturer') );
+        $cars = Mock\Car::FindAllByDoors(5, '<', array('FlexibleORMTests\Mock\Owner', 'FlexibleORMTests\Mock\Manufacturer') );
 
         $this->assertEquals( 'ORM\ModelCollection', get_class($cars));
 
@@ -375,7 +375,7 @@ class ORM_ModelTest extends Tests\ORMTest {
 
         foreach ( $cars as $car ) {
             $this->assertEquals(
-                'ORM\\Tests\\Mock\\Car',
+                'FlexibleORMTests\\Mock\\Car',
                 get_class( $car )
             );
 
@@ -761,7 +761,7 @@ class ORM_ModelTest extends Tests\ORMTest {
     
     public function testToString() {
         $car = Mock\Car::Find();
-        $this->assertEquals( 'ORM\Tests\Mock\Car ['.$car->id().']', (string)$car );
+        $this->assertEquals( 'FlexibleORMTests\Mock\Car ['.$car->id().']', (string)$car );
     }
     
     public function testPropertyType() {

@@ -2,20 +2,24 @@
 /**
  * Tests specific to AmazonSDB packages (SDB)
  */
-namespace ORM\SDB;
-use \ORM\Tests\Mock, \ORM\SDB\SDBStatement;
+namespace FlexibleORMTests\SDB;
+
+use ORM\SDB\SDBFactory;
+use ORM\SDB\SDBStatement;
+use FlexibleORMTests\Mock;
+use FlexibleORMTests\ORMTest;
 
 set_include_path(get_include_path(). PATH_SEPARATOR . __DIR__.'/..');
 require_once 'ORMTest.php';
 
-$sdb = \ORM\SDB\SDBStatement::GetSDBConnection();
+$sdb = SDBStatement::GetSDBConnection();
 $sdb->delete_domain( Mock\SDBOwner::TableName() );
 
-$sdb->create_domain( '123_mustbeescaped' );
-$sdb->put_attributes( 
-    '123_mustbeescaped', 
-    'test', 
-    array('note' => 'This domain name should be escaped with backticks'));
+//$sdb->create_domain( '123_mustbeescaped' );
+//$sdb->put_attributes( 
+//    '123_mustbeescaped', 
+//    'test', 
+//    array('note' => 'This domain name should be escaped with backticks'));
 
 Mock\SDBCar::CreateDomain();
 Mock\SDBOwner::CreateDomain();
@@ -35,7 +39,7 @@ foreach( $owners as $owner ) {
  *
  * Most of the features are already tested in ORMModelSDBTest
  */
-class SDBStatementTest extends \ORM\Tests\ORMTest {
+class SDBStatementTest extends ORMTest {
     const DOMAIN = 'SDBStatementTest';
 
     public function testInjectionInsert() {
@@ -113,7 +117,7 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
     
     public function testFetchArray() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM owners LIMIT 110");
+        $query = SDBFactory::Get("SELECT * FROM owners LIMIT 110");
         $query->execute();
         $result = $query->fetch(SDBStatement::FETCH_ARRAY);
         
@@ -122,7 +126,7 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
     
     public function testFetchAssoc() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM owners LIMIT 10");
+        $query = SDBFactory::Get("SELECT * FROM owners LIMIT 10");
         $query->execute();
         $result = $query->fetch(SDBStatement::FETCH_ASSOC);
         
@@ -133,7 +137,7 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
     
     public function testFetchBoth() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM owners LIMIT 10");
+        $query = SDBFactory::Get("SELECT * FROM owners LIMIT 10");
         $query->execute();
         $result = $query->fetch();
         
@@ -145,7 +149,7 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
     
     public function testFetchMultiple() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 10");
+        $query = SDBFactory::Get("SELECT name FROM owners LIMIT 10");
         $query->execute();
         
         $lastName   = '';
@@ -161,7 +165,7 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
     
     public function testFetchAllAssoc() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 10");
+        $query = SDBFactory::Get("SELECT name FROM owners LIMIT 10");
         $query->execute();
         $count      = 0;
         $results    = array();
@@ -182,7 +186,7 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
     
     public function testFetchAll() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT name FROM owners LIMIT 5");
+        $query = SDBFactory::Get("SELECT name FROM owners LIMIT 5");
         $query->execute();
         $count      = 0;
         $results    = array();
@@ -202,7 +206,7 @@ class SDBStatementTest extends \ORM\Tests\ORMTest {
     }
     
     public function testTableEscaping() {
-        $query = \ORM\SDB\SDBFactory::Get("SELECT * FROM `123_mustbeescaped` LIMIT 1");
+        $query = SDBFactory::Get("SELECT * FROM `123_mustbeescaped` LIMIT 1");
         $this->assertTrue( $query->execute(), 'Query failed' );
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace ORM\Tests\Mock\AlternateController;
+namespace FlexibleORMTests\Mock\AlternateController;
 use ORM\Controller\BaseController;
 
 /**

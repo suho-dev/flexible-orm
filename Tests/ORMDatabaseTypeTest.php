@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift@suho.com.au
  */
-namespace ORM\Tests;
+namespace FlexibleORMTests;
 
 /**
  * Description of ORMDatabaseTypeTest

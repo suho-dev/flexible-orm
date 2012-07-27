@@ -1,6 +1,8 @@
 <?php
-namespace ORM\Tests;
-use \ORM\Tests\Mock,    \ORM\Utilities\Debug;
+namespace FlexibleORMTests;
+
+use ORM\Tests\Mock;
+use ORM\Utilities\Debug;
 
 require_once 'ORMTest.php';
 
