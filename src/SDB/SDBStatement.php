@@ -4,13 +4,15 @@
  * @author jarrod.swift
  */
 namespace ORM\SDB;
-use \ORM\Utilities\Configuration;
-use \ORM\Exceptions\ORMPDOException;
-use \ORM\Exceptions\ORMInsertException;
-use \ORM\Exceptions\ORMUpdateException;
-use \ORM\Exceptions\ORMFetchIntoClassNotFoundException;
-use \ORM\Exceptions\ORMFetchIntoException;
-use \ORM\Exceptions\ORMFetchException;
+
+use ORM\Exceptions\ORMFetchException;
+use ORM\Exceptions\ORMFetchIntoClassNotFoundException;
+use ORM\Exceptions\ORMFetchIntoException;
+use ORM\Exceptions\ORMInsertException;
+use ORM\Exceptions\ORMPDOException;
+use ORM\Exceptions\ORMUpdateException;
+use ORM\Interfaces\DataStatement;
+use ORM\ModelCollection;
 
 /**
  * Mimick the behaviour of ORM_PDOStatement for AmazonSDB
@@ -38,7 +40,7 @@ use \ORM\Exceptions\ORMFetchException;
  *
  * @see SDBFactory, ORMModelSDB, SDBResponse
  */
-class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
+class SDBStatement extends SDBWrapper implements DataStatement {
     /**
      * Fetch as both associative and indexed array
      * @see fetch(), fetchAll()
@@ -756,7 +758,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
         }
 
         if ( !$this->_result->isOK() ) {
-            throw new \ORM\Exceptions\ORMFetchIntoException(
+            throw new ORMFetchIntoException(
                 $this->_result->errorMessage()
             );
         } else if ( count($this->_result) ) {
@@ -940,7 +942,7 @@ class SDBStatement extends SDBWrapper implements \ORM\Interfaces\DataStatement {
             throw new ORMFetchIntoClassNotFoundException("Unknown class $className requested");
         }
 
-        $collection = new \ORM\ModelCollection();
+        $collection = new ModelCollection();
         
         if ( !$this->_result->isOK() ) {
             throw new ORMFetchIntoException(

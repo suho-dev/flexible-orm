@@ -5,6 +5,10 @@
  */
 namespace ORM\SDB;
 
+use ORM\ORM_Model;
+use ReflectionClass;
+use ReflectionProperty;
+
 /**
  * An model class where the backend is the Amazon simpleDB service.
  * 
@@ -23,7 +27,7 @@ namespace ORM\SDB;
  *
  * @see ORM_Model, SDBSessionHandler
  */
-class ORMModelSDB extends \ORM\ORM_Model {
+class ORMModelSDB extends ORM_Model {
     /**
      * Set the datafactor class to SDBFactory
      */
@@ -43,18 +47,11 @@ class ORMModelSDB extends \ORM\ORM_Model {
      *      An array of field names representing each field
      */
     public static function DescribeTable() {
-        $className  = get_called_class();
-        $item       = new $className;
-
-        // get_object_vars() must be called from outside the object scope
-        // to ensure it only gets the publicly accessible attributes
-        $publicPropertiesFunction = (function() use( $item ) {
-            $vars = get_object_vars($item);
-
-            return array_keys($vars);
-        });
-
-        return $publicPropertiesFunction();
+        $reflection = new ReflectionClass(get_called_class());
+        
+        return array_map(function(ReflectionProperty $property) {
+            return $property->name;
+        }, $reflection->getProperties(ReflectionProperty::IS_PUBLIC));
     }
 
     /**
