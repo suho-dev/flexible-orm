@@ -6,7 +6,6 @@
  * @todo Fix the autoloader
  */
 namespace FlexibleORMTests;
-use \ORM\Utilities\Configuration;
 
 require_once 'ORMTest.php';
 

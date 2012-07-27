@@ -6,6 +6,7 @@
  */
 namespace FlexibleORMTests;
 
+use ORM\ModelCollection;
 use ORM\PDOFactory;
 
 require_once 'ORMTest.php';

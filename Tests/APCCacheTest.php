@@ -5,7 +5,8 @@
  * @author jarrod.swift
  */
 namespace FlexibleORMTests;
-use \ORM\Cache, \ORM\Utilities\Cache\APCcache;
+
+use ORM\Utilities\Cache\APCCache;
 
 require_once dirname(__FILE__) . '/ORMTest.php';
 
@@ -20,7 +21,7 @@ class APCCacheTest extends ORMTest {
     protected $object;
 
     protected function setUp() {
-        $this->object = new APCcache();
+        $this->object = new APCCache();
     }
 
     protected function tearDown() {

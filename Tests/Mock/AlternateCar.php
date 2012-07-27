@@ -8,6 +8,7 @@
  */
 namespace FlexibleORMTests\Mock;
 use ORM\ORM_Model;
+
 /**
  * Description of AlternateCar
  *
@@ -17,4 +18,3 @@ class AlternateCar extends ORM_Model {
     const DATABASE  = 'secondDatabase';
     const TABLE     = 'cars';
 }
-?>

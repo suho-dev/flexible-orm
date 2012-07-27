@@ -130,6 +130,6 @@ class ORM_CoreTest extends ORMTest {
     }
 
     public function testClassPath() {
-        $this->assertEquals('ORM\Tests\Mock\Car', Mock\Car::FullClassName() );
+        $this->assertEquals('FlexibleORMTests\Mock\Car', Mock\Car::FullClassName() );
     }
 }

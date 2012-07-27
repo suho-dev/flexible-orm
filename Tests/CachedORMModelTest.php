@@ -1,12 +1,12 @@
 <?php
-/**
- * Tests for ORM_Model class
- * @file
- * @author jarrod.swift
- * @todo Fix the autoloader
- */
-namespace ORM;
-use \ORM\Tests\Mock, \ORM\PDOFactory, \ORM\DEBUG;
+namespace FlexibleORMTests;
+
+use FlexibleORMTests\Mock\CachedCar;
+use FlexibleORMTests\Mock\CachedElephant;
+use FlexibleORMTests\Mock\CachedOwner;
+use ORM\PDOFactory;
+use ORM\Utilities\Cache\APCCache;
+use Owner;
 
 require_once 'ORMTest.php';
 PDOFactory::GetFactory()->startProfiling();
@@ -18,21 +18,21 @@ PDOFactory::GetFactory()->startProfiling();
  * @note This tests that CachedORMModelTest behaves exactly as ORM_Model and that
  *      it caches objects correctly
  */
-class CachedORMModelTest extends Tests\ORMTest {
+class CachedORMModelTest extends ORMTest {
     protected function tearDown() {
-        $freds = Mock\Owner::FindAllByName('Fred');
+        $freds = Owner::FindAllByName('Fred');
         $freds->delete();
     }
 
     public function testTableName() {
         $this->assertEquals(
             'cars',
-            Mock\CachedCar::TableName()
+            CachedCar::TableName()
         );
     }
 
     public function testFind() {
-        $car = Mock\CachedCar::Find(1);
+        $car = CachedCar::Find(1);
 
         $this->assertEquals(
             'ORM\\Tests\\Mock\\CachedCar',
@@ -51,11 +51,11 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testFindFalse() {
-        $this->assertFalse( Mock\CachedCar::Find(1000) );
+        $this->assertFalse( CachedCar::Find(1000) );
     }
 
     public function testFindWithOptions() {
-        $car = Mock\CachedCar::Find(array(
+        $car = CachedCar::Find(array(
             'where' => 'brand LIKE "Alfa Romeo"'
         ), 'ORM\Tests\Mock\CachedOwner');
 
@@ -81,7 +81,7 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testFindWith() {
-        $car = Mock\CachedCar::Find( 1, 'ORM\Tests\Mock\CachedOwner');
+        $car = CachedCar::Find( 1, 'ORM\Tests\Mock\CachedOwner');
 
         $this->assertEquals(
             'ORM\\Tests\Mock\\CachedCar',
@@ -106,7 +106,7 @@ class CachedORMModelTest extends Tests\ORMTest {
 
     public function testFindOptions() {
         $brand  = 'Alfa Romeo';
-        $car    = Mock\CachedCar::Find(array(
+        $car    = CachedCar::Find(array(
             'where' => 'doors > ? AND brand NOT LIKE ?',
             'order' => 'colour DESC',
             'values' => array( 3, $brand )
@@ -128,7 +128,7 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testFindNoOptions() {
-        $car    = Mock\CachedCar::Find();
+        $car    = CachedCar::Find();
 
         $this->assertEquals(
             'ORM\\Tests\Mock\\CachedCar',
@@ -142,7 +142,7 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testFindBy() {
-        $car = Mock\CachedCar::FindByBrand('Alfa Romeo');
+        $car = CachedCar::FindByBrand('Alfa Romeo');
 
         $this->assertEquals(
             'ORM\\Tests\Mock\\CachedCar',
@@ -156,7 +156,7 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testFindAllBy() {
-        $cars = Mock\CachedCar::FindAllByBrand('Volkswagen');
+        $cars = CachedCar::FindAllByBrand('Volkswagen');
 
         $this->assertEquals(
             'ORM\\ModelCollection',
@@ -182,7 +182,7 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testDescribeTable() {
-        $describe = Mock\CachedElephant::DescribeTable();
+        $describe = CachedElephant::DescribeTable();
 
         $this->assertEquals( 2, count( $describe ) );
         $this->assertTrue( in_array('name', $describe) );
@@ -190,7 +190,7 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testCreate() {
-        $elephant = new Mock\CachedElephant();
+        $elephant = new CachedElephant();
 
         $elephant->name     = "Roger";
         $elephant->weight   = 1234.5;
@@ -199,37 +199,37 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testCreateWithAutoIncrement() {
-        $owner = new Mock\CachedOwner();
+        $owner = new CachedOwner();
         $owner->name = 'Fred';
         $owner->age  = rand(0,120);
         $owner->save();
 
-        $retrieved = Mock\CachedOwner::Find( $owner->id() );
+        $retrieved = CachedOwner::Find( $owner->id() );
 
         $this->assertEquals( $owner->age, $retrieved->age );
 
     }
 
     public function testUpdate() {
-        $elephant = new Mock\CachedElephant();
+        $elephant = new CachedElephant();
         $elephant->name     = "Tim";
         $elephant->weight   = 1000;
 
         $this->assertTrue( $elephant->save(), 'Unable to save elephant: ', $elephant->errorMessagesString() );
 
-        $elephant = Mock\CachedElephant::Find( 'Tim' );
+        $elephant = CachedElephant::Find( 'Tim' );
         $this->assertEquals( 1000, $elephant->weight );
         $elephant->weight = 1400;
 
         $this->assertTrue( $elephant->save() );
 
-        $elephant = Mock\CachedElephant::Find( 'Tim' );
+        $elephant = CachedElephant::Find( 'Tim' );
         $this->assertEquals( 1400, $elephant->weight );
 
     }
 
     public function testDelete() {
-        $ford = new Mock\CachedCar(array(
+        $ford = new CachedCar(array(
             'brand'     => 'Ford',
             'colour'    => 'Black',
             'owner_id'  => 3,
@@ -241,14 +241,14 @@ class CachedORMModelTest extends Tests\ORMTest {
         $ford->save();
 
         // Ensure it has been created for this to make sense as a test
-        $this->assertEquals( $ford->id(), Mock\CachedCar::Find($ford->id())->id() );
+        $this->assertEquals( $ford->id(), CachedCar::Find($ford->id())->id() );
 
         $ford->delete();
-        $this->assertFalse( Mock\CachedCar::Find($ford->id()) );
+        $this->assertFalse( CachedCar::Find($ford->id()) );
     }
 
     public function testLoad() {
-        $car = new Mock\CachedCar(array('id' => 2, 'name' => 'leo') );
+        $car = new CachedCar(array('id' => 2, 'name' => 'leo') );
         $car->load();
 
         $this->assertEquals( 2, $car->id );
@@ -258,7 +258,7 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testLoadNewObject() {
-        $car = new Mock\CachedCar(array('id' => 100000, 'name' => 'leo') );
+        $car = new CachedCar(array('id' => 100000, 'name' => 'leo') );
         $car->load();
 
         $this->assertEquals( 100000, $car->id );
@@ -267,10 +267,10 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testCacheOnFind() {
-        $cache              = new \ORM\Utilities\Cache\APCCache();
+        $cache              = new APCCache();
         $cache->flush();
         
-        $car                = Mock\CachedCar::Find(3);
+        $car                = CachedCar::Find(3);
         $cachedCarObject    = $cache->get( (string)$car );
 
         $this->assertTrue( $cachedCarObject !== false, "Unable to find $car in the cache. " );
@@ -278,10 +278,10 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testCacheOnFindWith() {
-        $cache              = new \ORM\Utilities\Cache\APCCache();
+        $cache              = new APCCache();
         $cache->flush();
 
-        $car                = Mock\CachedCar::Find(3, 'ORM\Tests\Mock\CachedOwner');
+        $car                = CachedCar::Find(3, 'ORM\Tests\Mock\CachedOwner');
         $cachedCarObject    = $cache->get( (string)$car );
         $cachedOwnerObject  = $cache->get( (string)$car->CachedOwner );
 
@@ -295,11 +295,11 @@ class CachedORMModelTest extends Tests\ORMTest {
     }
 
     public function testRetrieveFromCache() {
-        $cache              = new \ORM\Utilities\Cache\APCCache();
+        $cache              = new APCCache();
         $cache->flush();
 
-        $car                = Mock\CachedCar::Find(3, 'ORM\Tests\Mock\CachedOwner');
-        $retrievedCar       = Mock\CachedCar::RetrieveFromCache(3, 'ORM\Tests\Mock\CachedOwner');
+        $car                = CachedCar::Find(3, 'ORM\Tests\Mock\CachedOwner');
+        $retrievedCar       = CachedCar::RetrieveFromCache(3, 'ORM\Tests\Mock\CachedOwner');
 
 //        $apc = new \APCIterator('user');
 //        echo "\nCached:\n";

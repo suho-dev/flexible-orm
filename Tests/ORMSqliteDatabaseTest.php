@@ -27,7 +27,7 @@ $db = null;
  * Test class for ORM_Model using multiple databases
  */
 class ORMSqliteDatabaseTest extends ORMDatabaseTypeTest {
-    protected $carClass         = '\ORM\Tests\Mock\AlternateCarSqlite';
+    protected $carClass         = '\FlexibleORMTests\Mock\AlternateCarSqlite';
     protected $databaseConfig   = 'sqliteDB';
 
 }

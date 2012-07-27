@@ -1,7 +1,6 @@
 <?php
 namespace FlexibleORMTests;
 
-use ORM\Tests\Mock;
 use ORM\Utilities\Debug;
 
 require_once 'ORMTest.php';
@@ -73,5 +72,3 @@ class DebugTest extends ORMTest {
         $this->assertGreaterThan( 10, strlen($expected), "Output is too short!" );
     }
 }
-
-?>

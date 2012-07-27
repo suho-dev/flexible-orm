@@ -6,12 +6,14 @@
  * @todo Fix the autoloader
  */
 namespace FlexibleORMTests;
-use \ORM\Tests\Mock\AlternateCarSqlite, \ORM\Utilities\Configuration;
+
+use ORM\Utilities\Configuration;
+use PDO;
 
 require_once 'ORMTest.php';
 
 $conf = Configuration::postgresDB();
-$db = new \PDO( "pgsql:dbname={$conf->name};host=localhost", $conf->user, $conf->pass );
+$db = new PDO( "pgsql:dbname={$conf->name};host=localhost", $conf->user, $conf->pass );
 $db->exec('EMPTY TABLE cars IF EXISTS;');
 $db = null;
 

@@ -6,7 +6,6 @@
  * @todo Fix the autoloader
  */
 namespace FlexibleORMTests;
-use \ORM\Tests\Mock, \ORM\PDOFactory, \ORM\DEBUG;
 
 require_once 'ORMTest.php';
 //PDOFactory::GetFactory()->startProfiling();
@@ -25,7 +24,7 @@ class ORMSecondDatabaseTest extends ORMTest {
         $car = Mock\AlternateCar::Find(1);
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\AlternateCar',
+            'FlexibleORMTests\\Mock\\AlternateCar',
             get_class( $car )
         );
 
@@ -50,7 +49,7 @@ class ORMSecondDatabaseTest extends ORMTest {
         ));
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\AlternateCar',
+            'FlexibleORMTests\\Mock\\AlternateCar',
             get_class( $car )
         );
 
@@ -68,7 +67,7 @@ class ORMSecondDatabaseTest extends ORMTest {
         $car = Mock\AlternateCar::FindByBrand('Ferrari');
 
         $this->assertEquals(
-            'ORM\\Tests\\Mock\\AlternateCar',
+            'FlexibleORMTests\\Mock\\AlternateCar',
             get_class( $car )
         );
 
@@ -93,7 +92,7 @@ class ORMSecondDatabaseTest extends ORMTest {
 
         foreach ( $cars as $car ) {
             $this->assertEquals(
-                'ORM\\Tests\\Mock\\AlternateCar',
+                'FlexibleORMTests\\Mock\\AlternateCar',
                 get_class( $car )
             );
 
@@ -121,7 +120,7 @@ class ORMSecondDatabaseTest extends ORMTest {
 
         foreach ( $cars as $car ) {
             $this->assertEquals(
-                'ORM\\Tests\\Mock\\AlternateCar',
+                'FlexibleORMTests\\Mock\\AlternateCar',
                 get_class( $car )
             );
 
@@ -136,4 +135,3 @@ class ORMSecondDatabaseTest extends ORMTest {
         }
     }
 }
-?>
