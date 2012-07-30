@@ -13,12 +13,12 @@ use ReflectionProperty;
  * An model class where the backend is the Amazon simpleDB service.
  * 
  * Almost identical to the ORM_Model class with a few exceptions:
- *  # Primary key is always itemName()
- *  # Foreign keys (ie FindWith requests) require extra lookups, as there are no
+ *  -# Primary key is always itemName()
+ *  -# Foreign keys (ie FindWith requests) require extra lookups, as there are no
  * joins in SimpleDB
- *  # Requests that return a lot of results or use large offset values may be
+ *  -# Requests that return a lot of results or use large offset values may be
  * slow
- *  # The ability to store arrays as properties (only indexed)
+ *  -# The ability to store arrays as properties (only indexed)
  * 
  * \note When using array properties, the order can sometimes change.
  * 
