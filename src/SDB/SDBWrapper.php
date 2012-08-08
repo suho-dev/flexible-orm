@@ -40,6 +40,8 @@ abstract class SDBWrapper {
      *   - Use the Configuration value \c AWS->region to set the region for the SDB
      *   - Use the Configuration value \c AWS->apc_enabled to enable/disable APC
      *   - Use the Configuration value \c AWS->key and \c AWS->secret_key to determine
+     *   - Use the Configuration value \c AWS->sdb_alternate_hostname and AWS->sdb_credentials to specify alternate endpoint host/port, and CFCredential name
+     *
      * the account settings for Amazon SimpleDB
      * 
      * Valid regions for AWS->region are:
@@ -74,6 +76,17 @@ abstract class SDBWrapper {
         if ( Configuration::AWS()->apc_enabled ) {
             self::$_sdb->set_cache_config('apc');
         }
+        
+        if ( Configuration::AWS()->sdb_alternate_hostname ) {
+            self::$_sdb->ssl_verification = false;
+            self::$_sdb->use_ssl = false;
+            if (strstr(Configuration::AWS()->sdb_alternate_hostname, ":")) {
+                list($hostname, $port_number) = explode(":", Configuration::AWS()->sdb_alternate_hostname);
+                self::$_sdb->set_hostname($hostname, $port_number);
+            } else {
+                self::$_sdb->set_hostname(Configuration::AWS()->sdb_alternate_hostname);
+            }
+        }
     }
     
     private static function _BuildSDBConstructorOptions() {
@@ -88,7 +101,9 @@ abstract class SDBWrapper {
         if( $secret ) {
             $options['secret'] = $secret;
         }
-        
+        if (Configuration::AWS()->sdb_credentials) {
+            $options['credentials'] = Configuration::AWS()->sdb_credentials;
+        }
         return $options;
     }
     
