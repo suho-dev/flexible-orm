@@ -278,4 +278,26 @@ class Configuration {
     public static function Debug() {
         Debug::Dump(self::$_settings);
     }
+
+    /**
+     * Enable a value to be added manually.
+     *
+     * @param string $group
+     *     The name of the group to add the value to.
+     * @param string $property
+     *     The name of the property.
+     * @param string $value
+     *     The value of the property
+     */
+    public static function AddValue($group, $property, $value) {
+        if ( is_null(self::$_settings) ) {
+            self::$_settings = new Configuration();
+        }
+
+        if (!array_key_exists($group, self::$_settings->_options)) {
+            self::$_settings->_options[$group] = array();
+        }
+        self::$_settings->_options[$group][$property] = $value;
+    }
+
 }
