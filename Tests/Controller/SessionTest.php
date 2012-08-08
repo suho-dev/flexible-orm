@@ -8,9 +8,9 @@
  * @author jarrod.swift
  */
 namespace ORM\Controller;
-use ORM\Tests\ORMTest;
-use ORM\Tests\Mock\MockSessionWrapper;
-use ORM\Tests\Mock\SessionMock as Session;
+use FlexibleORMTests\ORMTest;
+use FlexibleORMTests\Mock\MockSessionWrapper;
+use FlexibleORMTests\Mock\SessionMock as Session;
 
 
 session_start('ORM_DEFAULT');
@@ -21,7 +21,7 @@ require_once '../ORMTest.php';
 /**
  * Test the Session class using the MockSessionWrapper
  */
-class SessionTest extends \ORM\Tests\ORMTest {
+class SessionTest extends \FlexibleORMTests\ORMTest {
     /**
      * @var MockSessionWrapper $sessionWrapper
      */

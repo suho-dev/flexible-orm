@@ -8,9 +8,9 @@ require_once '../ORMTest.php';
 
 /**
  */
-class SDBFactoryTest  extends \ORM\Tests\ORMTest {
+class SDBFactoryTest  extends \FlexibleORMTests\ORMTest {
     public function setUp() {
-        \ORM\Tests\Mock\SDBCar::CreateDomain();
+        \FlexibleORMTests\Mock\SDBCar::CreateDomain();
     }
     
     public function testGet() {

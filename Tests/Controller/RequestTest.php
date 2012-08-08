@@ -13,7 +13,7 @@ require_once '../ORMTest.php';
  * Description of RequestTest
  *
  */
-class RequestTest extends \ORM\Tests\ORMTest {
+class RequestTest extends \FlexibleORMTests\ORMTest {
     /**
      * @var Request $object
      */

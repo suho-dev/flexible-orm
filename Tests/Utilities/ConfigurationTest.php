@@ -13,7 +13,7 @@ require_once '../ORMTest.php';
  * Test class for Configuration.
  * 
  */
-class ConfigurationTest extends \ORM\Tests\ORMTest {
+class ConfigurationTest extends \FlexibleORMTests\ORMTest {
 
     /**
      * Clear and reload the Configuration details before each test

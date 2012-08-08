@@ -9,7 +9,7 @@
 namespace ORM\Controller;
 use \ORM\Controller\BaseController, 
     \ORM\Controller\Request, 
-    \ORM\Tests\Mock\CarsController,
+    \FlexibleORMTests\Mock\CarsController,
     \ORM\Controller\SmartyTemplate;
 
 require_once '../ORMTest.php';
@@ -21,7 +21,7 @@ require 'Smarty/libs/Smarty.class.php';
  * @todo Make including Smarty more flexible
  *
  */
-class BaseControllerTest extends \ORM\Tests\ORMTest {
+class BaseControllerTest extends \FlexibleORMTests\ORMTest {
     /**
      * @var CarsController $controller
      */

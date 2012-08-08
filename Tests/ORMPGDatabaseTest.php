@@ -22,6 +22,6 @@ $db = null;
  * Test class for ORM_Model using multiple databases
  */
 class ORMPGDatabaseTest extends ORMDatabaseTypeTest {
-    protected $carClass         = '\ORM\Tests\Mock\CarPostgres';
+    protected $carClass         = '\FlexibleORMTests\Mock\CarPostgres';
     protected $databaseConfig   = 'postgresDB';
 }

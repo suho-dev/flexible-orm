@@ -10,7 +10,7 @@ require_once '../ORMTest.php';
  * Description of SDBSessionHandlerTest
  *
  */
-class SDBSessionHandlerTest extends \ORM\Tests\ORMTest {
+class SDBSessionHandlerTest extends \FlexibleORMTests\ORMTest {
     public $session_id;
     private $_savedData = array(
         'some' => array('saved', 'data')

@@ -57,7 +57,7 @@ class CachedORMModelTest extends ORMTest {
     public function testFindWithOptions() {
         $car = CachedCar::Find(array(
             'where' => 'brand LIKE "Alfa Romeo"'
-        ), 'ORM\Tests\Mock\CachedOwner');
+        ), 'FlexibleORMTests\Mock\CachedOwner');
 
         $this->assertEquals(
             'ORM\\Tests\\Mock\\CachedCar',
@@ -81,7 +81,7 @@ class CachedORMModelTest extends ORMTest {
     }
 
     public function testFindWith() {
-        $car = CachedCar::Find( 1, 'ORM\Tests\Mock\CachedOwner');
+        $car = CachedCar::Find( 1, 'FlexibleORMTests\Mock\CachedOwner');
 
         $this->assertEquals(
             'ORM\\Tests\Mock\\CachedCar',
@@ -281,7 +281,7 @@ class CachedORMModelTest extends ORMTest {
         $cache              = new APCCache();
         $cache->flush();
 
-        $car                = CachedCar::Find(3, 'ORM\Tests\Mock\CachedOwner');
+        $car                = CachedCar::Find(3, 'FlexibleORMTests\Mock\CachedOwner');
         $cachedCarObject    = $cache->get( (string)$car );
         $cachedOwnerObject  = $cache->get( (string)$car->CachedOwner );
 
@@ -298,8 +298,8 @@ class CachedORMModelTest extends ORMTest {
         $cache              = new APCCache();
         $cache->flush();
 
-        $car                = CachedCar::Find(3, 'ORM\Tests\Mock\CachedOwner');
-        $retrievedCar       = CachedCar::RetrieveFromCache(3, 'ORM\Tests\Mock\CachedOwner');
+        $car                = CachedCar::Find(3, 'FlexibleORMTests\Mock\CachedOwner');
+        $retrievedCar       = CachedCar::RetrieveFromCache(3, 'FlexibleORMTests\Mock\CachedOwner');
 
 //        $apc = new \APCIterator('user');
 //        echo "\nCached:\n";

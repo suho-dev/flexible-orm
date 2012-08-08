@@ -1,6 +1,6 @@
 <?php
 namespace ORM\SDB;
-use \ORM\Tests\Mock;
+use \FlexibleORMTests\Mock;
 
 require_once '../ORMTest.php';
 $sdb = SDBStatement::GetSDBConnection();
@@ -11,7 +11,7 @@ $sdb->create_domain('sources');
  *
  * @author jarrodswift
  */
-class TagsTest extends \ORM\Tests\ORMTest {
+class TagsTest extends \FlexibleORMTests\ORMTest {
     /**
      * @var AmazonSDB $sdb 
      */
@@ -35,10 +35,10 @@ class TagsTest extends \ORM\Tests\ORMTest {
         $statement  = SDBFactory::Get( "SELECT * FROM sources WHERE itemName() = \"$id\"" );
         $statement->setConsistentRead(true);
         $statement->execute();
-        $source     = $statement->fetchInto('\ORM\Tests\Mock\Source');
+        $source     = $statement->fetchInto('\FlexibleORMTests\Mock\Source');
         
         $this->assertEquals( $name, $source->description );
-        $this->assertInstanceOf('\ORM\Tests\Mock\Source', $source);
+        $this->assertInstanceOf('\FlexibleORMTests\Mock\Source', $source);
         
         $this->assertEquals( count($tags), count($source->tags), "Tags array wrong length");
         foreach( $tags as $tag ) {
@@ -59,7 +59,7 @@ class TagsTest extends \ORM\Tests\ORMTest {
        
         $statement  = SDBFactory::Get( "SELECT * FROM sources WHERE itemName() = \"$id\"" );
         $statement->execute();
-        $savedSource = $statement->fetchInto('\ORM\Tests\Mock\Source');
+        $savedSource = $statement->fetchInto('\FlexibleORMTests\Mock\Source');
         
         $this->assertEquals( $tags, $savedSource->tags );
     }

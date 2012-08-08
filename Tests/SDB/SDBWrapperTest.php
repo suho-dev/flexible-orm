@@ -10,7 +10,7 @@ require_once '../ORMTest.php';
 /**
  * @todo write these tests for SDBWrapper
  */
-class SDBWrapperTest  extends \ORM\Tests\ORMTest {
+class SDBWrapperTest  extends \FlexibleORMTests\ORMTest {
     public function testSDBRegion() {
         $this->markTestIncomplete();
     }

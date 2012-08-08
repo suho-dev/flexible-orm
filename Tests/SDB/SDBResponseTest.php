@@ -1,11 +1,11 @@
 <?php
 namespace ORM\SDB;
-use \ORM\Tests\Mock, \ORM\SDB\SDBResponse;
+use \FlexibleORMTests\Mock, \ORM\SDB\SDBResponse;
 
 require_once '../ORMTest.php';
 
 
-class SDBResponseTest extends \ORM\Tests\ORMTest {
+class SDBResponseTest extends \FlexibleORMTests\ORMTest {
     /**
      * @var AmazonSDB $object
      */

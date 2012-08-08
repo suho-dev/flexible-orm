@@ -1,6 +1,6 @@
 <?php
 namespace ORM\SDB;
-use \ORM\Tests\Mock, \ORM\SDB\ORMModelSDB;
+use \FlexibleORMTests\Mock, \ORM\SDB\ORMModelSDB;
 
 require_once '../ORMTest.php';
 //$sdb = \ORM\SDB\SDBStatement::GetSDBConnection();
@@ -10,7 +10,7 @@ require_once '../ORMTest.php';
 //    $sdb->delete_domain($domain);
 //}
 
-class ORMModelSDBTest extends \ORM\Tests\ORMTest {
+class ORMModelSDBTest extends \FlexibleORMTests\ORMTest {
     /**
      * @var AmazonSDB $object
      */
@@ -57,7 +57,7 @@ class ORMModelSDBTest extends \ORM\Tests\ORMTest {
     public function testFind() {
         $car = Mock\SDBCar::Find(3);
 
-        $this->assertEquals( 'ORM\Tests\Mock\SDBCar', get_class($car) );
+        $this->assertEquals( 'FlexibleORMTests\Mock\SDBCar', get_class($car) );
         $this->assertEquals( 'Volkswagen', $car->brand );
         $this->assertEquals( '3', $car->id() );
     }
@@ -65,7 +65,7 @@ class ORMModelSDBTest extends \ORM\Tests\ORMTest {
     public function testFindBy() {
         $car = Mock\SDBCar::FindByBrand('Alfa Romeo');
 
-        $this->assertEquals( 'ORM\Tests\Mock\SDBCar', get_class($car) );
+        $this->assertEquals( 'FlexibleORMTests\Mock\SDBCar', get_class($car) );
         $this->assertEquals( 'Alfa Romeo', $car->brand );
         $this->assertEquals( '1', $car->id() );
     }
@@ -75,7 +75,7 @@ class ORMModelSDBTest extends \ORM\Tests\ORMTest {
 
         $this->assertEquals( 3, count($cars) );
         $this->assertEquals( 'ORM\ModelCollection', get_class($cars) );
-        $this->assertEquals( 'ORM\Tests\Mock\SDBCar', get_class($cars[1]) );
+        $this->assertEquals( 'FlexibleORMTests\Mock\SDBCar', get_class($cars[1]) );
     }
 
     public function testFindAllBy() {
@@ -203,7 +203,7 @@ class ORMModelSDBTest extends \ORM\Tests\ORMTest {
             'values' => array(':name' => 'MyName%')
         ));
 
-        $this->assertEquals( 'ORM\Tests\Mock\SDBOwner', get_class($owner),
+        $this->assertEquals( 'FlexibleORMTests\Mock\SDBOwner', get_class($owner),
             "Find was confused by escaped single quote in WHERE"
         );
 
@@ -212,7 +212,7 @@ class ORMModelSDBTest extends \ORM\Tests\ORMTest {
             'values' => array(':name' => 'MyName%', ':first' => "o'connel")
         ));
 
-        $this->assertEquals( 'ORM\Tests\Mock\SDBOwner', get_class($owner),
+        $this->assertEquals( 'FlexibleORMTests\Mock\SDBOwner', get_class($owner),
             "Find was confused by single quote in placeholder"
         );
     }
@@ -292,14 +292,14 @@ class ORMModelSDBTest extends \ORM\Tests\ORMTest {
     public function testFindWith() {
         $this->_setupForeignKeysTest();
         
-        $carWithOwner = Mock\SDBCar::FindByBrand( 'Volkswagen', '\ORM\Tests\Mock\SDBOwner');
+        $carWithOwner = Mock\SDBCar::FindByBrand( 'Volkswagen', '\FlexibleORMTests\Mock\SDBOwner');
 
         $this->assertEquals( 'MyCarsOwner', $carWithOwner->SDBOwner->name );
     }
 
     public function testFindAllWith() {
         $this->_setupForeignKeysTest();
-        $carsWithOwners = Mock\SDBCar::FindAll(array(), '\ORM\Tests\Mock\SDBOwner');
+        $carsWithOwners = Mock\SDBCar::FindAll(array(), '\FlexibleORMTests\Mock\SDBOwner');
 
         foreach ($carsWithOwners as $car ) {
             $this->assertEquals( 'MyCarsOwner', $car->SDBOwner->name );

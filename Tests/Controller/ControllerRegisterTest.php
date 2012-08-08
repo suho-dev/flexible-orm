@@ -7,7 +7,7 @@ require_once '../ORMTest.php';
  *
  * @author jarrodswift
  */
-class ControllerRegisterTest extends \ORM\Tests\ORMTest {
+class ControllerRegisterTest extends \FlexibleORMTests\ORMTest {
     /**
      * @var ControllerRegister $register
      */
@@ -19,54 +19,54 @@ class ControllerRegisterTest extends \ORM\Tests\ORMTest {
     
     public function testRegisterNamespace() {
         $registeredNamespaces = $this->register->registerNamespace(
-            '\ORM\Tests\Mock\Controller'
+            '\FlexibleORMTests\Mock\Controller'
         );
         
-        $this->assertEquals(array('\ORM\Tests\Mock\Controller'), $registeredNamespaces);
+        $this->assertEquals(array('\FlexibleORMTests\Mock\Controller'), $registeredNamespaces);
         
         $registeredNamespaces = $this->register->registerNamespace(
-            '\ORM\Tests\Mock\AlternateController'
+            '\FlexibleORMTests\Mock\AlternateController'
         );
         
         $this->assertEquals(array(
-            '\ORM\Tests\Mock\Controller',
-            '\ORM\Tests\Mock\AlternateController'
+            '\FlexibleORMTests\Mock\Controller',
+            '\FlexibleORMTests\Mock\AlternateController'
             ), $registeredNamespaces);
     }
     
     public function testRegisterController() {
         $registered = $this->register->registerController(
-            'special', '\ORM\Tests\Mock\Controller\Cars'
+            'special', '\FlexibleORMTests\Mock\Controller\Cars'
         );
         
-        $this->assertEquals(array('special'=>'\ORM\Tests\Mock\Controller\Cars'), $registered);
+        $this->assertEquals(array('special'=>'\FlexibleORMTests\Mock\Controller\Cars'), $registered);
     }
     
     public function testGetClassName() {
         $this->register->registerController(
-            'special', '\ORM\Tests\Mock\Controller\Cars'
+            'special', '\FlexibleORMTests\Mock\Controller\Cars'
         );
         
         $this->assertEquals(
-            '\ORM\Tests\Mock\Controller\Cars',
+            '\FlexibleORMTests\Mock\Controller\Cars',
             $this->register->getClassName('special')
         );
     }
     
     public function testGetNamespacedName() {
         $this->register->registerNamespace(
-            '\ORM\Tests\Mock\Controller'
+            '\FlexibleORMTests\Mock\Controller'
         );
         
         $this->assertEquals(
-            '\ORM\Tests\Mock\Controller\Cars',
+            '\FlexibleORMTests\Mock\Controller\Cars',
             $this->register->getClassName('cars')
         );
     }
     
     public function testGetUnknown() {
         $this->register->registerNamespace(
-            '\ORM\Tests\Mock\Controller'
+            '\FlexibleORMTests\Mock\Controller'
         );
         
         $this->assertFalse(
@@ -76,7 +76,7 @@ class ControllerRegisterTest extends \ORM\Tests\ORMTest {
     
     public function testGetNotAController() {
         $this->register->registerNamespace(
-            '\ORM\Tests\Mock\Controller'
+            '\FlexibleORMTests\Mock\Controller'
         );
         
         $this->assertFalse(

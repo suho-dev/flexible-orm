@@ -13,7 +13,7 @@ require_once '../ORMTest.php';
  *
  * @author jarrodswift
  */
-class SmartyTemplateTest extends \ORM\Tests\ORMTest {
+class SmartyTemplateTest extends \FlexibleORMTests\ORMTest {
     public function testFetch() {
         $this->markTestIncomplete();
     }
