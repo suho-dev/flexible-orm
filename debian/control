@@ -1,0 +1,11 @@
+Source: php-flexible-orm
+Section: web
+Priority: extra
+Maintainer: Pierre Dumuid <pierre.dumuid@sustainabilityhouse.com.au>
+Build-Depends: debhelper (>= 6), quilt
+Standards-Version: 3.8.0
+
+Package: php-flexible-orm
+Architecture: all
+Depends: php5 | php5-cgi | php5-cli | libapache2-mod-php5
+Description: A set of scripts that contain flexible orm.
