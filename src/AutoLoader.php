@@ -212,6 +212,10 @@ class AutoLoader {
      */
     public function locatePackage( $class ) {
         foreach ( $this->_packageLocations as $package => $path ) {
+            if (strpos($package, "\\") !== false) {
+                $package = str_replace("\\", "\\\\", $package);
+            }
+
             if ( preg_match("/^\\\?$package\\\(.*)$/", $class, $matches ) ) {
                 return $path.'/'.str_replace('\\', '/', $matches[1]);
             }
