@@ -138,7 +138,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * <b>Usage: Primary key lookup</b>
      * @code
      * // Find car with id=2
-     * @car = Car::Find( 2 );
+     * $car = Car::Find( 2 );
      * @endcode
      *
      * <b>Usage: Array of options</b>
@@ -166,7 +166,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *
      * @code
      * // Fetch the car with id 1 and include the Owner object
-     * @car = Car::Find( 1, 'Owner' );
+     * $car = Car::Find( 1, 'Owner' );
      * echo "This car is owned by ", $car->Owner->name;
      * @endcode
      * 
