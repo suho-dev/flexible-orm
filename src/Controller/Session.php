@@ -160,7 +160,7 @@ class Session {
      */
     public function destroySession() {
         if (!$this->isLocked()) {
-            $this->_session->start(self::SESSION_NAME);
+            $this->_session->start(static::SESSION_NAME);
         }
         
         $this->_sessionVariableCache = array();
@@ -179,11 +179,11 @@ class Session {
      * Retrieve variables from global session variable and store it in local cache
      */
     private function _loadSessionVariable() {
-        $this->_session->start(self::SESSION_NAME);
+        $this->_session->start(static::SESSION_NAME);
         
         $this->_sessionVariableCache = array();
-        if (isset($this->_session[self::FIELD_NAME])) {
-            $this->_sessionVariableCache = $this->_session[self::FIELD_NAME];
+        if (isset($this->_session[static::FIELD_NAME])) {
+            $this->_sessionVariableCache = $this->_session[static::FIELD_NAME];
         }
         
         if (!$this->isLocked()) {
@@ -203,7 +203,7 @@ class Session {
             throw new LogicException("Session is not in a locked condition, unable to update session variable.");
         }
         
-        $this->_session[self::FIELD_NAME] = $this->_sessionVariableCache;
+        $this->_session[static::FIELD_NAME] = $this->_sessionVariableCache;
         $this->_session->writeClose();
         
         $this->_locked = false;
