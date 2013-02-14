@@ -7,8 +7,6 @@
 namespace ORM\Utilities;
 use \ORM\Utilities\Configuration;
 
-require_once '../ORMTest.php';
-
 /**
  * Test class for Configuration.
  * 
@@ -20,7 +18,7 @@ class ConfigurationTest extends \FlexibleORMTests\ORMTest {
      */
     protected function setUp() {
         Configuration::Clear();
-        Configuration::Load('../test.ini');
+        Configuration::Load(__DIR__ . '/data/test.ini');
     }
 
     public function testValueNull() {
@@ -42,7 +40,7 @@ class ConfigurationTest extends \FlexibleORMTests\ORMTest {
     }
 
     public function testCall() {
-        $this->assertEquals( 'root', Configuration::database('user') );
+        $this->assertEquals( 'test_user', Configuration::database('user') );
     }
 
     public function testCallOO() {
