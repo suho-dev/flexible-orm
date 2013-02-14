@@ -37,7 +37,7 @@ class BaseControllerTest extends \FlexibleORMTests\ORMTest {
     
     public function setUp() {
         $this->smarty = new SmartyTemplate();
-        $this->smarty->template_dir = __DIR__ .'/templates';
+        $this->smarty->template_dir = __DIR__ .'/data/templates';
         
         $this->request    = new Request(array('id' => 20, 'action' => 'view'), array('id' => 30), array( 'name' => 'jarrod', 'id' => 40));
         $this->controller = new CarsController( $this->request, $this->smarty );
