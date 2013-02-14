@@ -8,15 +8,12 @@
  * @author jarrod.swift
  */
 namespace ORM\Controller;
-use FlexibleORMTests\ORMTest;
 use FlexibleORMTests\Mock\MockSessionWrapper;
 use FlexibleORMTests\Mock\SessionMock as Session;
 
 
 session_start('ORM_DEFAULT');
 session_write_close();
-
-require_once '../ORMTest.php';
 
 /**
  * Test the Session class using the MockSessionWrapper

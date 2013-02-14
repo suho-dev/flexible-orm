@@ -6,9 +6,6 @@
 namespace ORM\Controller;
 use ORM\Controller\Request;
 
-require_once '../ORMTest.php';
-
-
 /**
  * Description of RequestTest
  *

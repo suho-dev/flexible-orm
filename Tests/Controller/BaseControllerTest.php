@@ -12,9 +12,6 @@ use ORM\Controller\Request;
 use FlexibleORMTests\Mock\CarsController;
 use ORM\Controller\SmartyTemplate;
 
-require_once '../ORMTest.php';
-require 'Smarty/libs/Smarty.class.php';
-
 /**
  * Description of ControllerTest
  * 

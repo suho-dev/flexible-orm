@@ -1,7 +1,6 @@
 <?php
 namespace ORM\Controller;
 
-require_once '../ORMTest.php';
 /**
  * Description of ControllerRegisterTest
  *

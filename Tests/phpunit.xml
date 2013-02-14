@@ -1,0 +1,15 @@
+<phpunit bootstrap="phpunitBootstrap.php"
+         colors="false"
+         verbose="false"
+         strict="true"
+         stopOnError="true"
+         stopOnFailure="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         mapTestClassNameToCoveredClassName="true">
+    <testsuites>
+        <testsuite name="Everything">
+            <directory suffix="Test.php">Tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

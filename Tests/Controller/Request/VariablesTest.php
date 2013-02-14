@@ -5,7 +5,6 @@
  */
 
 namespace ORM\Controller\Request;
-require_once '../../ORMTest.php';
 
 /**
  * Test class for Variables.

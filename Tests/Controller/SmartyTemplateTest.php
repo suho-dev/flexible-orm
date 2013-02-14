@@ -4,9 +4,6 @@
  * @author jarrod.swift
  */
 namespace ORM\Controller;
-use ORM\Controller\SmartyTemplate;
-
-require_once '../ORMTest.php';
 
 /**
  * Description of SmartyTemplateTest
