@@ -6,17 +6,16 @@
  */
 namespace FlexibleORMTests;
 
+use PHPUnit_Framework_TestCase;
 use Mock_Zend_TestClass;
 use ORM\AutoLoader;
 use ORM\Utilities\Configuration;
-
-require_once dirname(__FILE__) . '/ORMTest.php';
 
 /**
  * Test class for Configuration.
  * 
  */
-class AutoLoaderTest extends ORMTest {
+class AutoLoaderTest extends PHPUnit_Framework_TestCase {
     /**
      * @var AutoLoader $autoloader
      */
@@ -64,6 +63,11 @@ class AutoLoaderTest extends ORMTest {
     }
 
     function testLocatePackage() {
+        $this->autoloader->setPackageLocations(array(
+            'Controller'  => "/server/projects/controller.1.1",
+            'Treehouse'   => "/server/projects/treehouse",
+            )
+        );
         $this->assertEquals(
             '/server/projects/controller.1.1/',
             $this->autoloader->locatePackage('\Controller\\')
@@ -118,6 +122,11 @@ class AutoLoaderTest extends ORMTest {
     }
  
     function testGetPackageLocations() {
+        $this->autoloader->setPackageLocations(array(
+            'Controller'  => "/server/projects/controller.1.1",
+            'Treehouse'   => "/server/projects/treehouse",
+            )
+        );
         $packageLocations = $this->autoloader->getPackageLocations();
         $this->assertTrue( array_key_exists('Controller', $packageLocations) );
         $this->assertTrue( array_key_exists('Treehouse', $packageLocations) );
