@@ -6,6 +6,7 @@
 namespace ORM\Utilities\Cache;
 
 use ORM\Interfaces\Cache;
+use ORM\Exceptions\ORMException;
 
 /**
  * Object-oriented wrapper for APCcache
@@ -35,9 +36,14 @@ class APCCache implements Cache {
      *      The object to store in cache
      * @param int $ttl
      *      [optional] Seconds until cache expires (0 == never). Default = 0
+     * @throws \ORM\Exceptions\ORMException
+     *      When there apc-cache is disabled.
      */
     public function set( $name, $object, $ttl = 0 ) {
-        apc_store( self::PREFIX.$name, $object, $ttl );
+        $r = apc_store( self::PREFIX.$name, $object, $ttl );
+        if ($r == false) {
+            throw new ORMException("APC Cache unable to store a value. Please ensure that apc is enabled.");
+        }
     }
 
     /**
