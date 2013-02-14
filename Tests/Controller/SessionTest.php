@@ -8,6 +8,8 @@
  * @author jarrod.swift
  */
 namespace ORM\Controller;
+
+use PHPUnit_Framework_TestCase;
 use FlexibleORMTests\Mock\MockSessionWrapper;
 use FlexibleORMTests\Mock\SessionMock as Session;
 
@@ -18,7 +20,7 @@ session_write_close();
 /**
  * Test the Session class using the MockSessionWrapper
  */
-class SessionTest extends \FlexibleORMTests\ORMTest {
+class SessionTest extends PHPUnit_Framework_TestCase {
     /**
      * @var MockSessionWrapper $sessionWrapper
      */

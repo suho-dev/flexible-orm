@@ -7,6 +7,8 @@
  * Tests specific to the Controller package
  */
 namespace ORM\Controller;
+
+use PHPUnit_Framework_TestCase;
 use ORM\Controller\BaseController;
 use ORM\Controller\Request;
 use FlexibleORMTests\Mock\CarsController;
@@ -18,7 +20,7 @@ use ORM\Controller\SmartyTemplate;
  * @todo Make including Smarty more flexible
  *
  */
-class BaseControllerTest extends \FlexibleORMTests\ORMTest {
+class BaseControllerTest extends PHPUnit_Framework_TestCase {
     /**
      * @var CarsController $controller
      */

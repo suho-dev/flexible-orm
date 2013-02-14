@@ -4,13 +4,15 @@
  * @author jarrod.swift
  */
 namespace ORM\Controller;
+
+use PHPUnit_Framework_TestCase;
 use ORM\Controller\Request;
 
 /**
  * Description of RequestTest
  *
  */
-class RequestTest extends \FlexibleORMTests\ORMTest {
+class RequestTest extends PHPUnit_Framework_TestCase {
     /**
      * @var Request $object
      */

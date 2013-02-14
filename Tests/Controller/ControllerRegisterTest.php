@@ -1,12 +1,14 @@
 <?php
 namespace ORM\Controller;
 
+use PHPUnit_Framework_TestCase;
+
 /**
  * Description of ControllerRegisterTest
  *
  * @author jarrodswift
  */
-class ControllerRegisterTest extends \FlexibleORMTests\ORMTest {
+class ControllerRegisterTest extends PHPUnit_Framework_TestCase {
     /**
      * @var ControllerRegister $register
      */
