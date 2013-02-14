@@ -7,14 +7,13 @@
 namespace FlexibleORMTests;
 
 use ORM\Utilities\Cache\APCCache;
-
-require_once dirname(__FILE__) . '/ORMTest.php';
+use PHPUnit_Framework_TestCase;
 
 /**
  * Test class for APCCache.
  *
  */
-class APCCacheTest extends ORMTest {
+class APCCacheTest extends PHPUnit_Framework_TestCase {
     /**
      * @var APCCache $object
      */
@@ -22,6 +21,9 @@ class APCCacheTest extends ORMTest {
 
     protected function setUp() {
         $this->object = new APCCache();
+        // Unfortunately we can 'set' this ini since it's a PHP_INI_SYSTEM configuration.
+        // echo "apc.enable_cli = 1" | sudo tee /etc/php5/conf.d/90-enable-apc-for-cli.ini
+        $this->assertEquals(1, ini_get('apc.enable_cli'));
     }
 
     protected function tearDown() {
