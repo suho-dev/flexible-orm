@@ -4,7 +4,8 @@
  * @author jarrod.swift
  */
 namespace ORM\Utilities\Cache;
-use \ORM\Interfaces\Cache;
+
+use ORM\Interfaces\Cache;
 
 /**
  * Object-oriented wrapper for APCcache
