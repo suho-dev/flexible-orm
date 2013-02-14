@@ -7,10 +7,10 @@
  * Tests specific to the Controller package
  */
 namespace ORM\Controller;
-use \ORM\Controller\BaseController, 
-    \ORM\Controller\Request, 
-    \FlexibleORMTests\Mock\CarsController,
-    \ORM\Controller\SmartyTemplate;
+use ORM\Controller\BaseController;
+use ORM\Controller\Request;
+use FlexibleORMTests\Mock\CarsController;
+use ORM\Controller\SmartyTemplate;
 
 require_once '../ORMTest.php';
 require 'Smarty/libs/Smarty.class.php';
