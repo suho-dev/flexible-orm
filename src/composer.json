@@ -1,5 +1,5 @@
 {
     "require-dev": {
-         "smarty/smarty": "v3.1.13"
+         "smarty/smarty": ">=v3.1.13"
     }
 }
