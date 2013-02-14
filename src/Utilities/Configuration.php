@@ -161,6 +161,9 @@ class Configuration {
      *      Returns the single Configuration instance
      */
     public static function Get() {
+        if ( is_null(self::$_settings) ) {
+            self::$_settings = new Configuration();
+        }
         return self::$_settings;
     }
     
