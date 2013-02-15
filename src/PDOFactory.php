@@ -113,7 +113,7 @@ class PDOFactory implements Interfaces\DataFactory {
                 "No database configuration details for $databaseConfig"
             );
         }
-        
+
         $db_name    = Configuration::$databaseConfig()->name;
         $db_host    = Configuration::$databaseConfig()->host ?: 'localhost';
         $db_user    = Configuration::$databaseConfig()->user;
@@ -121,9 +121,9 @@ class PDOFactory implements Interfaces\DataFactory {
         $db_prefix  = Configuration::$databaseConfig()->prefix ?: 'mysql';
         $dsn        = Configuration::$databaseConfig()->dsn;
         $dsn        = $dsn ?: "$db_prefix:host={$db_host};dbname={$db_name};";
-        
+
         $this->_setDatabaseType( $dsn );
-        
+
         try {
             $this->_db = new \PDO( $dsn, $db_user, $db_pswd );
             $this->_db->setAttribute( \PDO::ATTR_EMULATE_PREPARES, true);
