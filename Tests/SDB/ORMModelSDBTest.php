@@ -1,8 +1,12 @@
 <?php
 namespace ORM\SDB;
-use \FlexibleORMTests\Mock, \ORM\SDB\ORMModelSDB;
 
-require_once '../ORMTest.php';
+use PHPUnit_Framework_TestCase;
+use FlexibleORMTests\Mock;
+use ORM\SDB\ORMModelSDB;
+use AmazonSDB;
+
+
 //$sdb = \ORM\SDB\SDBStatement::GetSDBConnection();
 //$domains = $sdb->list_domains();
 //
@@ -10,7 +14,7 @@ require_once '../ORMTest.php';
 //    $sdb->delete_domain($domain);
 //}
 
-class ORMModelSDBTest extends \FlexibleORMTests\ORMTest {
+class ORMModelSDBTest extends PHPUnit_Framework_TestCase {
     /**
      * @var AmazonSDB $object
      */

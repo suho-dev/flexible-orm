@@ -5,12 +5,12 @@
  */
 namespace ORM\SDB;
 
-require_once '../ORMTest.php';
+use PHPUnit_Framework_TestCase;
 
 /**
  * @todo write these tests for SDBWrapper
  */
-class SDBWrapperTest  extends \FlexibleORMTests\ORMTest {
+class SDBWrapperTest  extends PHPUnit_Framework_TestCase {
     public function testSDBRegion() {
         $this->markTestIncomplete();
     }

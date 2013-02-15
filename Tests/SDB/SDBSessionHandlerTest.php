@@ -4,20 +4,21 @@
  * @author jarrod.swift
  */
 namespace ORM\SDB;
-require_once '../ORMTest.php';
+
+use PHPUnit_Framework_TestCase;
 
 /**
  * Description of SDBSessionHandlerTest
  *
  */
-class SDBSessionHandlerTest extends \FlexibleORMTests\ORMTest {
+class SDBSessionHandlerTest extends PHPUnit_Framework_TestCase {
     public $session_id;
     private $_savedData = array(
         'some' => array('saved', 'data')
     );
 
     public function setUp() {
-        SDB\SDBStatement::GetSDBConnection()->create_domain(SDB\SDBSession::TableName());
+        SDBStatement::GetSDBConnection()->create_domain(SDB\SDBSession::TableName());
 
         // Setup a fake session
         $this->session_id   = "My-test-".rand();
@@ -29,7 +30,7 @@ class SDBSessionHandlerTest extends \FlexibleORMTests\ORMTest {
     }
 
     public function tearDown() {
-        SDB\SDBStatement::GetSDBConnection()->delete_domain(SDB\SDBSession::TableName());
+        SDBStatement::GetSDBConnection()->delete_domain(SDB\SDBSession::TableName());
     }
 
     public function testRegister() {

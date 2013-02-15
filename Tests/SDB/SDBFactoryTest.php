@@ -4,11 +4,12 @@
  * @author jarrod.swift
  */
 namespace ORM\SDB;
-require_once '../ORMTest.php';
+
+use PHPUnit_Framework_TestCase;
 
 /**
  */
-class SDBFactoryTest  extends \FlexibleORMTests\ORMTest {
+class SDBFactoryTest  extends PHPUnit_Framework_TestCase {
     public function setUp() {
         \FlexibleORMTests\Mock\SDBCar::CreateDomain();
     }

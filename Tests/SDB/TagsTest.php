@@ -1,8 +1,10 @@
 <?php
 namespace ORM\SDB;
+
+use PHPUnit_Framework_TestCase;
+
 use \FlexibleORMTests\Mock;
 
-require_once '../ORMTest.php';
 $sdb = SDBStatement::GetSDBConnection();
 $sdb->create_domain('sources');
 
@@ -11,7 +13,7 @@ $sdb->create_domain('sources');
  *
  * @author jarrodswift
  */
-class TagsTest extends \FlexibleORMTests\ORMTest {
+class TagsTest extends PHPUnit_Framework_TestCase {
     /**
      * @var AmazonSDB $sdb 
      */

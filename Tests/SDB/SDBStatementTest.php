@@ -4,10 +4,10 @@
  */
 namespace FlexibleORMTests\SDB;
 
+use PHPUnit_Framework_TestCase;
 use ORM\SDB\SDBFactory;
 use ORM\SDB\SDBStatement;
 use FlexibleORMTests\Mock;
-use FlexibleORMTests\ORMTest;
 
 set_include_path(get_include_path(). PATH_SEPARATOR . __DIR__.'/..');
 require_once 'ORMTest.php';
@@ -39,7 +39,7 @@ foreach( $owners as $owner ) {
  *
  * Most of the features are already tested in ORMModelSDBTest
  */
-class SDBStatementTest extends ORMTest {
+class SDBStatementTest extends PHPUnit_Framework_TestCase {
     const DOMAIN = 'SDBStatementTest';
 
     public function testInjectionInsert() {
