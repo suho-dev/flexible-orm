@@ -30,7 +30,7 @@ class PDOFactory implements Interfaces\DataFactory {
      * Array of PDOFactory instances, only one for each database connection
      *
      * Keys are the database configuration name
-     * 
+     *
      * @var array $_factories
      */
     private static $_factories = array();
@@ -41,7 +41,7 @@ class PDOFactory implements Interfaces\DataFactory {
      * The keys are the SQL query strings. This is used to ensure that if the
      * same SQL is requested multiple times the statement will only be prepared
      * once. Each element of the array will be a different ORM_PDOStatement.
-     * 
+     *
      * @var array $_statements
      */
     private $_statements;
@@ -51,13 +51,13 @@ class PDOFactory implements Interfaces\DataFactory {
      * @var PDO $_db
      */
     private $_db;
-    
+
     /**
      * Description of the database type
      * @var string $_databaseType
      */
     private $_databaseType;
-    
+
     /**
      * Store the datatypes and field names after being looked up
      * @var array $_knownTables
@@ -81,7 +81,7 @@ class PDOFactory implements Interfaces\DataFactory {
      * pass = "password"
      * prefix = "pgsql" # optional DSN prefix (default='mysql')
      * @endcode
-     * 
+     *
      * <i>Alternative Method:</i>
      * @code
      * [database]
@@ -101,7 +101,7 @@ class PDOFactory implements Interfaces\DataFactory {
      *
      * @throws ORMPDOInvalidDatabaseConfigurationException if
      *      configuration details are not present or invalid
-     * 
+     *
      * @param string $databaseConfig
      *      Name of the group to load from the Configuration (normally this would
      *      be "database").
@@ -133,38 +133,38 @@ class PDOFactory implements Interfaces\DataFactory {
             throw new \ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException( "[$databaseConfig] ".$e->getMessage() );
         }
     }
-    
+
     /**
      * Use the database prefix as the database "type"
-     * 
+     *
      * Sets the $_databaseType property
-     * 
+     *
      * @param string $dsn
      *      The database connection string
      */
     private function _setDatabaseType( &$dsn ) {
         list( $this->_databaseType, ) = explode( ':', $dsn, 2 );
-        
+
         if ( $this->_databaseType == 'sqlsrv' ) {
             $dsn = preg_replace( array('/host=/','/dbname=/'), array('Server=', 'Database='), $dsn );
         }
     }
-    
+
     /**
      * Get the type of database this Factory is connected to
-     * 
+     *
      * \note Rough- just uses the DSN prefix
-     * 
+     *
      * @return string
      *      Database type as a string
      */
     public function databaseType() {
         return $this->_databaseType;
     }
-    
+
     /**
      * Get the PDO object behind this object
-     * 
+     *
      * @return PDO
      */
     public function PDO() {
@@ -189,7 +189,7 @@ class PDOFactory implements Interfaces\DataFactory {
      * $query->execute();
      * // at this point $query === $anotherQuery
      * @endcode
-     * 
+     *
      * @param string $sql
      *      The SQL to prepare
      * @param string $database
@@ -202,10 +202,10 @@ class PDOFactory implements Interfaces\DataFactory {
      */
     public static function Get( $sql, $database = self::DEFAULT_DATABASE, $callingClass = null ) {
         $factory = self::GetFactory( $database );
-        
+
         return $factory->statement( $sql );
     }
-    
+
     private function _convertToCompatibleSQL( $sql ) {
         switch( $this->databaseType() ) {
         case 'sqlsrv':
@@ -220,14 +220,14 @@ class PDOFactory implements Interfaces\DataFactory {
         default:
             $compatibleSql = $sql;
         }
-        
+
         return $compatibleSql;
     }
 
     /**
      * Get (and set if required) the prepared statement
-     * 
-     * @param string $sql 
+     *
+     * @param string $sql
      *      The SQL to prepare
      * @return ORM_PDOStatement
      */
@@ -237,11 +237,11 @@ class PDOFactory implements Interfaces\DataFactory {
                 $this->getStatement($sql) :
                 $this->setStatement($sql);
     }
-    
+
     /**
      * Check to see whether a matching prepared statement has already been prepared
      * for the supplied SQL
-     * 
+     *
      * @param string $sql
      *      The SQL to prepare
      * @return boolean
@@ -265,7 +265,7 @@ class PDOFactory implements Interfaces\DataFactory {
 
     /**
      * Retrieve a prepared statement
-     * 
+     *
      * @param string $sql
      *      The SQL statement required
      * @return ORM_PDOStatement
@@ -304,7 +304,7 @@ class PDOFactory implements Interfaces\DataFactory {
         if ( !isset(self::$_factories[$database]) ) {
             self::$_factories[$database] = new PDOFactory($database);
         }
-        
+
         return self::$_factories[$database];
     }
 
@@ -337,22 +337,22 @@ class PDOFactory implements Interfaces\DataFactory {
 
         return $profiles;
     }
-    
+
     /**
      * Get the names of each field from the database table structure
-     * 
+     *
      * @param string $table
-     *      The table name 
+     *      The table name
      * @return array
      *      Field names in a numerically indexed array
      */
     public function fieldNames( $table ) {
         return array_keys( $this->describeTable($table) );
     }
-    
+
     /**
      * Get a description of a field in the table
-     * 
+     *
      * @throws FieldDoesNotExistException if the field requested does not exist
      * @param string $table
      *      The table name
@@ -362,21 +362,21 @@ class PDOFactory implements Interfaces\DataFactory {
      */
     public function describeField( $table, $field ) {
         $fields = $this->describeTable($table);
-        
+
         if(array_key_exists($field, $fields) ) {
             return $fields[$field];
         } else {
             throw new FieldDoesNotExistException("Field $field does not exist in $table");
         }
     }
-    
+
     /**
      * Get a desciption of all the fields and their field types from the given table
-     * 
+     *
      * @todo Improve this so that it is easier to add to and maintain
-     * 
+     *
      * @param string $table
-     *      Table name 
+     *      Table name
      * @return array
      *      Keys will be field names and values will be field descriptions
      */
@@ -397,13 +397,13 @@ class PDOFactory implements Interfaces\DataFactory {
                 $this->_knownTables[$table] = $this->_describeTableMysql( $table );
             }
         }
-        
+
         return $this->_knownTables[$table];
     }
-    
+
     /**
      * Get the column names and datatypes from a MySQL database
-     * 
+     *
      * @param string $table
      *      Table name
      * @return array
@@ -418,13 +418,13 @@ class PDOFactory implements Interfaces\DataFactory {
         foreach( $result as $fieldPropreties ) {
             $fields[$fieldPropreties['Field']] = $fieldPropreties['Type'];
         }
-        
+
         return $fields;
     }
-    
+
     /**
      * Get the column names and datatypes from a Postgres database
-     * 
+     *
      * @todo implement fetching datatypes
      * @param string $table
      *      Table name
@@ -440,10 +440,10 @@ class PDOFactory implements Interfaces\DataFactory {
             return $row['column_name'];
         }, $result );
     }
-    
+
     /**
      * Get the column names and datatypes from a MS SQL database
-     * 
+     *
      * @todo implement fetching datatypes
      * @param string $table
      *      Table name
@@ -459,10 +459,10 @@ class PDOFactory implements Interfaces\DataFactory {
             return $row['COLUMN_NAME'];
         }, $result );
     }
-    
+
     /**
      * Get the column names and datatypes from a SQLite database
-     * 
+     *
      * @todo implement fetching datatypes
      * @param string $table
      *      Table name
