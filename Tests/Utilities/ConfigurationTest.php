@@ -5,13 +5,15 @@
  * @author jarrod.swift
  */
 namespace ORM\Utilities;
+
+use PHPUnit_Framework_TestCase;
 use \ORM\Utilities\Configuration;
 
 /**
  * Test class for Configuration.
  * 
  */
-class ConfigurationTest extends \FlexibleORMTests\ORMTest {
+class ConfigurationTest extends PHPUnit_Framework_TestCase {
 
     /**
      * Clear and reload the Configuration details before each test
