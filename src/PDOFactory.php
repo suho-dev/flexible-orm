@@ -415,8 +415,8 @@ class PDOFactory implements Interfaces\DataFactory {
         $result = $query->fetchAll( PDO::FETCH_ASSOC );
 
         $fields = array();
-        foreach( $result as $fieldPropreties ) {
-            $fields[$fieldPropreties['Field']] = $fieldPropreties['Type'];
+        foreach( $result as $fieldProperties ) {
+            $fields[$fieldProperties['Field']] = $fieldProperties['Type'];
         }
 
         return $fields;
