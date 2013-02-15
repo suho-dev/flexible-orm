@@ -6,6 +6,7 @@
 namespace ORM;
 use ORM\Exceptions\ORMInvalidStaticMethodException;
 use ORM\Exceptions\FieldDoesNotExistException;
+use ORM\Exceptions\ORMInsertException;
 
 
 /**
@@ -776,6 +777,10 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $properties = $this->_includedFields( static::DescribeModel() );
         $fields     = static::TranslatePropertiesToFields($properties);
         $df         = static::DataFactory();
+
+        if (count($properties) == 0) {
+            throw new ORMInsertException("Attempt to insert into a table without setting any fields.");
+        }
 
         $sql    = "INSERT INTO `$table` (`".implode('`, `', $fields)."`)";
         $sql    .= " VALUES ( :".implode(', :', $properties)." )";
