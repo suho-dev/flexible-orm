@@ -14,6 +14,8 @@ use ORM\ORM_Model;
  * A simple Model using a separate sqlite database
  */
 class AlternateCarSqlite extends ORM_Model {
+    const CLASS_NAME = __CLASS__;
+
     const DATABASE  = 'sqliteDB';
     const TABLE     = 'cars';
 }
