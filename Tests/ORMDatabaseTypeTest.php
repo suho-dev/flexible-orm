@@ -5,11 +5,13 @@
  */
 namespace FlexibleORMTests;
 
+use PHPUnit_Framework_TestCase;
+
 /**
  * Description of ORMDatabaseTypeTest
  *
  */
-abstract class ORMDatabaseTypeTest extends ORMTest {
+abstract class ORMDatabaseTypeTest extends PHPUnit_Framework_TestCase {
     protected $carClass         = '/ORM/Mock/Car';
     protected $databaseConfig   = 'database';
 
@@ -49,7 +51,6 @@ abstract class ORMDatabaseTypeTest extends ORMTest {
         $foo->colour    = "Orange";
         $this->assertTrue( $foo->save() );
         
-        echo "Looking for {$foo->id()}\n";
         $savedCar = $class::Find( $foo->id() );
         
         $this->assertEquals( $foo->brand, $savedCar->brand );
