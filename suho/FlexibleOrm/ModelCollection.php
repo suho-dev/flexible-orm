@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM;
+namespace Suho\FlexibleOrm;
 /**
  * The ModelCollection class is used as a container for multiple ORM_Interface classes
  * 

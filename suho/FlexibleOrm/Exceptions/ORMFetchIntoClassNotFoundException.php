@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Exceptions;
+namespace Suho\FlexibleOrm\Exceptions;
 
 /**
  * Raised when the class specifiec for fetching into is not defined

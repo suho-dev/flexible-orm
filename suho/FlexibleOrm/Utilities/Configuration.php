@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Utilities;
+namespace Suho\FlexibleOrm\Utilities;
 
 /**
  * The Configuration class is a simple class to keep all application settings in.

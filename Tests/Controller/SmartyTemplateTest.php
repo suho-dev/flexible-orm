@@ -4,7 +4,7 @@
  * @author jarrod.swift
  */
 namespace ORM\Controller;
-use ORM\Controller\SmartyTemplate;
+use Suho\FlexibleOrm\Controller\SmartyTemplate;
 
 require_once '../ORMTest.php';
 

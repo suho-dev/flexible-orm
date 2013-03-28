@@ -1,7 +1,7 @@
 <?php
 namespace FlexibleORMTests;
 
-use ORM\PDOFactory;
+use Suho\FlexibleOrm\PDOFactory;
 
 require_once 'ORMTest.php';
 

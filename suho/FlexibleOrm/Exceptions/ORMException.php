@@ -6,7 +6,7 @@
 /**
  * Custom flexible-orm exceptions
  */
-namespace ORM\Exceptions;
+namespace Suho\FlexibleOrm\Exceptions;
 
 /**
  * Basic exception for flexible-orm

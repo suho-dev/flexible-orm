@@ -1,6 +1,6 @@
 <?php
 namespace FlexibleORMTests\Mock;
-use ORM\Controller\Session;
+use Suho\FlexibleOrm\Controller\Session;
 
 /**
  * Extend the Session class to allow the removal of the singleton instance

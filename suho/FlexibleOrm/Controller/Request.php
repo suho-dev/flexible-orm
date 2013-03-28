@@ -3,10 +3,10 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Controller;
-use ORM\Controller\Request\Variables;
+namespace Suho\FlexibleOrm\Controller;
+use Suho\FlexibleOrm\Controller\Request\Variables;
 use \LogicException;
-use ORM\Interfaces\RequestData;
+use Suho\FlexibleOrm\Interfaces\RequestData;
 
 /**
  * Represents the request parameters

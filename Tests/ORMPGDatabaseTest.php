@@ -7,7 +7,7 @@
  */
 namespace FlexibleORMTests;
 
-use ORM\Utilities\Configuration;
+use Suho\FlexibleOrm\Utilities\Configuration;
 use PDO;
 
 require_once 'ORMTest.php';

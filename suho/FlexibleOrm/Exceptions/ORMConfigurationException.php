@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Exceptions;
+namespace Suho\FlexibleOrm\Exceptions;
 
 /**
  * Thrown by problems with the Configuration class

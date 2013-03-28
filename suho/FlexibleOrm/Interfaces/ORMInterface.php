@@ -6,7 +6,7 @@
  * @package ORM
  * @author Jarrod Swift
  */
-namespace ORM\Interfaces;
+namespace Suho\FlexibleOrm\Interfaces;
 /**
  * The interface to define the minimum external methods implemented
  * by an ORM object.

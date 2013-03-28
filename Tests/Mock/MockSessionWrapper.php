@@ -4,7 +4,7 @@
  * @author jarrod.swift
  */
 namespace FlexibleORMTests\Mock;
-use ORM\Interfaces\SessionWrapper;
+use Suho\FlexibleOrm\Interfaces\SessionWrapper;
 /**
  * Description of MockSessionWrapper
  *

@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM;
+namespace Suho\FlexibleOrm;
 
 /**
  * An abstract class which defines the actions of an

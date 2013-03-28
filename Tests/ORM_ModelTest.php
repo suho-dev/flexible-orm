@@ -8,7 +8,7 @@
 namespace FlexibleORMTests;
 
 use FlexibleORMTests\Mock;
-use ORM\PDOFactory;
+use Suho\FlexibleOrm\PDOFactory;
 
 require_once 'ORMTest.php';
 

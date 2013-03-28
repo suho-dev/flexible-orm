@@ -1,6 +1,6 @@
 <?php
 namespace FlexibleORMTests\Mock\AlternateController;
-use ORM\Controller\BaseController;
+use Suho\FlexibleOrm\Controller\BaseController;
 
 /**
  * Description of Cars

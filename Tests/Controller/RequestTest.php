@@ -4,7 +4,7 @@
  * @author jarrod.swift
  */
 namespace ORM\Controller;
-use ORM\Controller\Request;
+use Suho\FlexibleOrm\Controller\Request;
 
 require_once '../ORMTest.php';
 

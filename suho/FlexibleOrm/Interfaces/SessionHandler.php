@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Interfaces;
+namespace Suho\FlexibleOrm\Interfaces;
 
 /**
  * Simple interface to define a session handler

@@ -4,7 +4,7 @@
  * @author jarrod.swift
  */
 namespace FlexibleORMTests\Mock;
-use ORM\ORM_Model;
+use Suho\FlexibleOrm\ORM_Model;
 /**
  * Description of Owner
  *

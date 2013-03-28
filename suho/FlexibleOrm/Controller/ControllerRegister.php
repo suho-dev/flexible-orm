@@ -3,9 +3,9 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Controller;
-use ORM\Interfaces\ClassRegister;
-use ORM\Interfaces\Controller;
+namespace Suho\FlexibleOrm\Controller;
+use Suho\FlexibleOrm\Interfaces\ClassRegister;
+use Suho\FlexibleOrm\Interfaces\Controller;
 
 /**
  * Register of controllers

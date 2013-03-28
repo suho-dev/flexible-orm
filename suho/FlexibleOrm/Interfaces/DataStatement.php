@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Interfaces;
+namespace Suho\FlexibleOrm\Interfaces;
 /**
  * All prepared statements returned by a DataFactory class must implement this
  * interface

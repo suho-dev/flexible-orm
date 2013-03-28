@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Utilities;
+namespace Suho\FlexibleOrm\Utilities;
 
 /**
  * Simple class top allow the Object-oriented method of accessing configuration

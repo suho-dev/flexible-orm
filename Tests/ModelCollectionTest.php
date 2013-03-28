@@ -6,8 +6,8 @@
  */
 namespace FlexibleORMTests;
 
-use ORM\ModelCollection;
-use ORM\PDOFactory;
+use Suho\FlexibleOrm\ModelCollection;
+use Suho\FlexibleOrm\PDOFactory;
 
 require_once 'ORMTest.php';
 

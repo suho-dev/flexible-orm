@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\SDB;
+namespace Suho\FlexibleOrm\SDB;
 
 /**
  * An alternative DataFactory for use with Amazon SDB backed models

@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Controller;
+namespace Suho\FlexibleOrm\Controller;
 use \ORM\Interfaces\Template;
 use \ORM\Interfaces\Controller;
 use \ORM\Interfaces\RequestData;

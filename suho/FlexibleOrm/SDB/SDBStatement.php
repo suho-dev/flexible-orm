@@ -3,16 +3,16 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\SDB;
+namespace Suho\FlexibleOrm\SDB;
 
-use ORM\Exceptions\ORMFetchException;
-use ORM\Exceptions\ORMFetchIntoClassNotFoundException;
-use ORM\Exceptions\ORMFetchIntoException;
-use ORM\Exceptions\ORMInsertException;
-use ORM\Exceptions\ORMPDOException;
-use ORM\Exceptions\ORMUpdateException;
-use ORM\Interfaces\DataStatement;
-use ORM\ModelCollection;
+use Suho\FlexibleOrm\Exceptions\ORMFetchException;
+use Suho\FlexibleOrm\Exceptions\ORMFetchIntoClassNotFoundException;
+use Suho\FlexibleOrm\Exceptions\ORMFetchIntoException;
+use Suho\FlexibleOrm\Exceptions\ORMInsertException;
+use Suho\FlexibleOrm\Exceptions\ORMPDOException;
+use Suho\FlexibleOrm\Exceptions\ORMUpdateException;
+use Suho\FlexibleOrm\Interfaces\DataStatement;
+use Suho\FlexibleOrm\ModelCollection;
 
 /**
  * Mimick the behaviour of ORM_PDOStatement for AmazonSDB

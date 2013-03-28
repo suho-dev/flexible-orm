@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\SDB;
+namespace Suho\FlexibleOrm\SDB;
 
 use \ORM\Utilities\Cache\APCCache;
 

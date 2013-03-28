@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM;
+namespace Suho\FlexibleOrm;
 
 /**
  * Represents an array of anything

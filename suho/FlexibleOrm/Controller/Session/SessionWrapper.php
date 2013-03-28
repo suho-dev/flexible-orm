@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Controller\Session;
+namespace Suho\FlexibleOrm\Controller\Session;
 use \ArrayObject;
 
 /**

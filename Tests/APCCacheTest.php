@@ -6,7 +6,7 @@
  */
 namespace FlexibleORMTests;
 
-use ORM\Utilities\Cache\APCCache;
+use Suho\FlexibleOrm\Utilities\Cache\APCCache;
 
 require_once dirname(__FILE__) . '/ORMTest.php';
 

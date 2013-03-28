@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM;
+namespace Suho\FlexibleOrm;
 /**
  * An ORM Model class that implements caching on Find/FindAll actions and keeps
  * the cache updated on save() actions.

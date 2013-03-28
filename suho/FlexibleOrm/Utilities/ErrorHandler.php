@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Utilities;
+namespace Suho\FlexibleOrm\Utilities;
 use \ORM\Exceptions\PHPErrorException;
 use \ORM\Exceptions\PHPErrorNoticeException;
 use \ORM\Exceptions\PHPFatalErrorException;

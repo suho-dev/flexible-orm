@@ -4,8 +4,8 @@ namespace FlexibleORMTests;
 use FlexibleORMTests\Mock\CachedCar;
 use FlexibleORMTests\Mock\CachedElephant;
 use FlexibleORMTests\Mock\CachedOwner;
-use ORM\PDOFactory;
-use ORM\Utilities\Cache\APCCache;
+use Suho\FlexibleOrm\PDOFactory;
+use Suho\FlexibleOrm\Utilities\Cache\APCCache;
 use Owner;
 
 require_once 'ORMTest.php';

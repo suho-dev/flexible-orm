@@ -3,9 +3,9 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\SDB;
+namespace Suho\FlexibleOrm\SDB;
 
-use ORM\ORM_Model;
+use Suho\FlexibleOrm\ORM_Model;
 use ReflectionClass;
 use ReflectionProperty;
 

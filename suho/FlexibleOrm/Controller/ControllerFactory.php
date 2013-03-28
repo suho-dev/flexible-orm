@@ -3,9 +3,9 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Controller;
-use ORM\Exceptions\ControllerDoesNotExistException;
-use ORM\Interfaces\ClassRegister;
+namespace Suho\FlexibleOrm\Controller;
+use Suho\FlexibleOrm\Exceptions\ControllerDoesNotExistException;
+use Suho\FlexibleOrm\Interfaces\ClassRegister;
 use ReflectionClass;
 
 /**

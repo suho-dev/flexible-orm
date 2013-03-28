@@ -4,7 +4,7 @@
  * @author jarrod.swift
  */
 namespace FlexibleORMTests\Mock;
-use ORM\Undoable\UndoableModel;
+use Suho\FlexibleOrm\Undoable\UndoableModel;
 /**
  * Description of AlternateCar
  *

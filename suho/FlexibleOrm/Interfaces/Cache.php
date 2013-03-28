@@ -6,7 +6,7 @@
 /**
  * Contains all defined flexible-orm interfaces
  */
-namespace ORM\Interfaces;
+namespace Suho\FlexibleOrm\Interfaces;
 /**
  * Very simple cache interface, the main purpose of which is to allow simple switching
  * between alternative caching methods, such as APCCache and Memcached.

@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Utilities;
+namespace Suho\FlexibleOrm\Utilities;
 use \ORM\Interfaces\DebugLog;
 
 /**

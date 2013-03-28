@@ -3,8 +3,8 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Exceptions;
-use ORM\Controller\BaseController;
+namespace Suho\FlexibleOrm\Exceptions;
+use Suho\FlexibleOrm\Controller\BaseController;
 
 /**
  * Raised when an Controller action either doesn't exist or is not publicly

@@ -4,9 +4,9 @@
  * @author jarrod.swift
  * @version 2.0
  */
-namespace ORM;
-use ORM\Exceptions\IncludePathDoesNotExistException;
-use ORM\Exceptions\IncludePathIsNotADirectoryException;
+namespace Suho\FlexibleOrm;
+use Suho\FlexibleOrm\Exceptions\IncludePathDoesNotExistException;
+use Suho\FlexibleOrm\Exceptions\IncludePathIsNotADirectoryException;
 
 /**
  * Simple autoloading class for ORM

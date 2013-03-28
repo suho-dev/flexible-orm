@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Controller;
+namespace Suho\FlexibleOrm\Controller;
 use \Smarty;
 
 /**

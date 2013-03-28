@@ -1,7 +1,7 @@
 <?php
 namespace FlexibleORMTests;
 
-use ORM\ObjectCollection;
+use Suho\FlexibleOrm\ObjectCollection;
 
 require_once 'ORMTest.php';
 

@@ -7,7 +7,7 @@
  * Mock object classes for testing
  */
 namespace FlexibleORMTests\Mock;
-use ORM\ORM_Model;
+use Suho\FlexibleOrm\ORM_Model;
 
 
 

@@ -2,7 +2,7 @@
 /**
  * Namespace for included Cache implementations
  */
-namespace ORM\Utilities\Cache;
+namespace Suho\FlexibleOrm\Utilities\Cache;
 
 /**
  * This is an empty cache object, ie it implements the interface but does not cache

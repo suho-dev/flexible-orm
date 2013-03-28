@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Interfaces;
+namespace Suho\FlexibleOrm\Interfaces;
 
 /**
  * Interface for SQL prepared statement factory classes

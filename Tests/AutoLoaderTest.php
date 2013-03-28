@@ -7,8 +7,8 @@
 namespace FlexibleORMTests;
 
 use Mock_Zend_TestClass;
-use ORM\AutoLoader;
-use ORM\Utilities\Configuration;
+use Suho\FlexibleOrm\AutoLoader;
+use Suho\FlexibleOrm\Utilities\Configuration;
 
 require_once dirname(__FILE__) . '/ORMTest.php';
 

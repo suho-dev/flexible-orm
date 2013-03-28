@@ -3,12 +3,12 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM;
+namespace Suho\FlexibleOrm;
 
-use ORM\Exceptions\ORMFetchIntoClassNotFoundException;
-use ORM\Exceptions\ORMFetchIntoRelatedClassNotFoundException;
-use ORM\Exceptions\ORMFindByInvalidFieldException;
-use ORM\Exceptions\ORMPDOException;
+use Suho\FlexibleOrm\Exceptions\ORMFetchIntoClassNotFoundException;
+use Suho\FlexibleOrm\Exceptions\ORMFetchIntoRelatedClassNotFoundException;
+use Suho\FlexibleOrm\Exceptions\ORMFindByInvalidFieldException;
+use Suho\FlexibleOrm\Exceptions\ORMPDOException;
 use PDO;
 use PDOException;
 use PDOStatement;

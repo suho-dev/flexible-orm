@@ -6,7 +6,7 @@
 /**
  * Amazon Simple DB resources
  */
-namespace ORM\SDB;
+namespace Suho\FlexibleOrm\SDB;
 use \ORM\Utilities\Configuration;
 use \AmazonSDB;
 

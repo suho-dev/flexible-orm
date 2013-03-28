@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Interfaces;
+namespace Suho\FlexibleOrm\Interfaces;
 
 /**
  * Interface that must be implemented by controller classes that you wish to use

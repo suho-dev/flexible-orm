@@ -8,9 +8,9 @@
  */
 namespace FlexibleORMTests;
 
-use ORM\AutoLoader;
-use ORM\Utilities\Cache\APCCache;
-use ORM\Utilities\Configuration;
+use Suho\FlexibleOrm\AutoLoader;
+use Suho\FlexibleOrm\Utilities\Cache\APCCache;
+use Suho\FlexibleOrm\Utilities\Configuration;
 use PHPUnit_Framework_TestCase;
 
 error_reporting(E_ALL);

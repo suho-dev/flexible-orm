@@ -1,7 +1,7 @@
 <?php
 namespace FlexibleORMTests;
 
-use ORM\Utilities\Debug;
+use Suho\FlexibleOrm\Utilities\Debug;
 
 require_once 'ORMTest.php';
 

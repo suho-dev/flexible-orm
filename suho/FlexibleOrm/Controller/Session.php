@@ -4,11 +4,11 @@
  * @author Pierre Dumuid <pierre.dumuid@sustainabilityhouse.com.au>
  * @author Jarrod Swift <jarrod.swift@sustainabilityhouse.com.au>
  */
-namespace ORM\Controller;
+namespace Suho\FlexibleOrm\Controller;
 use \LogicException;
 use \BadMethodCallException;
-use ORM\Interfaces\SessionWrapper;
-use ORM\Exceptions\IncorrectSessionLockIndexException;
+use Suho\FlexibleOrm\Interfaces\SessionWrapper;
+use Suho\FlexibleOrm\Exceptions\IncorrectSessionLockIndexException;
 
 /**
  * A wrapper for the session variables

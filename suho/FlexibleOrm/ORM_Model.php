@@ -3,9 +3,9 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM;
-use ORM\Exceptions\ORMInvalidStaticMethodException;
-use ORM\Exceptions\FieldDoesNotExistException;
+namespace Suho\FlexibleOrm;
+use Suho\FlexibleOrm\Exceptions\ORMInvalidStaticMethodException;
+use Suho\FlexibleOrm\Exceptions\FieldDoesNotExistException;
 
 
 /**

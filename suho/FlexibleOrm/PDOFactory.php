@@ -3,11 +3,11 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM;
+namespace Suho\FlexibleOrm;
 use \PDO;
-use ORM\Utilities\Configuration;
-use ORM\Exceptions\ORMPDOInvalidDatabaseConfigurationException;
-use ORM\Exceptions\FieldDoesNotExistException;
+use Suho\FlexibleOrm\Utilities\Configuration;
+use Suho\FlexibleOrm\Exceptions\ORMPDOInvalidDatabaseConfigurationException;
+use Suho\FlexibleOrm\Exceptions\FieldDoesNotExistException;
 
 /**
  * A singleton database managing class that acts as a factory for prepared

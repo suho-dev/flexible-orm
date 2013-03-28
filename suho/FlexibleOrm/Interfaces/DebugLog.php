@@ -6,7 +6,7 @@
  * @package ORM
  * @author Jarrod Swift
  */
-namespace ORM\Interfaces;
+namespace Suho\FlexibleOrm\Interfaces;
 
 /**
  * Interface for classes used to store debug logs

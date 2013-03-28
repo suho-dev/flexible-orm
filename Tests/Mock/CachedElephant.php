@@ -8,7 +8,7 @@
  * and open the template in the editor.
  */
 namespace FlexibleORMTests\Mock;
-use ORM\CachedORMModel;
+use Suho\FlexibleOrm\CachedORMModel;
 /**
  * Description of CachedElephant
  *

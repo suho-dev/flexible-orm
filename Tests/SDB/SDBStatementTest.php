@@ -4,8 +4,8 @@
  */
 namespace FlexibleORMTests\SDB;
 
-use ORM\SDB\SDBFactory;
-use ORM\SDB\SDBStatement;
+use Suho\FlexibleOrm\SDB\SDBFactory;
+use Suho\FlexibleOrm\SDB\SDBStatement;
 use FlexibleORMTests\Mock;
 use FlexibleORMTests\ORMTest;
 

@@ -3,7 +3,7 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Utilities\Cache;
+namespace Suho\FlexibleOrm\Utilities\Cache;
 use \ORM\Interfaces\Cache;
 
 /**

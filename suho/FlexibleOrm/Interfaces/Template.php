@@ -3,7 +3,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-namespace ORM\Interfaces;
+namespace Suho\FlexibleOrm\Interfaces;
 
 /**
  * Defines the interface for templating classes for use with controller

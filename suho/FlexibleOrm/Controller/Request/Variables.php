@@ -6,7 +6,7 @@
 /**
  * HTTP request handling
  */
-namespace ORM\Controller\Request;
+namespace Suho\FlexibleOrm\Controller\Request;
 
 /**
  * Read-only variable access with filters and defaults

@@ -1,6 +1,6 @@
 <?php
 namespace ORM\Utilities;
-use ORM\Utilities\ErrorHandler;
+use Suho\FlexibleOrm\Utilities\ErrorHandler;
 
 require_once '../ORMTest.php';
 
