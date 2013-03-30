@@ -4,8 +4,9 @@
  * @file
  * @author jarrod.swift
  */
-namespace ORM\Utilities;
-use \ORM\Utilities\Configuration;
+namespace Suho\FlexibleOrm\Utilities;
+
+use Tests\Suho\FlexibleOrm\ORMTest;
 
 require_once '../ORMTest.php';
 
@@ -13,14 +14,14 @@ require_once '../ORMTest.php';
  * Test class for Configuration.
  * 
  */
-class ConfigurationTest extends \FlexibleORMTests\ORMTest {
+class ConfigurationTest extends ORMTest {
 
     /**
      * Clear and reload the Configuration details before each test
      */
     protected function setUp() {
         Configuration::Clear();
-        Configuration::Load('../test.ini');
+        Configuration::Load("$this->pathToTestRoot/test.ini");
     }
 
     public function testValueNull() {
@@ -42,11 +43,11 @@ class ConfigurationTest extends \FlexibleORMTests\ORMTest {
     }
 
     public function testCall() {
-        $this->assertEquals( 'root', Configuration::database('user') );
+        $this->assertEquals( 'test_user', Configuration::database('user') );
     }
 
     public function testCallOO() {
-        $this->assertInstanceOf( '\ORM\Utilities\ConfigurationGroup', Configuration::test() );
+        $this->assertInstanceOf( __NAMESPACE__.'\ConfigurationGroup', Configuration::test() );
         $this->assertEquals('value', Configuration::test()->property);
     }
 
@@ -54,4 +55,4 @@ class ConfigurationTest extends \FlexibleORMTests\ORMTest {
         $this->assertNull( Configuration::test()->non_existant );
     }
 }
-?>
+
