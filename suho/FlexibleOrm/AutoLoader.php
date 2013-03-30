@@ -140,10 +140,14 @@ class AutoLoader {
      *      for these packages
      */
     public function setPackageLocations( array $packages ) {
-        $this->_packageLocations = $packages;
+        $this->_packageLocations = array(
+           str_replace("\\", "\\\\", __NAMESPACE__) => __DIR__,
+        );
         
-        if( !array_key_exists(__NAMESPACE__ ,$this->_packageLocations) ) {
-            $this->_packageLocations[__NAMESPACE__] = __DIR__;
+        foreach( $packages as $package => $location ) {
+            $escapedPackage = str_replace("\\", "\\\\", $package);
+            
+            $this->_packageLocations[$escapedPackage] = $location;
         }
     }
 
@@ -173,9 +177,14 @@ class AutoLoader {
      *      True if succesfully found
      */
     public function loadZend( $class ) {
-        $pathName = str_replace( array('_', '\\'), '/', $class );
+        $pathName   = str_replace( array('_', '\\'), '/', $class );
+        $include    = $this->locatePackage(str_replace( '_', '\\', $class ));
         
-        if ( $this->_locateInIncludePath($pathName) ) {
+        if ( $include ) {
+            require "$include.php";
+            return true;
+            
+        } elseif ( $this->_locateInIncludePath($pathName) ) {
             require "$pathName.php";
             return true;
         }
@@ -212,10 +221,6 @@ class AutoLoader {
      */
     public function locatePackage( $class ) {
         foreach ( $this->_packageLocations as $package => $path ) {
-            if (strpos($package, "\\") !== false) {
-                $package = str_replace("\\", "\\\\", $package);
-            }
-
             if ( preg_match("/^\\\?$package\\\(.*)$/", $class, $matches ) ) {
                 return $path.'/'.str_replace('\\', '/', $matches[1]);
             }

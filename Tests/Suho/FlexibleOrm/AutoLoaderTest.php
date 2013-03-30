@@ -4,11 +4,10 @@
  * @file
  * @author jarrod.swift
  */
-namespace FlexibleORMTests;
+namespace Suho\FlexibleOrm;
 
 use Mock_Zend_TestClass;
-use Suho\FlexibleOrm\AutoLoader;
-use Suho\FlexibleOrm\Utilities\Configuration;
+use Tests\Suho\FlexibleOrm\ORMTest;
 
 require_once dirname(__FILE__) . '/ORMTest.php';
 
@@ -22,14 +21,22 @@ class AutoLoaderTest extends ORMTest {
      */
     protected $autoloader;
     
+    private $defaultPackageLocations;
+    
     function setUp() {
-        $this->autoloader = new AutoLoader( Configuration::packages()->toArray() );
+        $this->defaultPackageLocations = array(
+            'Suho\FlexibleOrm' => $this->pathToFlexibleOrm,
+            'Suho\Roborater'   => '/sites/roborater',
+            'Mock'             => "$this->pathToTestRoot/Mock",
+        );
+        
+        $this->autoloader = new AutoLoader($this->defaultPackageLocations);
     }
     
     function testLocate() {
         $this->assertEquals(
-            realpath(__DIR__.'/../src/Utilities/Configuration.php'),
-            $this->autoloader->locate( 'ORM\Utilities\Configuration')
+            realpath("$this->pathToFlexibleOrm/Utilities/Configuration.php"),
+            $this->autoloader->locate( __NAMESPACE__.'\Utilities\Configuration')
         );
 
         $this->assertEquals(
@@ -38,19 +45,23 @@ class AutoLoaderTest extends ORMTest {
         );
 
         $this->assertEquals(
-            './Mock/Owner.php',
+            "$this->pathToTestRoot/Mock/Owner.php",
             $this->autoloader->locate('Mock\Owner')
         );
     }
     
     function testResetPackageLocations() {
-        $this->autoloader->setPackageLocations(array(
+        $expected = array(
             'Helpdesk'  => '/server/projects/helpdesk'
-        ));
+        );
+        
+        $this->autoloader->setPackageLocations($expected);
+        
+        $expected[str_replace("\\", "\\\\", __NAMESPACE__)] = $this->defaultPackageLocations[__NAMESPACE__];
         
         $this->assertEquals(
-            '/server/projects/helpdesk/models/user.php',
-            $this->autoloader->locate('Helpdesk\Models\User')
+            $expected,
+            $this->autoloader->getPackageLocations()
         );
     }
 
@@ -65,8 +76,12 @@ class AutoLoaderTest extends ORMTest {
 
     function testLocatePackage() {
         $this->assertEquals(
-            '/server/projects/controller.1.1/',
-            $this->autoloader->locatePackage('\Controller\\')
+            '/sites/roborater/Simulation',
+            $this->autoloader->locatePackage('Suho\Roborater\Simulation')
+        );
+        $this->assertEquals(
+            "{$this->defaultPackageLocations['Mock']}/Zend/TestClass",
+            $this->autoloader->locatePackage('Mock\Zend\TestClass')
         );
     }
     
@@ -84,13 +99,6 @@ class AutoLoaderTest extends ORMTest {
     }
     
     /**
-     * Get an array of included paths
-     */
-    private function _getIncludePaths() {
-        return explode( PATH_SEPARATOR, get_include_path() );
-    }
-    
-    /**
      * Ensure that adding the path twice does not result in the inlcude_path
      * having the same path in it twice.
      * 
@@ -104,38 +112,19 @@ class AutoLoaderTest extends ORMTest {
     }
     
     /**
-     * @expectedException \ORM\Exceptions\IncludePathDoesNotExistException
+     * @expectedException \Suho\FlexibleOrm\Exceptions\IncludePathDoesNotExistException
      */
     function testAddIncludePathInvalid() {
         $this->autoloader->addIncludePath('/would/be/suprising/if/this/existed');
     }
     
     /**
-     * @expectedException \ORM\Exceptions\IncludePathIsNotADirectoryException
+     * @expectedException \Suho\FlexibleOrm\Exceptions\IncludePathIsNotADirectoryException
      */
     function testAddIncludePathFile() {
         $this->autoloader->addIncludePath( __FILE__ );
     }
  
-    function testGetPackageLocations() {
-        $packageLocations = $this->autoloader->getPackageLocations();
-        $this->assertTrue( array_key_exists('Controller', $packageLocations) );
-        $this->assertTrue( array_key_exists('Treehouse', $packageLocations) );
-        $this->assertEquals( '/server/projects/treehouse', $packageLocations['Treehouse']);
-    }
-    
-    /**
-     * Hard to test more than it has added to the autoloader stack
-     */
-    function testRegister() {
-        $originalStack      = spl_autoload_functions();
-        $originalStackSize  = count( $originalStack );
-        
-        $this->autoloader->register( AutoLoader::AUTOLOAD_STYLE_BOTH );
-        
-        $this->assertEquals( $originalStackSize+2, count(spl_autoload_functions()) );
-    }
-    
     function testLoadZend() {
         $this->assertTrue( 
             $this->autoloader->loadZend('Mock_Zend_TestClass'),
@@ -151,5 +140,12 @@ class AutoLoaderTest extends ORMTest {
             $this->autoloader->loadZend('Mock_Zend_AnotherTestClass'),
             'loadZend was able to locate Mock_Zend_AnotherTestClass, which should not exist'
         );
+    }
+    
+    /**
+     * Get an array of included paths
+     */
+    private function _getIncludePaths() {
+        return explode( PATH_SEPARATOR, get_include_path() );
     }
 }
