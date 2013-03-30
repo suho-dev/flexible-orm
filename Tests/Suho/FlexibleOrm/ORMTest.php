@@ -16,11 +16,6 @@ error_reporting(E_ALL);
 
 //require_once 'AWSSDKforPHP/sdk.class.php';
 
-//if ( function_exists('apc_clear_cache') ) {
-//    $cache = new APCCache();
-//    $cache->flush();
-//}
-
 /**
  * Description of ORMTestClass
  *

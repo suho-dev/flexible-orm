@@ -4,7 +4,7 @@
  * @author jarrod.swift
  */
 namespace Suho\FlexibleOrm\Utilities;
-use \ORM\Interfaces\DebugLog;
+use Suho\FlexibleOrm\Interfaces\DebugLog;
 
 /**
  * Simple class to help with debugging tasks

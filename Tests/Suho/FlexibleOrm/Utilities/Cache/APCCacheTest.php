@@ -4,11 +4,17 @@
  * @file
  * @author jarrod.swift
  */
-namespace FlexibleORMTests;
+namespace Suho\FlexibleOrm\Utilities\Cache;
 
-use Suho\FlexibleOrm\Utilities\Cache\APCCache;
+use Tests\Suho\FlexibleOrm\ORMTest;
 
-require_once dirname(__FILE__) . '/ORMTest.php';
+require_once  '../../ORMTest.php';
+
+ini_set('apc.enable_cli', 'true');
+
+if ( !function_exists('apc_clear_cache') ) {
+    die("APC Not available");
+}
 
 /**
  * Test class for APCCache.

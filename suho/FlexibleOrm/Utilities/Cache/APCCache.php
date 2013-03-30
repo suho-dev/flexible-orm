@@ -4,7 +4,8 @@
  * @author jarrod.swift
  */
 namespace Suho\FlexibleOrm\Utilities\Cache;
-use \ORM\Interfaces\Cache;
+
+use Suho\FlexibleOrm\Interfaces\Cache;
 
 /**
  * Object-oriented wrapper for APCcache

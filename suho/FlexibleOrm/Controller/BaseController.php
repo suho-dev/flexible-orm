@@ -4,9 +4,9 @@
  * @author jarrod.swift
  */
 namespace Suho\FlexibleOrm\Controller;
-use \ORM\Interfaces\Template;
-use \ORM\Interfaces\Controller;
-use \ORM\Interfaces\RequestData;
+use Suho\FlexibleOrm\Interfaces\Template;
+use Suho\FlexibleOrm\Interfaces\Controller;
+use Suho\FlexibleOrm\Interfaces\RequestData;
 use \ORM\Exceptions\InvalidActionException;
 
 /**
