@@ -8,6 +8,7 @@ use \ORM\Interfaces\Template;
 use \ORM\Interfaces\Controller;
 use \ORM\Interfaces\RequestData;
 use \ORM\Exceptions\InvalidActionException;
+use \ORM\Utilities\PHPObject;
 
 /**
  * Simple controller class for implementing a MVC stack
@@ -224,14 +225,8 @@ abstract class BaseController implements Controller {
      * 
      */
     private function _assignTemplateVariables() {
-        $publicPropertiesFunction = (function( $controller ) {
-            $vars = get_object_vars($controller);
+        $properties = PHPObject::GetPublicProperties($this);
 
-            return array_keys($vars);
-        });
-        
-        $properties = $publicPropertiesFunction( $this );
-        
         foreach ( $properties as $property ) {
             $this->_template->assign( $property, $this->$property );
         }
