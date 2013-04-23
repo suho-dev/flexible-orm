@@ -1,0 +1,27 @@
+{
+    "name": "suho/flexible-orm",
+     "authors": [
+        {
+            "name": "Jarrod Swift",
+            "email": "jarrod.swift@suho.com.au",
+            "role": "Developer"
+        },
+        {
+            "name": "Pierre Dumuid",
+            "email": "pierre.dumuid@suho.com.au",
+            "role": "Developer"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/pmdumuid/flexible-orm.git"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    }
+}
