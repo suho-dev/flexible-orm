@@ -42,7 +42,7 @@ class ConfigurationTest extends \FlexibleORMTests\ORMTest {
     }
 
     public function testCall() {
-        $this->assertEquals( 'root', Configuration::database('user') );
+        $this->assertEquals( 'test_user', Configuration::database('user') );
     }
 
     public function testCallOO() {
@@ -54,4 +54,4 @@ class ConfigurationTest extends \FlexibleORMTests\ORMTest {
         $this->assertNull( Configuration::test()->non_existant );
     }
 }
-?>
+

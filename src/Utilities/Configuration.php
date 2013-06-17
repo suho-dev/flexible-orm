@@ -251,7 +251,7 @@ class Configuration {
      * @return
      *      The requested property value
      */
-    public static function __callStatic( $group, $arguments ) {
+    public static function __callStatic( $group, $arguments = array()) {
         if ( is_null(self::$_settings) ) {
             self::$_settings = new Configuration();
         }
