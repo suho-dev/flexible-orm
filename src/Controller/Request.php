@@ -72,6 +72,15 @@ class Request implements RequestData {
     private $_request;
     
     /**
+     * The server variable assigned to this Request
+     *
+     * Can be accessed (read-only) with <code>$request->server</code>
+     *
+     * @var Variables $_server
+     */
+    private $_server;
+
+    /**
      * A temporary array used for generating the $_request variable.
      * 
      * @see _initRequest()
@@ -94,11 +103,15 @@ class Request implements RequestData {
      * @param array $cookies 
      *      Usually this would be set to the value of \c $_COOKIES (maybe with 
      *      some modifications.
+     * @param array $server
+     *      Usually this would be set to the value of \c $_SERVER (maybe with
+     *      some modifications.
      */
-    public function __construct( array $get = array(), array $post = array(), array $cookies = array() ) {
+    public function __construct( array $get = array(), array $post = array(), array $cookies = array(), array $server = array() ) {
         $this->_get     = new Variables( $get );
         $this->_post    = new Variables( $post );
         $this->_cookies = new Variables( $cookies );
+        $this->_server  = new Variables( $server );
         
         $this->_initRequest();
     }
@@ -144,6 +157,9 @@ class Request implements RequestData {
      * @return Variables|string
      *      Either a set of variables or the value of a request variable (see
      *      usage). The value from a html form is always a string.
+     * @todo Make the default throw an deprecation notices to disallow accessing request variables.
+     *       Given that there might other variables we wish to store in this object as time goes on.
+     *       This functionallity means that we cannot easily add new variables without possibly breaking something.
      */
     public function __get( $name ) {
         switch($name) {
@@ -151,6 +167,7 @@ class Request implements RequestData {
         case 'post':    return $this->_post;
         case 'cookies': return $this->_cookies;
         case 'request': return $this->_request;
+        case 'server':  return $this->_server;
         default:
             return $this->_request->$name;
         }
