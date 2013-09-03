@@ -253,7 +253,20 @@ abstract class BaseController implements Controller {
             return $actionOutput;
         }
     }
-    
+
+    /**
+     * Get raw HTTP headers from the templating system.
+     *
+     * @param type $templateName
+     * @return array
+     */
+    public function getRawHTTPHeaders($templateName = null) {
+        if (is_null($templateName)) {
+            $templateName = $this->_templateName;
+        }
+        return $this->_template->getRawHTTPHeaders($templateName);
+    }
+
     /**
      * Redirect to another action and terminate execution
      * 

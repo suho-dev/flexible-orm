@@ -57,4 +57,16 @@ interface Template {
      *      True if it does exist
      */
     public function templateExists( $template );
+
+    /**
+     * Get an array of headers that should be set before returning the action content.
+     * This function will be called AFTER fetch
+     *
+     * @param type $template
+     *      The name of the template to fetch
+     * @return array
+     *      An array of strings that would be used with the header() function.
+     */
+    public function getRawHTTPHeaders($template);
+
 }

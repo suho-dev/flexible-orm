@@ -24,7 +24,13 @@ class SmartyTemplate extends Smarty implements \ORM\Interfaces\Template {
      * @var string $templateExtension
      */
     public $templateExtension = 'tpl';
-    
+
+    /**
+     * An array of rawHTTP Headers
+     * @var array
+     */
+    protected $_rawHTTPHeaders = array();
+
     /**
      * Override the Smarty fetch() method to allow for automatic file name 
      * extensions
@@ -51,4 +57,16 @@ class SmartyTemplate extends Smarty implements \ORM\Interfaces\Template {
     public function templateExists( $template ) {
         return parent::templateExists( "$template.{$this->templateExtension}" );
     }
+
+    /**
+     * Get an array of headers that should be set before returning the action content.
+     * This function will be called AFTER fetch.
+     *
+     * @param type $template
+     * @return type
+     */
+    public function getRawHTTPHeaders($template) {
+        return $this->_rawHTTPHeaders;
+    }
+
 }
