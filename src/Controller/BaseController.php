@@ -268,6 +268,21 @@ abstract class BaseController implements Controller {
     }
 
     /**
+     * Redirect to another URL.
+     *
+     * \note This function halts execution, nothing that occurs after it will
+     *       be run. If it did not terminate, then all code after a redirection
+     *       still occurs, probably wasting resources.
+     *
+     * @param string $url
+     *      The Location to redirect to.
+     */
+    public function redirectToURL($url) {
+        header("Location: $url");
+        die("Redirecting to $url");
+    }
+
+    /**
      * Redirect to another action and terminate execution
      * 
      * \note This function halts execution, nothing that occurs after it will 
@@ -288,9 +303,7 @@ abstract class BaseController implements Controller {
      */
     public function redirectTo( $action, $controller = null, $params = array() ) {
         $url = static::URL( $action, $controller, $params );
-        
-        header("Location: $url");
-        die("Redirecting to $url");
+        $this->redirectToURL($url);
     }
     
     /**
