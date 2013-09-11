@@ -1066,21 +1066,22 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      *      true if an existing object existed
      */
     public function load() {
-        if ( $stored_object = static::Find( $this->_id ) ) {
-            $attributes = $stored_object->attributes();
-
-            foreach ( $attributes as $attribute ) {
-                if ( !isset($this->$attribute) ) {
-                    $this->$attribute = $stored_object->$attribute;
-                }
-
-                $this->setOriginalValue($attribute, $stored_object->$attribute);
-            }
-
-            return true;
+        $stored_object = static::Find($this->_id);
+        if (!$stored_object) {
+            return false;
         }
 
-        return false;
+        $attributes = $stored_object->attributes();
+
+        foreach ( $attributes as $attribute ) {
+            if ( !isset($this->$attribute) ) {
+                $this->$attribute = $stored_object->$attribute;
+            }
+
+            $this->setOriginalValue($attribute, $stored_object->$attribute);
+        }
+
+        return true;
     }
 
     /**
