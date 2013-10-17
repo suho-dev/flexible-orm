@@ -8,25 +8,25 @@ namespace ORM;
 /**
  * An abstract class which defines the actions of an
  * ORM-like object.
- * 
+ *
  * Allows classes to be subclassed to behave like the basics of ORM_Model, but
  * without the back-end database connection. To create an Alternative to ORM_Model
  * that can be dropped in-place, use the ORM_Interface.
- * 
+ *
  */
 abstract class ORM_Core {
     /**
      * Optional array of aliases for field names in the database
-     * 
+     *
      * For example, if you have a database with fields \c my_first_address
      * and \c first_name you may wish to have them accessable through different
      * object properties:
-     * 
+     *
      * @code
      * $myClass->firstName; // references 'first_name'
      * $myClass->address;   // references 'my_first_address'
      * @endcode
-     * 
+     *
      * \n\n
      * To do this, you would define the \c $_fieldAliases variable in your class:
      * @code
@@ -37,19 +37,19 @@ abstract class ORM_Core {
      *     );
      * }
      * @endcode
-     * 
+     *
      * \note Will not affect the occasions where SQL is used directly, eg when
      *       supplying a 'where' option to a Find function. The recommendation
      *       when using SQL is to call the FieldAlias() function.
-     * 
+     *
      * @todo There should be a check for circular alias references
      * @var array $_fieldAliases
      */
     protected static $_fieldAliases = array();
-    
+
     /**
      * Array of key > values of fields with errors.
-     * 
+     *
      * @see errorMessages()
      * @var array $_errorMessages
      */
@@ -88,14 +88,14 @@ abstract class ORM_Core {
      * Get an associative array of all the values of the public attributes of this object
      *
      * Keys will be attribute names
-     * 
+     *
      * @return array
      * @see attributes()
      */
     public function values() {
         $properties = $this->attributes();
         $values     = array();
-        
+
         foreach ( $properties as $property ) {
             $values[$property] = property_exists( $this, $property ) ? $this->$property : null;
         }
@@ -105,28 +105,28 @@ abstract class ORM_Core {
 
     /**
      * Return array of all error messages
-     * 
+     *
      * If there are no error messages, this will return an empty array.
-     * 
+     *
      * The array will be associative, with the keys being object properties and
      * the values being the actual error message.
-     * 
+     *
      * <b>Usage</b>
      * @code
      * if ( !$car->save() ) {
      *     // Validation issue, echo each error message
-     *     foreach ( $car->errorMessages() as $property => $message ) { 
+     *     foreach ( $car->errorMessages() as $property => $message ) {
      *         echo "Error with the $property field - $message \n";
      *     }
-     * 
+     *
      *     // Log all the errors to a log file
      *     error_log( $car->errorMessagesString() );
      * }
      * @endcode
-     * 
-     * \note This is only populated if you use validationError(). See 
+     *
+     * \note This is only populated if you use validationError(). See
      *       \ref validation "Model Validation" for more information.
-     * 
+     *
      * @see errorMessage()
      * @return array
      */
@@ -136,11 +136,11 @@ abstract class ORM_Core {
 
     /**
      * Return a string of error messages
-     * 
+     *
      * Each error is listed comma seperated as "'PropertyName' ErrorMessage"
      *
      * See \ref validation "Model Validation" for more information.
-     * 
+     *
      * @see errorMessages()
      * @return string
      */
@@ -166,7 +166,7 @@ abstract class ORM_Core {
      *   echo "There was no error on the name field";
      * }
      * @endcode
-     * 
+     *
      * See \ref validation "Model Validation" for more information.
      *
      * @return string
@@ -190,7 +190,7 @@ abstract class ORM_Core {
      * echo $this->errorMessage( 'name' );
      * // will print 'Must be at least 5 characters long' if name was less than 5 chars long
      * @endcode
-     * 
+     *
      * See \ref validation "Model Validation" for more information.
      *
      * @param string $field
@@ -203,7 +203,7 @@ abstract class ORM_Core {
 
     /**
      * Clear all existing validation errors
-     * 
+     *
      * See \ref validation "Model Validation" for more information.
      */
     public function clearValidationErrors() {
@@ -229,20 +229,20 @@ abstract class ORM_Core {
         $changed         = array();
         $original_values = count($this->_originalValues) ? $this->_originalValues : array();
         $attributes      = $this->values();
-        
+
 
         foreach ( $attributes as $key => $value ) {
             if ( !array_key_exists( $key, $original_values ) || $original_values[$key] != $value ) {
                 $changed[] = $key;
             }
         }
-        
+
         return $changed;
     }
 
     /**
      * Get the originally fetched value of a property
-     * 
+     *
      * @param string $property
      *      Name of the property
      * @return mixed
@@ -262,7 +262,7 @@ abstract class ORM_Core {
 
     /**
      * Set an individual properties "original" value
-     * 
+     *
      * @param string $property
      *      The name of the attribute to set
      * @param mixed $value
@@ -285,30 +285,30 @@ abstract class ORM_Core {
             }
         }
     }
-    
+
     /**
      * Translate a database field name to a model property name
-     * 
+     *
      * If no alias has been defined for this field in \c $_fieldAliases then
      * the model property and field name will be identical.
-     * 
+     *
      * @see Opposite of TranslatePropertyToField()
      *      Aliases are defined in $_fieldAliases
      * @param string $fieldName
      *      The field name in the database
-     * @return string 
+     * @return string
      *      Model property name
      */
     public static function TranslateFieldToProperty( $fieldName ) {
         return isset(static::$_fieldAliases[$fieldName]) ? static::$_fieldAliases[$fieldName] : $fieldName;
     }
-    
+
     /**
      * Translate a model property name to a database field name
-     * 
+     *
      * If no alias has been defined in \c $_fieldAliases then the database
      * field name will be identical to the model property name.
-     * 
+     *
      * @see $_fieldAliases
      *      Opposite of TranslateFieldToProperty()
      * @param string $propertyName
@@ -321,10 +321,10 @@ abstract class ORM_Core {
         $fieldName = array_search( $propertyName, static::$_fieldAliases );
         return $fieldName === false ? $propertyName : $fieldName;
     }
-    
+
     /**
      * An alias for TranslatePropertyToField()
-     *  
+     *
      * @param string $propertyName
      *      The property name in the model
      * @return string
@@ -333,22 +333,22 @@ abstract class ORM_Core {
     public static function FieldAlias( $propertyName ) {
         return static::TranslatePropertyToField( $propertyName );
     }
-    
+
     /**
      * Translate an array of properties to a matching array of field names
-     * 
+     *
      * @see TranslatePropertyToField()
      * @param array $properties
      * @return array
      */
     public static function TranslatePropertiesToFields( array $properties ) {
         $className = get_called_class();
-        
+
         return array_map(function($property) use($className) {
             return $className::TranslatePropertyToField( $property );
         }, $properties);
     }
-    
+
     /**
      * Get the full namespaced class name for this class
      * @return string
