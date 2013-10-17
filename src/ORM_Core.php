@@ -97,10 +97,20 @@ abstract class ORM_Core {
         $values     = array();
 
         foreach ( $properties as $property ) {
-            $values[$property] = property_exists( $this, $property ) ? $this->$property : null;
+            $values[$property] = $this->_propertyExists($property) ? $this->$property : null;
         }
 
         return $values;
+    }
+
+    /**
+     * This function is enables the class to be extended by an alternate care-taker of the values. (i.e. over-ride of the __get, and __set methods).
+     *
+     * @param type $name
+     * @return type
+     */
+    protected function _propertyExists($name) {
+        return property_exists($this, $name);
     }
 
     /**
