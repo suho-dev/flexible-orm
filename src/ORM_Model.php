@@ -663,14 +663,20 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * @see _update(), _create()
      *
      * @param boolean $forceCreate
-     *      Skips the load test for speed, always resulting in a new object
+     *      Skips the load test for speed, always resulting in a new object even 
+     *      when the primary key has been set. Default: \c false
+     * @param boolean $skipLoad
+     *      Skip the loading of values from the database that allows saving of
+     *      partial objects. This switch will force the object to be saved exactly
+     *      as is. Will have no effect if this is a create operation. 
+     *      Default: \c false
      * @return boolean
      *      True if successful
      */
-    public function save( $forceCreate = false) {
+    public function save( $forceCreate = false, $skipLoad = false ) {
         $this->beforeSave();
 
-        if ( !$forceCreate && isset($this->_id) && $this->load() ) {
+        if ( !$forceCreate && isset($this->_id) && ($skipLoad || $this->load()) ) {
             $result = $this->_update();
         } else {
             $result = $this->_create();
