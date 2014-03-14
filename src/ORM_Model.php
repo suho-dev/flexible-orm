@@ -665,18 +665,18 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * @param boolean $forceCreate
      *      Skips the load test for speed, always resulting in a new object even 
      *      when the primary key has been set. Default: \c false
-     * @param boolean $skipLoad
+     * @param boolean $skipLoadValues
      *      Skip the loading of values from the database that allows saving of
      *      partial objects. This switch will force the object to be saved exactly
-     *      as is. Will have no effect if this is a create operation. 
+     *      as is, allowing a model to contain \c null. Will have no effect if this is a create operation. 
      *      Default: \c false
      * @return boolean
      *      True if successful
      */
-    public function save( $forceCreate = false, $skipLoad = false ) {
+    public function save( $forceCreate = false, $skipLoadValues = false ) {
         $this->beforeSave();
 
-        if ( !$forceCreate && isset($this->_id) && ($skipLoad || $this->load()) ) {
+        if ( !$forceCreate && isset($this->_id) && $this->load($skipLoadValues) ) {
             $result = $this->_update();
         } else {
             $result = $this->_create();
@@ -1068,10 +1068,13 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
      * 
      * @todo Throw an exception if this is called on an object with no _id
      *
+     * @param boolean $skipLoadValues
+     *      Don't actually load the values, just set the original values. This 
+     *      will allow null values to remain. Default \c false.
      * @return boolean
      *      true if an existing object existed
      */
-    public function load() {
+    public function load($skipLoadValues = false) {
         $stored_object = static::Find($this->_id);
         if (!$stored_object) {
             return false;
@@ -1080,7 +1083,7 @@ abstract class ORM_Model extends ORM_Core implements Interfaces\ORMInterface {
         $attributes = $stored_object->attributes();
 
         foreach ( $attributes as $attribute ) {
-            if ( !isset($this->$attribute) ) {
+            if ( !$skipLoadValues && !isset($this->$attribute) ) {
                 $this->$attribute = $stored_object->$attribute;
             }
 
