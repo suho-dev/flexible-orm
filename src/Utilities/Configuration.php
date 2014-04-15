@@ -207,7 +207,7 @@ class Configuration {
      * @return void
      */
     private function _add( $options ) {
-        $this->_options = array_merge( $this->_options, $options );
+        $this->_options = array_replace_recursive( $this->_options, $options );
     }
 
     /**
