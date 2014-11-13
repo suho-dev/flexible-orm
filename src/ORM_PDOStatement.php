@@ -176,7 +176,7 @@ class ORM_PDOStatement extends PDOStatement implements Interfaces\DataStatement 
             foreach ( $results as $field => $value ) {
                 list( $classDestination, $property ) = explode( '.', $field, 2 );
 
-                if ( $classDestination == '' || $class == $classDestination ) {
+                if ( $classDestination === '' || $class === $classDestination || strtolower($class) === strtolower($classDestination) ) {
                     // This is the requested (base) class
                     $propertyName = $object->TranslateFieldToProperty($property);
                     $object->{$propertyName} = $value;
