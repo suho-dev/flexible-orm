@@ -242,7 +242,7 @@ abstract class BaseController implements Controller {
      * @return string
      *      The output of the template
      */
-    private function _fetchTemplate( $templateName ) {
+    protected function _fetchTemplate( $templateName ) {
         $actionOutput = $this->_template->fetch($templateName);
         
         if ( $this->_useLayout && $this->_template->templateExists(self::LAYOUT_TEMPLATE) ) {
