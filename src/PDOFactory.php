@@ -122,10 +122,18 @@ class PDOFactory implements Interfaces\DataFactory {
         $dsn        = Configuration::$databaseConfig()->dsn;
         $dsn        = $dsn ?: "$db_prefix:host={$db_host};dbname={$db_name};";
 
+        $options = [];
+
+        if (Configuration::$databaseConfig()->ssl_key) {
+            $options[PDO::MYSQL_ATTR_SSL_KEY] = Configuration::$databaseConfig()->ssl_key;
+            $options[PDO::MYSQL_ATTR_SSL_CERT] = Configuration::$databaseConfig()->ssl_cert;
+            $options[PDO::MYSQL_ATTR_SSL_CA] = Configuration::$databaseConfig()->ssl_ca;
+        }
+
         $this->_setDatabaseType( $dsn );
 
         try {
-            $this->_db = new \PDO( $dsn, $db_user, $db_pswd );
+            $this->_db = new \PDO( $dsn, $db_user, $db_pswd, $options );
             $this->_db->setAttribute( \PDO::ATTR_EMULATE_PREPARES, true);
             $this->_db->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->_db->setAttribute( \PDO::ATTR_STATEMENT_CLASS, array(__NAMESPACE__.'\ORM_PDOStatement'));
