@@ -13,10 +13,6 @@
         }
     ],
     "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/pmdumuid/flexible-orm.git"
-        }
     ],
     "require": {
         "php": ">=5.3.0"
