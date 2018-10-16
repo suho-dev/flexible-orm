@@ -21,4 +21,18 @@ class PHPObject {
         $vars = get_object_vars($controller);
         return array_keys($vars);
     }
+
+    static function GetBasenameFromClass($class) {
+        return static::CleanControllerName(
+            get_class($class)
+        );
+    }
+
+    static function GetBasenameFromClassname($className) {
+        return basename( strtolower( str_replace(
+            array('Controller', '_',    '\\'),
+            array('',           '',     '/'),
+            $className
+        )));
+    }
 }

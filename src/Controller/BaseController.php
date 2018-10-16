@@ -122,7 +122,11 @@ abstract class BaseController implements Controller {
             $this->setTemplate($template);
         }
         
-        $this->controllerName   = static::ControllerName();
+        $this->controllerName
+            = PHPObject::GetBasenameFromClassname(static::CLASS_NAME)
+                ?: PHPObject::GetBasenameFromClass($this);
+
+        // error_log("[CONTROLLER_NAME] " . $this->controllerName);
     }
     
     /**
@@ -325,7 +329,10 @@ abstract class BaseController implements Controller {
      */
     public static function URL( $action, $controller = null, $params = array() ) {
         $paramArray     = is_array($params) ? $params : array('id' => $params);
-        $controllerName = $controller ?: static::ControllerName();
+        $controllerName
+            = $controller
+            ?: PHPObject::GetBasenameFromClassname(static::CLASS_NAME)
+            ?: PHPObject::GetBasenameFromClass(get_called_class());
         
         $id     = isset($paramArray['id']) ? $paramArray['id'] : '';
         $url    = "/$controllerName/$action/$id";
@@ -344,11 +351,11 @@ abstract class BaseController implements Controller {
      *      The classname but lowercase without underscores or the word 
      *      'Controller' in it.
      */
-    public static function ControllerName() {
-        return basename( strtolower( str_replace(
-                array('Controller', '_', '\\'), array('','','/'), get_called_class() 
-        )));
-    }
+    // public static function ControllerName() {
+    //     return basename( strtolower( str_replace(
+    //             array('Controller', '_', '\\'), array('','','/'), get_class($this) 
+    //     )));
+    // }
     
     /**
      * Called before the action method is called
